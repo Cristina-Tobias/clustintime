@@ -1,4 +1,4 @@
-# template-package
+# Clustering Toolbox
 A template repo to use for new repositories.
 
 [![Latest Version](https://img.shields.io/pypi/v/template-package.svg)](https://pypi.python.org/pypi/template-package/)
