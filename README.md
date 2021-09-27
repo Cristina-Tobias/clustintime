@@ -1,72 +1,68 @@
 # Clustering Toolbox
-A template repo to use for new repositories.
 
-[![Latest Version](https://img.shields.io/pypi/v/template-package.svg)](https://pypi.python.org/pypi/template-package/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/template-package.svg)](https://pypi.python.org/pypi/template-package/)
-[![DOI](https://zenodo.org/badge/111111.svg)](https://zenodo.org/badge/latestdoi/111111)
-[![License](https://img.shields.io/badge/License-LGPL%202.1-blue.svg)](https://opensource.org/licenses/LGPL-2.1)
-[![CircleCI](https://circleci.com/gh/ME-ICA/template-package.svg?style=shield)](https://circleci.com/gh/ME-ICA/template-package)
-[![Documentation Status](https://readthedocs.org/projects/template-package/badge/?version=latest)](http://template-package.readthedocs.io/en/latest/?badge=latest)
-[![Codecov](https://codecov.io/gh/me-ica/template-package/branch/main/graph/badge.svg)](https://codecov.io/gh/me-ica/template-package)
+This toolbox contains all the functions required to run the whole project pipeline from one command
 
 ## Instructions
 
-1. Replace `template-package` with the new repo name across the whole repository.
-1. Enable the GitHub repository on Zenodo.
-1. Set up the GitHub repository on CircleCI.
-1. Set up the GitHub repository on ReadTheDocs.
-1. Make the first release on GitHub.
-    - The PyPi deployment Action will fail.
-1. Deploy to PyPi (instructions below based on [this page](https://realpython.com/pypi-publish-python-package/#publishing-to-pypi)):
-    1. `pip install twine`
-    1. `python setup.py sdist bdist_wheel`
-    1. Upload to TestPyPi:
-        1. `twine upload --repository-url https://test.pypi.org/legacy/ dist/*`
-        1. Enter TestPyPi username
-        1. Enter TestPyPi password
-    1. Upload to PyPi (if TestPyPi worked):
-        1. `twine upload dist/*`
-        1. Enter PyPi username
-        1. Enter PyPi password
-    1. Future GitHub releases should now deploy to PyPi via the Action without issue.
-1. Update the Zenodo badge now that there's a real release.
-    - You must do this _after_ deploying to PyPi because any new commits
-      after the first release will change the versioneer-managed version string.
-1. Add all important CI steps to the branch protection rules for the `main` branch.
-1. Add Integrations for the following:
-    - AllContributors
-    - Welcome
-    - CodeCov
-    - circleci-artifacts-redirector
-    - Release Drafter? Not sure if the Action can suitably replace the Integration.
+The toolbox is composed of 4 libraries:
 
-## Information about this configuration
+1. func_for_clustering.py : This file contains the main pipeline
+2. Visualization.py : This file has the necessary functions to visualise the results
+3. Clustering.py : This file contains the algorithms employed in the pipeline and is programmed to show the results of the selected algorithm
+4. Processing.py : This file has smoothing functions as well as filtering algorithms to clean the data
 
-### Continuous integration via CircleCI
 
-The default configuration uses CircleCI and make to manage testing.
-After tests are run, code coverage information is pushed to CodeCov.
-CircleCI will also build the documentation as part of CI, and an artifact redirector
-(`circleci-artifacts-redirector`) is necessary to view the rendered documentation from each PR easily.
+### func_for_clustering
 
-### Versioning with versioneer
+The required arguments for this functions are:
 
-Versioneer is used to automatically track and update version strings.
+1. The data directory
+2. The mask directory
 
-### Linting with flake8, black, and isort
+Optional arguments are:
 
-flake8, black, and isort are used to manage code style.
+1. Processing: this argument can take the values of 'double', 'RSS', 'thr' or 'window'
+2. finger_tapping: this argument can take the values of 'No' or 'Yes'. If 'Yes', the directory of the timings and TR ought to be specified
+3. window_size: necessary argument if Processing takes the value of 'window'
+4. near: necessary argument if Processing takes the value of 'RSS'
+5. thr: necessary argument if Processing takes the value of 'thr'
+6. contrast: contrast for the correlation maps
+7. dir_path: directory for the finger_tapping timings
+8. TR: TR of the data, only necessary in finger_tapping events
+9. Algorithm: the possible values are 'infomap' or 'KMeans' 
+10. thr_infomap: necessary argument if the selected algorithm is infomap
+11. n_clusters: necessary argument if the selected algorithm is KMeans
+12. save_maps: can take values of 'No' or 'Yes'
+13. saving_dir: the results and plot will be saved onto the current directory if no other are specified
 
-### Reference management with duecredit
+By default this library executes the pipeline with no processing and applies the infomap algorithm with a threshold of the 90th percentile
 
-duecredit is used to build reference lists for the codebase.
-duecredit is included as a required dependency.
+### Visualization
 
-### Documentation with Sphinx and ReadTheDocs
+This library is composed of several functions for visualization.
 
-The package documentation is built with Sphinx and we assume that the documentation will be hosted by ReadTheDocs.
+1. display_table: displays an html table 
+2. plot_labels: plots the time_series of the found clusters
+3. RSS_peaks: plots the RSS of the data and the selected peaks. It return the indexes of the selected peaks
+4. show_table: employs display_table to show a table with the clusters, the number of time-points per cluster and the relative importance of each cluster
+5. plot_two_maps: plots the comparison of the original correlation map vs the one after preprocessing
+6. Dyn: saves a DyNeuSR html of the results
 
-### Deployment to PyPi
+### Clustering
 
-The package is designed to be pip installable and hosted on PyPi.
-New releases are pushed to PyPi automatically via a GitHub Action.
+This library contains the necessary functions to carry out the clustering operations:
+
+1. save_maps: saves the results of the clustering into an specified directory
+2. findCommunities: internal algorithm of infomap
+3. K_Means: KMeans algorithm with display of results
+4. Info_Map: InfoMap algorithm with display of results
+
+### Processing
+
+This library is employed by the main pipeline to apply filters in the data:
+
+1. thr_index: employs a threshold based on percentile and removes those points below the threshold
+2. correlation_with_window: calculates the correlation of the data using a sliding window of the specified length
+3. preprocess: depending on the settings employed in the main pipeline, it will return a processed correlation map 
+
+
