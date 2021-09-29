@@ -8,16 +8,21 @@ Created on Mon Sep 27 10:16:51 2021
 import numpy as np
 import Visualization as vis
 import infomap
+import sys
 from sklearn.cluster import KMeans
 import networkx as nx # creation, manipulation and study of the structure, dynamics and functions of complex networks
 import os
 import nibabel as nib
 from nilearn.masking import apply_mask 
 from nilearn.input_data import NiftiMasker
+import pandas as pd
+import Processing as proc
+
 
 def save_maps(labels, directory, data_file, mask_file):
     data = apply_mask(data_file,mask_file) # apply mask to the fitted signal
     masker = NiftiMasker(mask_file, standardize='zscore')
+    X = masker.fit(data_file)
     unique, counts = np.unique(labels, return_counts = True) # find the labels and how many in each of them
     unique = unique[counts > 1]
     counts = counts[counts > 1]
@@ -52,7 +57,7 @@ def findCommunities(G):
     nx.set_node_attributes(G, values=communities, name='community')
     return communities
 
-def K_Means(corr_map, n_clusters, multi_tap = [], single_tap = []):
+def K_Means(corr_map, indexes, nscans ,n_clusters, multi_tap = [], single_tap = [], TR = 0.5):
     print(' ')
     print('K-Means ')
     print(' ')
@@ -61,11 +66,24 @@ def K_Means(corr_map, n_clusters, multi_tap = [], single_tap = []):
             
     KM= KMeans(n_clusters=n_clusters)
     labels = KM.fit_predict(corr_map)
-    vis.plot_labels(labels, 'Assigned clusters for K_Means',multi_tap, single_tap)
-    vis.show_table(labels)
-    return labels
+    
+    labels = np.transpose(pd.DataFrame([labels,indexes])) #Create a vector that combines the previous indexes and the labels
+    labels = labels.set_index(1)
+    
+    final_labels = np.zeros(nscans)
+    
+    # assign to each timepoint their label
+    
+    
+    for i in labels.index:
+        final_labels[i] = labels[0][i]+1
         
-def Info_Map(corr_map, thr, multi_tap = [], single_tap = []):
+
+    vis.plot_labels(final_labels, 'Assigned clusters for K_Means',multi_tap, single_tap, TR)
+    vis.show_table(final_labels)
+    return final_labels
+        
+def Info_Map(data, indexes,thr, nscans,multi_tap = [], single_tap = [], TR = 0.5):
     print(' ')
     print('InfoMap')
     print(' ')
@@ -74,19 +92,30 @@ def Info_Map(corr_map, thr, multi_tap = [], single_tap = []):
           'InfoMap uses a random walker and applies the aforementioned theories to to find regions and nodes belonging to them.')
     print(' ')
 
-    corr_smooth_w5 = corr_map.copy()
-    thr_3 = np.percentile(corr_smooth_w5, thr)
-    corr_smooth_w5[corr_smooth_w5 < thr_3] = 0
-    corr_map = corr_smooth_w5 != 0 # Find all the voxels with correlation
-    
-    G = nx.from_numpy_matrix(corr_map) # Again the binary
+    corr_map = np.nan_to_num(proc.correlation_with_window(data, 5))
+    corr_map = pd.DataFrame(corr_map).loc[indexes,indexes]
+    corr_map[corr_map < np.percentile(corr_map,thr)] = 0
+    corr_smooth_binary = corr_map != 0 # Find all the voxels with correlation
+    corr_smooth_binary = np.matrix(corr_smooth_binary)
+
+    G = nx.from_numpy_matrix(corr_smooth_binary) # Again the binary
     coms = findCommunities(G) # Clustering
-    
-    coms_labels = np.zeros((corr_map.shape[0]))
-            
+
+    coms_labels = np.zeros(corr_map.shape[0])
+
     for ii in coms:
-        coms_labels[ii] = coms[ii]
+        coms_labels[ii] = coms[ii]    
+
+    labels = np.transpose(pd.DataFrame([coms_labels,indexes]))
+    labels = labels.set_index(1)
+    
+    final_labels = np.zeros(nscans)
+    
+    for i in labels.index:
+        final_labels[int(i)] = labels[0][int(i)]+1
         
-    vis.plot_labels(coms_labels, 'Labels for the infoMap algorithm', multi_tap, single_tap)
-    vis.show_table(coms_labels)   
-    return corr_map, coms_labels     
+       
+        
+    vis.plot_labels(final_labels, 'Labels for the infoMap algorithm', multi_tap, single_tap, TR)
+    vis.show_table(final_labels)   
+    return corr_map, final_labels     

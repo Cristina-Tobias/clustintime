@@ -16,15 +16,15 @@ import Visualization as vis
 def thr_index(data, thr):
     triangle=np.triu(data, 10) #remove everything below the 20th diagonal
 
-    thr = np.percentile(abs(triangle), thr) # threshold the matrix
+    thr_triangle = np.percentile(abs(triangle), thr) # threshold the matrix
+    aux = data.copy()
 
-    triangle_thr = triangle.copy()
-    triangle_thr[abs(triangle_thr) < thr] = 0 #set to 0 everything below the thr
+    aux[abs(aux) < thr_triangle] = 0 #set to 0 everything below the thr
 
-    zeroes = np.array([list(x).count(0) for x in triangle_thr])
+    zeroes = np.array([list(x).count(0) for x in aux])
     keep = np.array(np.where(zeroes < np.percentile(zeroes,thr)))[0]
     prueba = pd.DataFrame(data).loc[keep,keep]
-    return prueba
+    return np.matrix(prueba), keep
 
 def correlation_with_window(data, window_length):
     concat_data = np.zeros((data.shape[0],data.shape[1]*(window_length + 1)))
@@ -48,11 +48,12 @@ def correlation_with_window(data, window_length):
 
     return corr_map_window
 
-def preprocess(corr_map,analysis, data, window_size = 1, near = 1, thr = 0.95, contrast = 1, single_tap = [], multi_tap = []):
-
+def preprocess(corr_map,analysis, data, window_size = 1, near = 1, thr = 95, contrast = 1, single_tap = [], multi_tap = []):
+    indexes = range(corr_map.shape[0])
     if analysis == 'thr':
-        vis.plot_two_maps(corr_map, thr_index(corr_map, thr),'Original matrix', 'Filtered matrix',[], [], contrast)
-        corr_map = thr_index(corr_map, thr)
+        aux, indexes = thr_index(corr_map, thr)
+        vis.plot_two_maps(corr_map,aux ,'Original matrix', 'Filtered matrix',[], [], contrast)
+        corr_map, indexes = thr_index(corr_map, thr)
     elif analysis == 'RSS':
         indexes = vis.RSS_peaks(corr_map, near)
         vis.plot_two_maps(corr_map, pd.DataFrame(corr_map).loc[indexes,indexes],'Original matrix', 'Filtered matrix',single_tap, multi_tap, 0.25)
@@ -63,4 +64,4 @@ def preprocess(corr_map,analysis, data, window_size = 1, near = 1, thr = 0.95, c
     elif analysis == 'window':
         vis.plot_two_maps(corr_map, correlation_with_window(data, window_size),'Original matrix', f'Correlation with sliding window size {window_size} ', single_tap, multi_tap, 0.25)
         corr_map = correlation_with_window(data, window_size)
-    return corr_map
+    return corr_map, indexes

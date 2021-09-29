@@ -33,14 +33,21 @@ def display_table(data):
     display(HTML(html))
 
 
-def plot_labels(labels, title, multi_tap = [], single_tap = []):
+def plot_labels(labels, title, multi_tap = [], single_tap = [], TR = 0.5):
     
-        plt.figure(figsize = (25, 7))
-        plt.stem(labels)
-        plt.margins(0)
-        plt.vlines(single_tap,ymin = 0, ymax = labels.max(), linewidth = 1.2, color = 'red')
-        plt.vlines(multi_tap,ymin = 0, ymax = labels.max(), linewidth = 1.2, color = 'green')
-        plt.title(title)
+    plt.figure(figsize= [32,16])
+    plt.xlim([0, len(labels)*TR])
+    plt.ylim([0,labels.max()])
+    plt.xlabel('Time in seconds', fontsize = 30)
+    plt.ylabel('# Cluster', fontsize = 30)
+    
+    for i in range(int(labels.max())):
+        prueba = np.array([0]*len(labels))
+        prueba[np.where(labels == i+1)] = labels[np.where(labels == i+1)] 
+        plt.fill_between(np.linspace(0,len(labels)*TR,len(labels)),prueba)
+
+        
+
 
 def RSS_peaks(data, near):
     RSS_1 = [np.sum(np.square(i))**0.5 for i in data]
@@ -58,7 +65,7 @@ def RSS_peaks(data, near):
     new_peaks = new_peaks[new_peaks != 0]
     new_peaks = np.array(list(set(new_peaks)))   
     plt.plot(RSS_1)
-    plt.plot(RSS_1[new_peaks])
+    plt.plot(np.array(RSS_1)[new_peaks])
     plt.title('RSS of original data vs filtered RSS')
     plt.legend(['Original RSS'], 'Filtered RSS')
     
@@ -96,7 +103,7 @@ def plot_two_maps(map_1, map_2,title_1, title_2 ,single_tap = [], multi_tap = []
     ax2.hlines(single_tap, xmin=0, xmax=limit,
                        linewidth=.7)  # Same for horizontal
     ax2.hlines(multi_tap, xmin=0, xmax=limit, linewidth=.7)
-    ax2.set_title(title_1)
+    ax2.set_title(title_2)
     ax2.set_xlim([0,limit])
     ax2.set_ylim([limit,0])
     fig.colorbar(im)
