@@ -42,17 +42,17 @@ def RSS_peaks(data, near):
     return new_peaks
 
 
-def thr_index(data, thr):
-    triangle = np.triu(data, 10)  # remove everything below the 20th diagonal
+def thr_index(corr_map, thr):
+    triangle = np.triu(corr_map, 10)  # remove everything below the 20th diagonal
 
     thr_triangle = np.percentile(abs(triangle), thr)  # threshold the matrix
-    aux = data.copy()
+    aux = corr_map.copy()
 
     aux[abs(aux) < thr_triangle] = 0  # set to 0 everything below the thr
 
     zeroes = np.array([list(x).count(0) for x in aux])
     keep = np.array(np.where(zeroes < np.percentile(zeroes, thr)))[0]
-    prueba = pd.DataFrame(data).loc[keep, keep]
+    prueba = pd.corr_mapFrame(corr_map).loc[keep, keep]
     return np.matrix(prueba), keep
 
 
