@@ -19,10 +19,10 @@ import pandas as pd
 import Processing as proc
 
 
-def save_maps(labels, directory, data_file, mask_file):
-    data = apply_mask(data_file,mask_file) # apply mask to the fitted signal
+def generate_maps(labels, directory, data_file, mask_file, prefix):
+    #data = apply_mask(data_file,mask_file) # apply mask to the fitted signal
     masker = NiftiMasker(mask_file, standardize='zscore')
-    X = masker.fit(data_file)
+    data = masker.fit(data_file)
     unique, counts = np.unique(labels, return_counts = True) # find the labels and how many in each of them
     unique = unique[counts > 1]
     counts = counts[counts > 1]
@@ -30,9 +30,9 @@ def save_maps(labels, directory, data_file, mask_file):
     for map_idx in range(len(unique)):
         mean_img = np.mean(data[labels == map_idx], axis = 0)
         mean_img_3d = masker.inverse_transform(mean_img) #Transform the averaged image into a 3D image
-        nib.save(mean_img_3d, os.path.join(directory, f'{directory}/filename_{map_idx}.nii.gz'))
-    os.system('module load afni/latest')
-    os.system(f'3drefit -space ORIG -view orig {directory}/filename_*')
+        nib.save(mean_img_3d, os.path.join(directory, f'{directory}/{prefix}_cluster_{map_idx}.nii.gz'))
+    # os.system('module load afni/latest')
+    # os.system(f'3drefit -space ORIG -view orig {directory}/filename_*')
 
 def findCommunities(G):
     """

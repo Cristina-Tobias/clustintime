@@ -10,8 +10,30 @@ Created on Mon Sep 27 09:50:31 2021
 import numpy as np
 import pandas as pd
 import Visualization as vis
+from scipy.signal import find_peaks
+import matplotlib.pyplot as plt # For graphs
 
+def RSS_peaks(data, near):
+    RSS_1 = [np.sum(np.square(i))**0.5 for i in data]
+    peaks = find_peaks(RSS_1)[0]
+    new_peaks = [0]*2*near*len(peaks)
 
+    for i in range(len(peaks)):
+        if peaks[i] == 0:
+            new_peaks[0:2*near]=range(2*near)
+        elif peaks[i] == len(RSS_1):
+             new_peaks[(len(RSS_1)-near):(len(RSS_1)+near)] = range((len(RSS_1)-near),(len(RSS_1)+near))
+        else:
+            new_peaks[(peaks[i]-near):(peaks[i]+near)] = range((peaks[i]-near),(peaks[i]+near))
+    new_peaks = np.array(new_peaks)
+    new_peaks = new_peaks[new_peaks != 0]
+    new_peaks = np.array(list(set(new_peaks)))   
+    plt.plot(RSS_1)
+    plt.plot(np.array(RSS_1)[new_peaks])
+    plt.title('RSS of original data vs filtered RSS')
+    plt.legend(['Original RSS'], 'Filtered RSS')
+    
+    return new_peaks
 
 def thr_index(data, thr):
     triangle=np.triu(data, 10) #remove everything below the 20th diagonal
@@ -48,14 +70,14 @@ def correlation_with_window(data, window_length):
 
     return corr_map_window
 
-def preprocess(corr_map,analysis, data, window_size = 1, near = 1, thr = 95, contrast = 1, single_tap = [], multi_tap = []):
+def preprocess(corr_map,analysis, data = None, window_size = 1, near = 1, thr = 95, contrast = 1, single_tap = [], multi_tap = []):
     indexes = range(corr_map.shape[0])
     if analysis == 'thr':
         aux, indexes = thr_index(corr_map, thr)
         vis.plot_two_maps(corr_map,aux ,'Original matrix', 'Filtered matrix',[], [], contrast)
         corr_map, indexes = thr_index(corr_map, thr)
     elif analysis == 'RSS':
-        indexes = vis.RSS_peaks(corr_map, near)
+        indexes = RSS_peaks(corr_map, near)
         vis.plot_two_maps(corr_map, pd.DataFrame(corr_map).loc[indexes,indexes],'Original matrix', 'Filtered matrix',single_tap, multi_tap, 0.25)
         corr_map = pd.DataFrame(corr_map).loc[indexes,indexes]            
     elif analysis == 'double':
