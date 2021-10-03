@@ -38,6 +38,7 @@ def clustintime(
     n_clusters=7,
     save_maps=False,
     saving_dir=".",
+    prefix="",
 ):
     """
     Run main workflow of clustintime.
@@ -90,6 +91,8 @@ def clustintime(
     saving_dir : str or path, optional
         Fullpath to the saving directory.
         The default is ".".
+    prefix: str
+        Prefix for the saved outcomes
 
     Returns
     -------
@@ -136,7 +139,14 @@ def clustintime(
     if algorithm == "infomap":
         corr_map_2 = corr_map.copy()
         corr_map, labels = clus.Info_Map(
-            corr_map, indexes, thr_infomap, nscans=nscans, task=task, TR=TR
+            corr_map,
+            indexes,
+            thr_infomap,
+            nscans=nscans,
+            task=task,
+            TR=TR,
+            saving_dir=saving_dir,
+            prefix=prefix,
         )
         vis.plot_two_matrixes(
             corr_map_2, corr_map, "Original correlation map", "Binary correlation map"
@@ -149,8 +159,10 @@ def clustintime(
             n_clusters=n_clusters,
             TR=TR,
             task=task,
+            saving_dir=saving_dir,
+            prefix=prefix,
         )
 
     if save_maps == True:
-        clus.generate_maps(labels, saving_dir, data_file, mask_file)
+        clus.generate_maps(labels, saving_dir, data_file, mask_file, prefix)
     vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{algorithm}.html")

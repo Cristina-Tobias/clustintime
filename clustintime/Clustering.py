@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Sep 27 10:16:51 2021
-
-@author: ctobias
+Clustering library for clustintime
 """
 import os
-import sys
 
 import infomap
 import networkx as nx  # creation, manipulation and study of the structure, dynamics and functions of complex networks
@@ -16,12 +13,31 @@ import pandas as pd
 import Processing as proc
 import Visualization as vis
 from nilearn.input_data import NiftiMasker
-from nilearn.masking import apply_mask
 from sklearn.cluster import KMeans
 
 
 def generate_maps(labels, directory, data_file, mask_file, prefix):
-    # data = apply_mask(data_file,mask_file) # apply mask to the fitted signal
+    """
+    Creates the activity maps of each cluster
+
+    Parameters
+    ----------
+    labels : numpy array
+        Array of assigned clusters.
+    directory : str or path
+        Fullpath to the saving directory.
+    data_file : str or path
+        Fullpath to the data file.
+    mask_file : str or path
+        Fullpath to the mask file.
+    prefix : str
+        Prefix for the saved files.
+
+    Returns
+    -------
+    None.
+
+    """
     masker = NiftiMasker(mask_file, standardize="zscore")
     data = masker.fit(data_file)
     unique, counts = np.unique(
@@ -38,8 +54,6 @@ def generate_maps(labels, directory, data_file, mask_file, prefix):
         nib.save(
             mean_img_3d, os.path.join(directory, f"{directory}/{prefix}_cluster_{map_idx}.nii.gz")
         )
-    # os.system('module load afni/latest')
-    # os.system(f'3drefit -space ORIG -view orig {directory}/filename_*')
 
 
 def findCommunities(G):
@@ -70,13 +84,41 @@ def findCommunities(G):
     return communities
 
 
-def K_Means(corr_map, indexes, nscans, n_clusters, multi_tap=[], single_tap=[], TR=0.5):
+def K_Means(corr_map, indexes, nscans, n_clusters, task=[], TR=0.5, saving_dir=".", prefix=""):
+    """
+    K-Means uses a pre-stablished number of centroids and iterations defined by the user.
+    The algorithms places the centroids at random locations (real or imaginary, that represent the centre of the cluster) and then allocates each data point to the nearest cluster.
+    Afterwards, it will optimise the position of those centroids in the number of iterations defined.
+
+    Parameters
+    ----------
+    corr_map : matrix
+        Correlation map of the data.
+    indexes : numpy array
+        Indexes of the relevant time-points.
+    nscans : int
+        Number of scans.
+    n_clusters : int
+        Number of clusters.
+    task : dictionary or list, optional
+        Structure containing the timings of the task. The default is [].
+    TR : float, optional
+        TR of the data. The default is 0.5.
+    saving_dir : str or path
+        Fullpath of saving directory of the results
+    prefix : str
+        Desired name for the results
+
+    Returns
+    -------
+    final_labels : numpy array
+        Assigned clusters to each time-point.
+
+    """
     print(" ")
-    print("K-Means ")
+    print("Applying K-Means ...")
     print(" ")
-    print(
-        "K-Means uses a pre-stablished number of centroids and iterations defined by the user. The algorithms places the centroids at random locations (real or imaginary, that represent the centre of the cluster) and then allocates each data point to the nearest cluster. Afterwards, it will optimise the position of those centroids in the number of iterations defined."
-    )
+
     print(" ")
 
     KM = KMeans(n_clusters=n_clusters)
@@ -93,24 +135,50 @@ def K_Means(corr_map, indexes, nscans, n_clusters, multi_tap=[], single_tap=[], 
 
     for i in labels.index:
         final_labels[i] = labels[0][i] + 1
-
-    vis.plot_labels(final_labels, "Assigned clusters for K_Means", multi_tap, single_tap, TR)
-    vis.show_table(final_labels)
+    print("K-Means applied!")
+    vis.plot_labels(final_labels, "Assigned clusters for K_Means", task, TR)
+    vis.plot_labels_2(final_labels, "Assigned clusters for K_Means", task, TR)
+    vis.show_table(final_labels, saving_dir, prefix)
     return final_labels
 
 
-def Info_Map(data, indexes, thr, nscans, multi_tap=[], single_tap=[], TR=0.5):
+def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", prefix=""):
+    """
+    InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand the flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.
+    When a random walker enters a network, the probability that it transitions between two nodes is given by its Markov transition matrix. Nonetheless, once the walker find itself inside a region, it is relatively improbable that it transitions onto another.
+    InfoMap uses a random walker and applies the aforementioned theories to to find regions and nodes belonging to them.
+
+
+    Parameters
+    ----------
+    corr_map : matrix
+        Correlation map of the data.
+    indexes : numpy array
+        Indexes of the relevant time-points.
+    thr : int
+        Percentile threshold for the binarization.
+    nscans : int
+        Number of scans.
+    task : dictionary or list, optional
+        Structure containing the timings of the task. The default is [].
+    TR : float, optional
+        TR of the data. The default is 0.5.
+    saving_dir : str or path
+        Fullpath of saving directory of the results
+    prefix : str
+        Desired name for the results
+    Returns
+    -------
+    corr_map : matrix
+        Binary correlation map.
+    final_labels : numpy array
+        Assigned clusters to each time-point.
+
+    """
     print(" ")
-    print("InfoMap")
-    print(" ")
-    print(
-        "InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand the flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.",
-        "When a random walker enters a network, the probability that it transitions between two nodes is given by its Markov transition matrix. Nonetheless, once the walker find itself inside a region, it is relatively improbable that it transitions onto another.",
-        "InfoMap uses a random walker and applies the aforementioned theories to to find regions and nodes belonging to them.",
-    )
+    print("Applying InfoMap... ")
     print(" ")
 
-    corr_map = np.nan_to_num(proc.correlation_with_window(data, 5))
     corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
     corr_map[corr_map < np.percentile(corr_map, thr)] = 0
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
@@ -132,6 +200,9 @@ def Info_Map(data, indexes, thr, nscans, multi_tap=[], single_tap=[], TR=0.5):
     for i in labels.index:
         final_labels[int(i)] = labels[0][int(i)] + 1
 
-    vis.plot_labels(final_labels, "Labels for the infoMap algorithm", multi_tap, single_tap, TR)
-    vis.show_table(final_labels)
+    print("Infomap applied")
+
+    vis.plot_labels(final_labels, "Labels for the infoMap algorithm", task, TR)
+    vis.plot_labels_2(final_labels, "Labels for the infoMap algorithm", task, TR)
+    vis.show_table(final_labels, saving_dir, prefix)
     return corr_map, final_labels
