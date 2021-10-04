@@ -80,7 +80,7 @@ def plot_labels(labels, title, task=[], TR=0.5):
         plt.vlines(task[i], 0, labels.max(), linewidth=1.2, colors=colors[i])
 
 
-def plot_labels_2(labels, title, task=[], TR=0.5):
+def plot_heatmap(labels, title, task=[], TR=0.5):
     """
     Visualization of the clusters separately
 
@@ -100,22 +100,26 @@ def plot_labels_2(labels, title, task=[], TR=0.5):
     None.
 
     """
-    colors = sns.color_palette("bright", len(task))
-    fig, axs = plt.subplots(int(labels.max()), sharex=True, figsize=[16, 32])
-
-    plt.xlabel("Time in seconds", fontsize=10)
-
+    
+    heatmatrix = np.zeros([int(labels.max()), len(labels)])
+    rownames = np.zeros([int(labels.max())]).astype(str)
+    x = np.linspace(0, len(labels) * TR, len(labels)).astype(int)
+    
     for i in range(int(labels.max())):
         selected_labels = np.array([0] * len(labels))
         selected_labels[np.where(labels == i + 1)] = 1
-        axs[i].fill_between(
-            np.linspace(0, len(labels) * TR, len(labels)), selected_labels, color="g"
-        )
-        axs[i].set_xlim([0, len(labels) * TR])
-        axs[i].set_title(f"Cluster {i + 1}")
-
-        for j in range(len(task)):
-            axs[i].vlines(task[j], 0, 1, linewidth=1.2, colors=colors[j])
+        heatmatrix[i] = selected_labels
+        rownames[i] = f'Cluster {i+1}'
+    heatmatrix = pd.DataFrame(heatmatrix,columns = x ,index = rownames)
+    colors = sns.color_palette("bright", len(task))
+    sns.heatmap(heatmatrix,  cmap = 'YlGnBu', xticklabels = 150)
+    plt.xlabel('Time in seconds', fontsize = 10)
+    for j in range(len(task)):
+        plt.vlines(task[j]/TR, 0, labels.max() ,linewidth=1.2, colors=colors[j])
+    
+    
+    
+        
 
 
 def show_table(labels, saving_dir, prefix):

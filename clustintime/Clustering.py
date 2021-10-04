@@ -137,7 +137,7 @@ def K_Means(corr_map, indexes, nscans, n_clusters, task=[], TR=0.5, saving_dir="
         final_labels[i] = labels[0][i] + 1
     print("K-Means applied!")
     vis.plot_labels(final_labels, "Assigned clusters for K_Means", task, TR)
-    vis.plot_labels_2(final_labels, "Assigned clusters for K_Means", task, TR)
+    vis.plot_heatmap(final_labels, "Assigned clusters for K_Means", task, TR)
     vis.show_table(final_labels, saving_dir, prefix)
     return final_labels
 
@@ -203,6 +203,6 @@ def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pr
     print("Infomap applied")
 
     vis.plot_labels(final_labels, "Labels for the infoMap algorithm", task, TR)
-    vis.plot_labels_2(final_labels, "Labels for the infoMap algorithm", task, TR)
+    vis.plot_heatmap(final_labels, "Labels for the infoMap algorithm", task, TR)
     vis.show_table(final_labels, saving_dir, prefix)
     return corr_map, final_labels
