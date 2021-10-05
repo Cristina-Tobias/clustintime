@@ -1,1 +1,1 @@
-"""Init for CLI of phys2bids package."""
+"""Init for CLI of clustintime package."""
