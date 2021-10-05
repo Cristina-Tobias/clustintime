@@ -179,7 +179,7 @@ def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pr
     print("Applying InfoMap... ")
     print(" ")
 
-    corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
+    corr_map = pd.DataFrame(corr_map)
     corr_map[corr_map < np.percentile(corr_map, thr)] = 0
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
     corr_smooth_binary = np.matrix(corr_smooth_binary)

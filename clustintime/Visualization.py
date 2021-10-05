@@ -100,7 +100,7 @@ def plot_heatmap(labels, title, task=[], TR=0.5):
     None.
 
     """
-    
+    plt.figure()
     heatmatrix = np.zeros([int(labels.max()), len(labels)])
     rownames = np.zeros([int(labels.max())]).astype(str)
     x = np.linspace(0, len(labels) * TR, len(labels)).astype(int)
@@ -110,10 +110,12 @@ def plot_heatmap(labels, title, task=[], TR=0.5):
         selected_labels[np.where(labels == i + 1)] = 1
         heatmatrix[i] = selected_labels
         rownames[i] = f'Cluster {i+1}'
+    
     heatmatrix = pd.DataFrame(heatmatrix,columns = x ,index = rownames)
     colors = sns.color_palette("bright", len(task))
     sns.heatmap(heatmatrix,  cmap = 'YlGnBu', xticklabels = 150)
     plt.xlabel('Time in seconds', fontsize = 10)
+    
     for j in range(len(task)):
         plt.vlines(task[j]/TR, 0, labels.max() ,linewidth=1.2, colors=colors[j])
     
@@ -144,7 +146,7 @@ def show_table(labels, saving_dir, prefix):
     table_result.to_csv(f"{saving_dir}/{prefix}_Results.csv")
 
 
-def plot_two_matrixes(map_1, map_2, title_1, title_2, task=[], contrast=1):
+def plot_two_matrixes(map_1, map_2, title_1, title_2, task=[], contrast=1, TR = 0.5):
     """
     Graphical comparison between two correlation maps
 
@@ -162,6 +164,8 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, task=[], contrast=1):
         Structure containing the times when the task is performed. The default is [].
     contrast : int, optional
         Range of values of the correlation matrixes. The default is 1.
+    TR: float, optional
+        TR of the data. The default is 0.5
 
     Returns
     -------
@@ -175,9 +179,9 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, task=[], contrast=1):
     ax1.imshow(map_1, aspect="auto", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
     # Vertical lines to delimit the instant in which the event occurs
     limit = map_1.shape[0]
-    for i in len(task):
-        ax1.vlines(task[i], ymin=0, ymax=limit, linewidth=0.7)
-        ax1.hlines(task[i], xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
+    for i in range(len(task)):
+        ax1.vlines(task[i]/TR, ymin=0, ymax=limit, linewidth=0.7)
+        ax1.hlines(task[i]/TR , xmin=0, xmax=limit, linewidth=0.7) # Same for horizontal
     ax1.set_title(title_1)
     ax1.set_xlim([0, limit])
     ax1.set_ylim([limit, 0])
@@ -186,9 +190,9 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, task=[], contrast=1):
 
     im = ax2.imshow(map_2, aspect="auto", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
     limit = map_2.shape[0]
-    for i in len(task):
-        ax2.vlines(task[i], ymin=0, ymax=limit, linewidth=0.7)
-        ax2.hlines(task[i], xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
+    for i in range(len(task)):
+        ax2.vlines(task[i]/TR, ymin=0, ymax=limit, linewidth=0.7)
+        ax2.hlines(task[i]/TR, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax2.set_title(title_2)
     ax2.set_xlim([0, limit])
     ax2.set_ylim([limit, 0])

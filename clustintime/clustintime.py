@@ -126,14 +126,15 @@ def clustintime(
 
     if processing != None:
         corr_map, indexes = proc.preprocess(
-            corr_map=corr_map,
-            analysis=processing,
-            data=data,
-            window_size=window_size,
-            near=near,
-            thr=thr,
-            contrast=contrast,
-            task=task,
+            corr_map = corr_map,
+            analysis = processing,
+            data = data,
+            window_size = window_size,
+            near = near,
+            thr = thr,
+            contrast = contrast,
+            task = task,
+            TR = TR
         )
 
     if algorithm == "infomap":
