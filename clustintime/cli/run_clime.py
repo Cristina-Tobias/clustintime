@@ -4,9 +4,8 @@
 
 import argparse
 
-from clustintime import clustintime
 
-def get_parser():
+def _get_parser():
     '''
     Parse command line inputs for clustintime
 
@@ -140,7 +139,7 @@ def get_parser():
 
 if __name__ == '__main__':
     
-    raise RuntimeError('clustintime/clu/run_clime.py should not be run directly; \n'
+    raise RuntimeError('clustintime/cli/run_clime.py should not be run directly; \n'
                        'Please `pip install` clustintime and use the' 
                        '`clustintime` command')
    

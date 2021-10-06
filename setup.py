@@ -13,7 +13,7 @@ def main():
 
     import versioneer
 
-    ver_file = op.join("template-package", "info.py")
+    ver_file = op.join("clustintime", "info.py")
     with open(ver_file) as f:
         exec(f.read())
     vars = locals()
@@ -22,7 +22,7 @@ def main():
     cmdclass = versioneer.get_cmdclass()
 
     pkg_data = {
-        "template-package": [
+        "clustintime": [
             "tests/data/*",
         ]
     }

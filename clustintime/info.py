@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Get version
 spec = importlib.util.spec_from_file_location(
-    "_version", op.join(op.dirname(__file__), "template-package/_version.py")
+    "_version", op.join(op.dirname(__file__), "_version.py")
 )
 _version = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(_version)
@@ -28,23 +28,23 @@ for author in authors:
 # Get package description from README
 # Since this file is executed from ../setup.py, the path to the README is determined by the
 # location of setup.py.
-readme_path = Path(__file__).parent.joinpath("README.md")
+readme_path = Path(__file__).parent.joinpath("../README.md")
 longdesc = readme_path.open().read()
 
 # Fields
-AUTHOR = "ME-ICA developers"
-COPYRIGHT = "Copyright 2021, ME-ICA developers"
+AUTHOR = "Cristina Tobias"
+COPYRIGHT = "Copyright 2021, Cristina-Tobias"
 CREDITS = author_names
-LICENSE = "LGPL 2.1"
+LICENSE = "GPL 3.0"
 MAINTAINER = ""
 EMAIL = ""
 STATUS = "Prototype"
-URL = "https://github.com/ME-ICA/template-package"
-PACKAGENAME = "template-package"
+URL = "https://github.com/Cristina-Tobias/clustintime"
+PACKAGENAME = "clustintime"
 DESCRIPTION = ""
 LONGDESC = longdesc
 
-DOWNLOAD_URL = "https://github.com/ME-ICA/{name}/archive/{ver}.tar.gz".format(
+DOWNLOAD_URL = "https://github.com/Cristina-Tobias/{name}/archive/{ver}.tar.gz".format(
     name=PACKAGENAME, ver=VERSION
 )
 
@@ -55,6 +55,16 @@ REQUIRES = [
     "nilearn",
     "numpy>=1.15",
     "scipy>=1.3.3",
+    "pandas>=1.2.4",
+    "seaborn",
+    "dyneusr",
+    "IPython",
+    "kmapper",
+    "sklearn",
+    "umap",
+    "scipy",
+    "networkx",
+    "infomap"
 ]
 
 TESTS_REQUIRES = [
