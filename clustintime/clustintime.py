@@ -12,16 +12,16 @@ It requires python 3.6 or above, as well as the modules:
 """
 
 
-import Clustering as clus
+import clustintime.Clustering as clus
 
 # Libraries
 import numpy as np
-import Processing as proc
-import Visualization as vis
+import clustintime.Processing as proc
+import clustintime.Visualization as vis
 import sys
 from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
-from cli.run_clime import _get_parser
+from clustintime.cli.run_clime import _get_parser
 
 
 

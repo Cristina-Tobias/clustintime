@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Get version
 spec = importlib.util.spec_from_file_location(
-    "_version", op.join(op.dirname(__file__), "_version.py")
+    "_version", op.join(op.dirname(__file__), "clustintime/_version.py")
 )
 _version = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(_version)
@@ -28,7 +28,7 @@ for author in authors:
 # Get package description from README
 # Since this file is executed from ../setup.py, the path to the README is determined by the
 # location of setup.py.
-readme_path = Path(__file__).parent.joinpath("../README.md")
+readme_path = Path(__file__).parent.joinpath("README.md")
 longdesc = readme_path.open().read()
 
 # Fields
@@ -86,7 +86,7 @@ EXTRA_REQUIRES = {
     "tests": TESTS_REQUIRES,
 }
 
-ENTRY_POINTS = {}
+ENTRY_POINTS = {'console_scripts': 'clustintime= clustintime.clustintime:_main'}
 
 # Enable a handle to install all extra dependencies at once
 EXTRA_REQUIRES["all"] = list(set([v for deps in EXTRA_REQUIRES.values() for v in deps]))

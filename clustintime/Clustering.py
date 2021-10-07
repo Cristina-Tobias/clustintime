@@ -10,10 +10,11 @@ import networkx as nx  # creation, manipulation and study of the structure, dyna
 import nibabel as nib
 import numpy as np
 import pandas as pd
-import Processing as proc
-import Visualization as vis
+
+import clustintime.Visualization as vis
 from nilearn.input_data import NiftiMasker
 from sklearn.cluster import KMeans
+from nilearn.masking import apply_mask
 
 
 def generate_maps(labels, directory, data_file, mask_file, prefix):
@@ -39,7 +40,8 @@ def generate_maps(labels, directory, data_file, mask_file, prefix):
 
     """
     masker = NiftiMasker(mask_file, standardize="zscore")
-    data = masker.fit(data_file)
+    masker.fit(data_file)
+    data = apply_mask(data_file, mask_file)
     unique, counts = np.unique(
         labels, return_counts=True
     )  # find the labels and how many in each of them
