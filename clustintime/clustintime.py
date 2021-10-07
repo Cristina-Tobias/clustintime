@@ -18,8 +18,11 @@ import Clustering as clus
 import numpy as np
 import Processing as proc
 import Visualization as vis
+import sys
 from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
+from cli.run_clime import _get_parser
+
 
 
 def clustintime(
@@ -27,7 +30,7 @@ def clustintime(
     mask_file,
     *timings_file,
     processing=None,
-    timings=True,
+    timings=False,
     window_size=1,
     near=1,
     thr=95,
@@ -167,3 +170,10 @@ def clustintime(
     if save_maps == True:
         clus.generate_maps(labels, saving_dir, data_file, mask_file, prefix)
     vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{algorithm}.html")
+
+def _main(argv = None):
+    print(sys.argv)
+    options = _get_parser().parse_args(argv)
+    clustintime(**vars(options))
+    if __name__ == '__main__':
+        _main(sys.argv[1:])
