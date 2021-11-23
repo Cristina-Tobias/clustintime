@@ -35,12 +35,12 @@ def RSS_peaks(corr_map, near):
     new_peaks = [0] * 2 * near * len(peaks)
 
     for i in range(len(peaks)):
-        if peaks[i] == 0:
-            new_peaks[0 : 2 * near] = range(2 * near)
-        elif peaks[i] == len(RSS_1):
-            new_peaks[(len(RSS_1) - near) : (len(RSS_1) + near)] = range(
-                (len(RSS_1) - near), (len(RSS_1) + near)
-            )
+        if peaks[i] <= near:
+            new_peaks[0 : near] = range(near)
+        elif peaks[i] >= len(RSS_1)-near:
+            new_peaks[(len(RSS_1) - near) : peaks[i]] = range(
+                (len(RSS_1) - near), peaks[i]
+                )            
         else:
             new_peaks[(peaks[i] - near) : (peaks[i] + near)] = range(
                 (peaks[i] - near), (peaks[i] + near)
@@ -48,14 +48,17 @@ def RSS_peaks(corr_map, near):
     new_peaks = np.array(new_peaks)
     new_peaks = new_peaks[new_peaks != 0]
     new_peaks = np.array(list(set(new_peaks)))
+    plt.figure(figsize = [16, 8])
     plt.plot(RSS_1)
     
     filtered_plot = np.array([np.mean(RSS_1)]*len(RSS_1))
-    filtered_plot[new_peaks] = np.array(RSS_1)[new_peaks]
+    filtered_plot[[new_peaks]] = np.array(RSS_1)[new_peaks]
     
     plt.plot(filtered_plot)
     plt.title("RSS of original data vs filtered RSS")
-    plt.legend(["Original RSS"], "Filtered RSS")
+    plt.legend(["Original RSS","Filtered RSS"])
+    plt.xlabel('TR', fontsize = 10)
+    plt.ylabel('RSS', fontsize = 10)
 
     return new_peaks
 
@@ -79,17 +82,12 @@ def thr_index(corr_map, thr):
         Array containing the indexes of the relevant time-points.
 
     """
-    triangle = np.triu(corr_map, 10)  # remove everything below the 20th diagonal
 
-    thr_triangle = np.percentile(abs(triangle), thr)  # threshold the matrix
-    aux = corr_map.copy()
-
-    aux[abs(aux) < thr_triangle] = 0  # set to 0 everything below the thr
-
-    zeroes = np.array([list(x).count(0) for x in aux])
-    keep = np.array(np.where(zeroes < np.percentile(zeroes, thr)))[0]
-    thresh_corr_map = pd.DataFrame(corr_map).loc[keep, keep]
-    return np.matrix(thresh_corr_map), keep
+    if corr_map.max() == 0:
+        corr_map[abs(corr_map) < np.percentile(abs(corr_map),thr)] = 0  
+    else:
+        corr_map[corr_map < np.percentile(corr_map,thr)] = 0
+    return corr_map
 
 
 def correlation_with_window(data, window_length):
@@ -133,7 +131,7 @@ def correlation_with_window(data, window_length):
     return corr_map_window
 
 
-def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, contrast=1, task=[], TR = 0.5):
+def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95, contrast=1, task=[], TR = 0.5):
     """
     Main workflow for the processing algorithms
 
@@ -142,11 +140,11 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
     corr_map : matrix
         Correlation map of the data.
     analysis : str
-        Desired type of processing, the options are `double`, `thr`, `RSS`, `window`.
-    data : matrix, optional
-        fMRI data for the ẁindow` option. The default is None.
-    window_size : int, optional
-        Window size for the `window` option. The default is 1.
+        Desired type of processing, the options are `double`, `thr`, `RSS`.
+    saving_dir : str or path
+        Saving directory for figures
+    Prefix : str
+        Prefix for figure names
     near : int, optional
         Desired size of RSS peaks for the option `RSS`. The default is 1.
     thr : int, optional
@@ -168,9 +166,9 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
     """
     indexes = range(corr_map.shape[0])
     if analysis == "thr":
-        aux, indexes = thr_index(corr_map, thr)
-        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task, contrast, TR)
-        corr_map, indexes = thr_index(corr_map, thr)
+        aux = thr_index(corr_map, thr)
+        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task, contrast, TRsaving_dir = saving_dir, prefix = f'{prefix}_orig_thr_{thr}')
+        corr_map = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = RSS_peaks(corr_map, near)
         vis.plot_two_matrixes(
@@ -178,9 +176,11 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
             pd.DataFrame(corr_map).loc[indexes, indexes],
             "Original matrix",
             "Filtered matrix",
-            task,
-            contrast,
-            TR
+            task = task,
+            contrast = contrast,
+            TR = TR,
+            saving_dir = saving_dir, 
+            prefix = f'{prefix}_orig_RSS_{near}',
         )
         corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
     elif analysis == "double":
@@ -191,18 +191,11 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
             "Double correlation matrix",
             task,
             contrast,
-            TR
+            TR,
+            saving_dir = saving_dir, 
+            prefix = f'{prefix}_orig_double',
         )
         corr_map = np.nan_to_num(np.corrcoef(corr_map))
-    elif analysis == "window":
-        vis.plot_two_matrixes(
-            corr_map,
-            correlation_with_window(data, window_size),
-            "Original matrix",
-            f"Correlation with sliding window size {window_size} ",
-            task,
-            contrast,
-            TR
-        )
-        corr_map = correlation_with_window(data, window_size)
+
+
     return corr_map, indexes
