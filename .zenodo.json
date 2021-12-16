@@ -1,13 +1,13 @@
 {
     "creators": [
         {
-            "name": "The ME-ICA Community"
+            "name": "Clustintime"
         }
     ],
     "keywords": [
         "neuroimaging",
         "fMRI"
     ],
-    "license": "LGPL-2.1",
+    "license": "GPL-3.0",
     "upload_type": "software"
 }
