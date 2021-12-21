@@ -33,14 +33,29 @@ def _get_parser():
                           help = 'The name or fullpath to the file containing the mask' 
                                   'for the data',
                           required = True)
+    optional.add_argument('-com', '--component',
+                          dest = 'component',
+                          type = str,
+                          help = 'Desired component of the signal to analyze, the options are `whole`,' 
+                                 '`positive`, `negative`.',
+                          required = False,
+                          default = 'whole')
     
     optional.add_argument('-tf', '--timings-file',
-                          dest = '*timings_file',
+                          dest = 'timings_file',
                           type = str,
                           help = 'The name or fullpath to the file(s) containing the onset' 
                                   'of the tasks',
                           required = False,
-                          nargs = '*')
+                          nargs = '*',
+                          default = None)
+    optional.add_argument('-cor', '--correlation',
+                          dest = 'correlation',
+                          type = str,
+                          help = 'Desired type of correlation, the options are `standard`, `window`'
+                                 'Default is `standard`',
+                          required = False,
+                          default = 'standard')  
     
     optional.add_argument('-p', '--processing',
                           dest = 'processing',
@@ -48,15 +63,7 @@ def _get_parser():
                           help = 'The name of the desired type of processing.'
                                   'Default is None',
                           required = False,
-                          default = None)
-    
-    optional.add_argument('-t', '--timings',
-                          dest = 'timings',
-                          action = 'store_true',
-                          help = 'Use onset for the task'
-                                  'Default is not to use',
-                          required = False,
-                          default = False)
+                          default = None)     
     
     optional.add_argument('-ws', '--window-size',
                           dest = 'window_size',
@@ -103,14 +110,49 @@ def _get_parser():
                           help = 'Algorithm to be employed for clustering',
                           required = False,
                           default = 'infomap')
+    optional.add_argument('-aff', '--affinity',
+                          dest = 'affinity',
+                          type = str,
+                          help = 'Affinity to use. To see the available options see documentation of each algorithm'
+                                 'Default is `euclidean`',
+                          required = False,
+                          default = 'euclidean') 
+    
+    optional.add_argument('-li', '--linkage',
+                          dest = 'linkage',
+                          type = str,
+                          help = 'Linkage criterion for the \'Agglomerative Clustering\' algorithm. To see the available options see documentation of each algorithm'
+                                 'Default is `ward`',
+                          required = False,
+                          default = 'ward') 
     
     optional.add_argument('-nc', '--n-clusters',
                           dest = 'n_clusters',
                           type = int,
-                          help = 'When \'-alg\' takes the value of \'KMeans\', '
-                                  'it is used as the number of centroids to be employed',
+                          help = 'Number of clusters for some sklearn algorithms',
                           required = False,
                           default = 7)
+    optional.add_argument('-eps', '--eps',
+                          dest = 'eps',
+                          type = float,
+                          help = 'eps for the \'DBscan \' algorithm'
+                                 'Default is 0.3',
+                          required = False,
+                          default = 0.3) 
+    
+    optional.add_argument('-adb', '--alg-dbscan',
+                          dest = 'algorithm_dbscan',
+                          type = str,
+                          help = 'Algorithm to be used in the \'DBscan\' algorithm to define clusters'
+                                  'Default is `auto`',
+                          required = False,
+                          default = 'auto')   
+    optional.add_argument('-dam', '--damping',
+                          dest = 'damping',
+                          type = float,
+                          help = 'Damping factor in the range of [0.5, 1) for the algorithm of \'Affinity Propagation\'',
+                          required = False,
+                          default = 0.5)  
     
     optional.add_argument('-sm', '--save-maps',
                           dest = 'save_maps',
@@ -118,7 +160,7 @@ def _get_parser():
                           help = 'Save the generated maps. ' 
                                   'Default is not to save',
                           required = False,
-                          default = False)
+                          default = True)
     
     optional.add_argument('-sd', '--saving-dir',
                           dest = 'saving_dir',
@@ -134,6 +176,19 @@ def _get_parser():
                           help = 'Prefix for the saved data',
                           required = False,
                           default = '.')
+    optional.add_argument('-s', '--seed',
+                          dest = 'seed',
+                          type = int,
+                          help = 'Seed for the KMeans algorithm',
+                          required = False,
+                          default = 0)        
+    optional.add_argument('-dyn', '--dyneusr',
+                          dest = 'dyn',
+                          action = 'store_true',
+                          help = 'Generate and save DyneuSR map. ' 
+                                  'Default is not to save',
+                          required = False,
+                          default = False)
     parser._action_groups.append(optional)
     return parser
 

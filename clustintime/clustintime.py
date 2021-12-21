@@ -40,12 +40,11 @@ def clustintime(
     affinity = 'euclidean',
     linkage = 'ward',
     algorithm="infomap",
-    thr_infomap=90,
     n_clusters=7,
     eps = 0.3,
     damping = 0.5,
     algorithm_dbscan = 'auto',
-    save_maps=False,
+    save_maps=True,
     saving_dir=".",
     prefix="",
     seed=0,
@@ -94,15 +93,13 @@ def clustintime(
     algorithm : str, optional
         Desired clustering algorithm for the analysis, the options are `infomap` and `KMeans`.
         The default is "infomap".
-    thr_infomap : int, optional
-        Threshold percentile to binarize the matrix in the infomap algorithm.
-        The default is 90.
+
     n_clusters : int, optional
         Desired number of groups for the K Means algorithm.
         The default is 7.
     save_maps : bool, optional
         Boolean that indicates whether the results must be saved or not.
-        The default is False.
+        The default is True.
     saving_dir : str or path, optional
         Fullpath to the saving directory.
         The default is ".".
@@ -168,7 +165,7 @@ def clustintime(
         corr_map, labels = clus.Info_Map(
             corr_map,
             indexes,
-            thr_infomap,
+            thr,
             nscans=nscans,
             task=task,
             TR=TR,
@@ -229,7 +226,7 @@ def clustintime(
         corr_map, labels = clus.Louvain(
             corr_map,
             indexes,
-            thr_infomap,
+            thr,
             nscans=nscans,
             task=task,
             TR=TR,
@@ -244,7 +241,7 @@ def clustintime(
         corr_map, labels = clus.Louvain(
             corr_map,
             indexes,
-            thr_infomap,
+            thr,
             nscans=nscans,
             task=task,
             TR=TR,

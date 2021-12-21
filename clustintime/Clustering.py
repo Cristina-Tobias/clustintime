@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 import clustintime.Visualization as vis
+import clustintime.Processing as proc
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import OPTICS
@@ -379,7 +380,7 @@ def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pr
     print(" ")
 
     
-    corr_map[corr_map < np.percentile(corr_map, thr)] = 0
+    corr_map = proc.thr_index(corr_map, thr)
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
 
     G = nx.from_numpy_matrix(np.matrix(corr_smooth_binary))  # Again the binary
@@ -443,7 +444,7 @@ def Louvain(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pre
 
     # compute the best partition
 
-    corr_map[corr_map < np.percentile(corr_map, thr)] = 0
+    corr_map = proc.thr_index(corr_map, thr)
     
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
 
@@ -508,7 +509,7 @@ def Greedy_Mod(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", 
 
     # compute the best partition
 
-    corr_map[corr_map < np.percentile(corr_map, thr)] = 0
+    corr_map = proc.thr_index(corr_map, thr)
     
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
 

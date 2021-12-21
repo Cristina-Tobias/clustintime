@@ -83,7 +83,7 @@ def thr_index(corr_map, thr):
 
     """
 
-    if corr_map.max() == 0:
+    if corr_map.max().max() == 0:
         corr_map[abs(corr_map) < np.percentile(abs(corr_map),thr)] = 0  
     else:
         corr_map[corr_map < np.percentile(corr_map,thr)] = 0
@@ -166,8 +166,9 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
     """
     indexes = range(corr_map.shape[0])
     if analysis == "thr":
-        aux = thr_index(corr_map, thr)
-        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task, contrast, TRsaving_dir = saving_dir, prefix = f'{prefix}_orig_thr_{thr}')
+        aux = corr_map.copy()
+        aux = thr_index(aux, thr)
+        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task = task, contrast = contrast, TR= TR,saving_dir = saving_dir, prefix = f'{prefix}_orig_thr_{thr}')
         corr_map = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = RSS_peaks(corr_map, near)
@@ -189,9 +190,9 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
             np.nan_to_num(np.corrcoef(corr_map)),
             "Original matrix",
             "Double correlation matrix",
-            task,
-            contrast,
-            TR,
+            task = task,
+            contrast = contrast,
+            TR = TR,
             saving_dir = saving_dir, 
             prefix = f'{prefix}_orig_double',
         )

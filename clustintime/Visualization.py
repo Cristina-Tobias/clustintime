@@ -104,7 +104,7 @@ def plot_heatmap(labels, title ,saving_dir,prefix,task=[], TR=0.5):
     None.
 
     """
-    plt.figure(figsize = [16,8])
+    plt.figure(figsize = [8,8])
     heatmatrix = np.zeros([int(labels.max()), len(labels)])
     rownames = np.zeros([int(labels.max())]).astype(str)
     x = np.linspace(0, len(labels) * TR, len(labels)).astype(int)
