@@ -132,27 +132,7 @@ def _get_parser():
                           help = 'Number of clusters for some sklearn algorithms',
                           required = False,
                           default = 7)
-    optional.add_argument('-eps', '--eps',
-                          dest = 'eps',
-                          type = float,
-                          help = 'eps for the \'DBscan \' algorithm'
-                                 'Default is 0.3',
-                          required = False,
-                          default = 0.3) 
-    
-    optional.add_argument('-adb', '--alg-dbscan',
-                          dest = 'algorithm_dbscan',
-                          type = str,
-                          help = 'Algorithm to be used in the \'DBscan\' algorithm to define clusters'
-                                  'Default is `auto`',
-                          required = False,
-                          default = 'auto')   
-    optional.add_argument('-dam', '--damping',
-                          dest = 'damping',
-                          type = float,
-                          help = 'Damping factor in the range of [0.5, 1) for the algorithm of \'Affinity Propagation\'',
-                          required = False,
-                          default = 0.5)  
+   
     
     optional.add_argument('-sm', '--save-maps',
                           dest = 'save_maps',
@@ -161,7 +141,13 @@ def _get_parser():
                                   'Default is not to save',
                           required = False,
                           default = True)
-    
+    optional.add_argument('-con', '--consensus',
+                          dest = 'consensus',
+                          action = 'store_true',
+                          help = 'Use consensus in the clustering algorithm.'
+                                  'Default is not to use',
+                          required = False,
+                          default = '.')
     optional.add_argument('-sd', '--saving-dir',
                           dest = 'saving_dir',
                           type = str,
@@ -176,12 +162,14 @@ def _get_parser():
                           help = 'Prefix for the saved data',
                           required = False,
                           default = '.')
+    
     optional.add_argument('-s', '--seed',
                           dest = 'seed',
                           type = int,
                           help = 'Seed for the KMeans algorithm',
                           required = False,
-                          default = 0)        
+                          default = 0)  
+      
     optional.add_argument('-dyn', '--dyneusr',
                           dest = 'dyn',
                           action = 'store_true',
@@ -189,6 +177,21 @@ def _get_parser():
                                   'Default is not to save',
                           required = False,
                           default = False)
+    
+    optional.add_argument('-f', '--fir',
+                          dest = 'fir',
+                          action = 'store_true',
+                          help = 'Save the onset for FIR analysis in each cluster'
+                                  'Default is not to save',
+                          required = False,
+                          default = '.')
+    
+    optional.add_argument('-t', '--title',
+                          dest = 'Title',
+                          type = str,
+                          help = 'Title for the figures',
+                          required = False,
+                          default = '')
     parser._action_groups.append(optional)
     return parser
 
