@@ -16,8 +16,10 @@ import clustintime.Clustering as clus
 
 # Libraries
 import numpy as np
+import os
 import clustintime.Processing as proc
 import clustintime.Visualization as vis
+from scipy.signal import find_peaks
 import sys
 from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
@@ -40,15 +42,15 @@ def clustintime(
     affinity = 'euclidean',
     linkage = 'ward',
     algorithm="infomap",
+    consensus=False,
     n_clusters=7,
-    eps = 0.3,
-    damping = 0.5,
-    algorithm_dbscan = 'auto',
     save_maps=True,
     saving_dir=".",
     prefix="",
     seed=0,
-    Dyn = False
+    Dyn = False,
+    fir = False,
+    Title = ""
 ):
     """
     Run main workflow of clustintime.
@@ -93,7 +95,9 @@ def clustintime(
     algorithm : str, optional
         Desired clustering algorithm for the analysis, the options are `infomap` and `KMeans`.
         The default is "infomap".
-
+    consensus : bool, optional
+        Boolean that indicates whether to use consensus clustering in the algorithm or not.
+        The default is False.
     n_clusters : int, optional
         Desired number of groups for the K Means algorithm.
         The default is 7.
@@ -107,6 +111,8 @@ def clustintime(
         Prefix for the saved outcomes
     Dyn : bool, optional
         Generate a DyNeuSR graph. Default is `False`
+    Title: str, optional
+        Title for the graphs
 
     Returns
     -------
@@ -162,125 +168,92 @@ def clustintime(
 
     if algorithm == "infomap":
         corr_map_2 = corr_map.copy()
-        corr_map, labels = clus.Info_Map(
-            corr_map,
-            indexes,
-            thr,
-            nscans=nscans,
-            task=task,
-            TR=TR,
-            saving_dir=saving_dir,
-            prefix=prefix,
-        )
+        if consensus:
+            algorithm = clus.Info_Map
+            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+        else:
+            corr_map, labels = clus.Info_Map(
+                corr_map,
+                indexes,
+                thr
+                )
+
         vis.plot_two_matrixes(
             corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,  saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',TR= TR ,contrast = contrast
         )
     elif algorithm == "KMeans":
-        labels = clus.K_Means(
-            corr_map=corr_map,
-            indexes=indexes,
-            nscans=nscans,
-            n_clusters=n_clusters,
-            TR=TR,
-            task=task,
-            saving_dir=saving_dir,
-            prefix=prefix,
-            seed = seed
-        )
+        if consensus:
+            algorithm = clus.K_Means
+            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+        else:
+            labels = clus.K_Means(
+                corr_map=corr_map,
+                indexes=indexes,
+                nscans=nscans,
+                n_clusters=n_clusters,
+                seed = seed
+                )
     elif algorithm == 'Agglomerative':
-        labels = clus.Agglomerative_Clustering(
-            corr_map=corr_map,
-            indexes=indexes,
-            nscans=nscans,
-            n_clusters=n_clusters,
-            affinity = affinity,
-            linkage = linkage,
-            TR=TR,
-            task=task,
-            saving_dir=saving_dir,
-            prefix=prefix
-        )
-    elif algorithm == 'Affinity':
-        labels = clus.Affinity_Propagation(
-            corr_map=corr_map,
-            indexes=indexes,
-            nscans=nscans,
-            damping=damping,
-            TR=TR,
-            task=task,
-            saving_dir=saving_dir,
-            prefix=prefix
-        )
-    elif algorithm == 'Mean':
-        labels = clus.Mean_Shift(
-            corr_map=corr_map,
-            indexes=indexes,
-            nscans=nscans,
-            TR=TR,
-            task=task,
-            saving_dir=saving_dir,
-            prefix=prefix
-        )
+        if consensus:
+            algorithm = clus.Agglomerative_Clustering
+            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+        else:
+            labels = clus.Agglomerative_Clustering(
+                corr_map=corr_map,
+                indexes=indexes,
+                nscans=nscans,
+                n_clusters=n_clusters,
+                affinity = affinity,
+                linkage = linkage,
+                )
     elif algorithm == "Louvain":
         corr_map_2 = corr_map.copy()
-        corr_map, labels = clus.Louvain(
-            corr_map,
-            indexes,
-            thr,
-            nscans=nscans,
-            task=task,
-            TR=TR,
-            saving_dir=saving_dir,
-            prefix=prefix,
-        )
+        if consensus:
+            algorithm = clus.Louvain
+            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+        else:
+            corr_map, labels = clus.Louvain(
+                corr_map,
+                indexes,
+                thr,
+                nscans=nscans
+                )
         vis.plot_two_matrixes(
             corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task, saving_dir = saving_dir, prefix = f'{prefix}_orig_binary', TR= TR ,contrast = contrast
         )
     elif algorithm == "Greedy":
         corr_map_2 = corr_map.copy()
-        corr_map, labels = clus.Louvain(
-            corr_map,
-            indexes,
-            thr,
-            nscans=nscans,
-            task=task,
-            TR=TR,
-            saving_dir=saving_dir,
-            prefix=prefix,
-        )
+        if consensus:
+            algorithm = clus.Greedy_Mod
+            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+        else:
+            corr_map, labels = clus.Greedy_Mod(
+                corr_map,
+                indexes,
+                thr,
+                nscans=nscans
+                )
         vis.plot_two_matrixes(
             corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',  TR= TR ,contrast = contrast
         )
-    elif algorithm == 'DBSCAN':
-        labels = clus.dbscan(
-            corr_map=corr_map,
-            indexes=indexes,
-            nscans=nscans,
-            eps=eps,
-            metric = affinity,
-            algorithm = algorithm_dbscan,
-            TR=TR,
-            task=task,
-            saving_dir=saving_dir,
-            prefix=prefix
-        )
-    elif algorithm == 'OPTICS':
-        labels = clus.optics(
-            corr_map=corr_map,
-            indexes=indexes,
-            nscans=nscans,
-            algorithm = algorithm_dbscan,
-            TR=TR,
-            task=task,
-            saving_dir=saving_dir,
-            prefix=prefix
-        )
 
+    vis.plot_heatmap(labels, Title, task = task, TR = TR,  saving_dir = saving_dir, prefix = prefix)
+    vis.show_table(labels, saving_dir, prefix)
     if save_maps:
         clus.generate_maps(labels, saving_dir, data, masker, prefix)
     
     if Dyn:
         vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
+    if fir:
+        if os.path.exists(f'{saving_dir}/fir')==0:
+            os.mkdir(f'{saving_dir}/fir')
+        for i in range(int(max(labels))):
+            all_time_points = np.where(labels == i+1)[0]
+            difference = np.diff(all_time_points)
+            select = find_peaks(difference)[0]
+            fir_timepoints = np.insert(all_time_points[select+1],0, all_time_points[0])
+            vis.plot_heatmap(labels, f'FIR onsets for cluster {i+1}' ,f'{saving_dir}/fir',f'{prefix}_fir_{i+1}',task=[fir_timepoints*TR], TR=TR)
+            np.savetxt(f'{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D',fir_timepoints*TR)
 
 def _main(argv = None):
     print(sys.argv)

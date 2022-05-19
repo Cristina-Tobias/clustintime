@@ -10,6 +10,7 @@ import networkx as nx  # creation, manipulation and study of the structure, dyna
 import nibabel as nib
 import numpy as np
 import pandas as pd
+import random
 
 import clustintime.Visualization as vis
 import clustintime.Processing as proc
@@ -21,6 +22,7 @@ from sklearn.cluster import MeanShift
 from sklearn.cluster import AgglomerativeClustering
 from networkx.algorithms import community 
 from community import community_louvain
+
 
 
 def generate_maps(labels, directory, data, masker, prefix):
@@ -54,7 +56,8 @@ def generate_maps(labels, directory, data, masker, prefix):
 
     for map_idx in range(len(unique)):
         mean_img = np.mean(data[labels == map_idx + 1], axis=0)
-        mean_img = mean_img/mean_img.max()
+        if mean_img.min()/mean_img.max() < 0.9:
+            mean_img = mean_img/mean_img.max()
         mean_img_3d = masker.inverse_transform(
             mean_img
         )  # Transform the averaged image into a 3D image
@@ -91,8 +94,74 @@ def findCommunities(G):
     nx.set_node_attributes(G, values=communities, name="community")
     return communities
 
+def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
+    """
+    This algorithm samples the data and clusters it with a defined algorithm. With the results of each cluster, it creates a consensus matrix. 
+    The consensus matrix is then clustered a hundred times. If the results are the same in every run, that will be the returned labels.
+    If the results are not unanimous, the algorithm will return to the sampling step.   
+    
+    Parameters
+    ----------
+    corr_map : matrix
+        Correlation map of the data.
+    indexes : numpy array
+        Indexes of the relevant time-points.
+    algorithm : function
+        Algorithm to employ
 
-def K_Means(corr_map, indexes, nscans, n_clusters, task=[], TR=0.5, saving_dir=".", prefix="", seed = 0):
+
+    Returns
+    -------
+    final_labels : numpy array
+        Assigned clusters to each time-point.
+
+    """
+    npoints = len(indexes)
+    M_sum = np.zeros([npoints, npoints])
+    I_sum = np.zeros([npoints, npoints])
+    while 1:
+        for i in range(100):
+            sampling = np.sort(random.sample(range(npoints), round(npoints*0.6)))
+            I = pd.DataFrame([0]*npoints)
+            I[0][sampling] = 1
+            I_sum = I_sum + np.dot(I,np.transpose(I))  
+            data_sampled = corr_map[sampling,:][:,sampling]
+            if algorithm == Info_Map or algorithm == Greedy_Mod or algorithm == Louvain:
+                corr_mat, idx = algorithm(data_sampled, indexes, thr, nscans) 
+                idx = np.transpose(
+                    pd.DataFrame([idx, sampling])
+                    )  # Create a vector that combines the previous indexes and the labels
+            else: 
+                idx = algorithm(data_sampled, indexes, nscans, n_clusters) 
+                idx = np.transpose(
+                    pd.DataFrame([idx, sampling])
+                    )  # Create a vector that combines the previous indexes and the labels
+            idx = idx.set_index(1)
+            idx = idx[np.logical_not(np.isnan(idx[0]))]
+            labels = np.array([0]*npoints)
+            labels[sampling] = idx[0]
+            M = proc.compute_connectivity_matrix(npoints, labels) 
+        M_sum = M_sum + M
+        Consensus = np.divide(M_sum,I_sum)
+        Consensus[Consensus < proc.find_threshold_bfs(Consensus)] = 0
+        final_labels = algorithm(Consensus, indexes, 0, nscans)
+        thr = proc.find_threshold_bfs(Consensus)
+        Consensus[Consensus <= thr] = 0
+        aux = proc.compute_connectivity_matrix(npoints, final_labels[1]) 
+        boolean = True
+        for i in range(100):
+            labels = algorithm(corr_map = Consensus,indexes=indexes,thr=thr, nscans=npoints)
+            connect = proc.compute_connectivity_matrix(npoints, labels[1])
+            
+            if np.array_equal(aux, connect) == False:
+                boolean = False
+                break
+        if boolean:
+            break
+    return labels[1]
+
+
+def K_Means(corr_map, indexes, nscans, n_clusters, seed = 0):
     """
     K-Means uses a pre-stablished number of centroids and iterations defined by the user.
     The algorithms places the centroids at random locations (real or imaginary, that represent the centre of the cluster) and then allocates each data point to the nearest cluster.
@@ -108,14 +177,6 @@ def K_Means(corr_map, indexes, nscans, n_clusters, task=[], TR=0.5, saving_dir="
         Number of scans.
     n_clusters : int
         Number of clusters.
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
     seed : int
         Seed for the algorithm
 
@@ -146,13 +207,11 @@ def K_Means(corr_map, indexes, nscans, n_clusters, task=[], TR=0.5, saving_dir="
     for i in labels.index:
         final_labels[i] = labels[0][i] + 1
     print("K-Means applied!")
-    vis.plot_labels(final_labels, "Assigned clusters for K_Means", task, TR)
-    vis.plot_heatmap(final_labels, "Assigned clusters for K_Means", task = task, TR = TR,  saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
+
     return final_labels
 
 
-def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity = 'euclidean', linkage = 'ward',task=[], TR=0.5, saving_dir=".", prefix=""):
+def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity = 'euclidean', linkage = 'ward'):
     """
     Agglomerative Clustering recursively merges the pair of clusters that minimally increases a given linkage distance.
 
@@ -174,15 +233,6 @@ def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity = '
     linkage : str, optional:
         Linkage criterion to use. The linkage criterion determines which distance to use between sets of observation. The algorithm will merge the pairs of cluster that minimize this criterion.
         The options are `ward`, `complete`, `average`, `single`
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
-
 
     Returns
     -------
@@ -211,138 +261,12 @@ def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity = '
     for i in labels.index:
         final_labels[i] = labels[0][i] + 1
     print("Agglomerative Clustering applied!")
-    vis.plot_labels(final_labels, "Assigned clusters for Agglomerative Clustering", task, TR)
-    vis.plot_heatmap(final_labels, "Assigned clusters for Agglomerative Clustering", task = task, TR = TR, saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
+
     return final_labels
 
-def dbscan(corr_map, indexes, nscans, eps, metric = 'euclidean', algorithm = 'auto',task=[], TR=0.5, saving_dir=".", prefix=""):
-    """
-    Density-Based Spatial Clustering of Applications with Noise. Finds core samples of high density and expands clusters from them.
-
-    Parameters
-    ----------
-    corr_map : matrix
-        Correlation map of the data.
-    indexes : numpy array
-        Indexes of the relevant time-points.
-    nscans : int
-        Number of scans.
-    n_clusters : int
-        Number of clusters.
-    eps : float
-        The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is not a maximum bound on the distances of points within a cluster. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.
-    metric : str, optional
-        Metric used to compute the linkage. Can be `euclidean`, `l1`, `l2`, `manhattan`, `cosine`, or `precomputed`. 
-        If linkage is `ward`, only `euclidean` is accepted. 
-        If `precomputed`, a distance matrix (instead of a similarity matrix) is needed as input for the fit method.
-        The default is `euclidean`
-    algorithm : str, optional:
-        The algorithm to be used by the NearestNeighbors module to compute pointwise distances and find nearest neighbors.
-        The options are `auto`, `ball_tree`, `kd_tree`, `brute`. The default is `auto`
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
 
 
-    Returns
-    -------
-    final_labels : numpy array
-        Assigned clusters to each time-point.
-
-    """
-    print(" ")
-    print("Applying DBScan ...")
-    print(" ")
-
-    print(" ")
-
-    DBScan = DBSCAN(eps = eps, metric = metric, algorithm = algorithm).fit(corr_map)
-    labels = DBScan.labels_
-
-    labels = np.transpose(
-        pd.DataFrame([labels, indexes])
-    )  # Create a vector that combines the previous indexes and the labels
-    labels = labels.set_index(1)
-
-    final_labels = np.zeros(nscans)
-
-    # assign to each timepoint their label
-
-    for i in labels.index:
-        final_labels[i] = labels[0][i] + 1
-    print("DBScan applied!")
-    vis.plot_labels(final_labels, "Assigned clusters for DBScan", task, TR)
-    vis.plot_heatmap(final_labels, "Assigned clusters for DBScan", task = task, TR = TR, saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
-    return final_labels
-
-def optics(corr_map, indexes, nscans, algorithm = 'auto',task=[], TR=0.5, saving_dir=".", prefix=""):
-    """
-    OPTICS (Ordering Points To Identify the Clustering Structure), closely related to DBSCAN, finds core sample of high density and expands clusters from them. 
-    Unlike DBSCAN, keeps cluster hierarchy for a variable neighborhood radius. Better suited for usage on large datasets than the current sklearn implementation of DBSCAN.
-    Parameters
-    ----------
-    corr_map : matrix
-        Correlation map of the data.
-    indexes : numpy array
-        Indexes of the relevant time-points.
-    nscans : int
-        Number of scans.
-    n_clusters : int
-        Number of clusters.
-
-    algorithm : str, optional:
-        The algorithm to be used by the NearestNeighbors module to compute pointwise distances and find nearest neighbors.
-        The options are `auto`, `ball_tree`, `kd_tree`, `brute`. The default is `auto`
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
-
-
-    Returns
-    -------
-    final_labels : numpy array
-        Assigned clusters to each time-point.
-
-    """
-    print(" ")
-    print("Applying OPTICS ...")
-    print(" ")
-
-    print(" ")
-
-    optics = OPTICS(algorithm = algorithm).fit(corr_map)
-    labels = optics.labels_
-
-    labels = np.transpose(
-        pd.DataFrame([labels, indexes])
-    )  # Create a vector that combines the previous indexes and the labels
-    labels = labels.set_index(1)
-
-    final_labels = np.zeros(nscans)
-
-    # assign to each timepoint their label
-
-    for i in labels.index:
-        final_labels[i] = labels[0][i] + 1
-    print("DBScan applied!")
-    vis.plot_labels(final_labels, "Assigned clusters for DBScan", task, TR)
-    vis.plot_heatmap(final_labels, "Assigned clusters for DBScan", task = task, TR = TR, saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
-    return final_labels
-
-def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", prefix=""):
+def Info_Map(corr_map, indexes, thr, nscans):
     """
     InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand the flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.
     When a random walker enters a network, the probability that it transitions between two nodes is given by its Markov transition matrix. Nonetheless, once the walker find itself inside a region, it is relatively improbable that it transitions onto another.
@@ -359,14 +283,7 @@ def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pr
         Percentile threshold for the binarization.
     nscans : int
         Number of scans.
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
+
     Returns
     -------
     corr_map : matrix
@@ -401,12 +318,9 @@ def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pr
 
     print("Infomap applied")
 
-    vis.plot_labels(final_labels, "Labels for the infoMap algorithm", task, TR)
-    vis.plot_heatmap(final_labels, "Labels for the infoMap algorithm", task = task, TR = TR,  saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
     return corr_smooth_binary, final_labels
 
-def Louvain(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", prefix=""):
+def Louvain(corr_map, indexes, thr, nscans):
     """
     Louvain's algorithm maximises modularity and implements an extra step to ensure community properties in the network.
 
@@ -420,14 +334,7 @@ def Louvain(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pre
         Percentile threshold for the binarization.
     nscans : int
         Number of scans.
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
+ 
     Returns
     -------
     corr_map : matrix
@@ -466,12 +373,10 @@ def Louvain(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", pre
 
     print("Louvain applied")
 
-    vis.plot_labels(final_labels, "Labels for the louvain algorithm", task, TR)
-    vis.plot_heatmap(final_labels, "Labels for the louvain algorithm", task = task, TR = TR,  saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
+
     return corr_smooth_binary, final_labels
 
-def Greedy_Mod(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", prefix=""):
+def Greedy_Mod(corr_map, indexes, thr, nscans):
     """
     Greedy modularity maximises modularity.
 
@@ -485,14 +390,7 @@ def Greedy_Mod(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", 
         Percentile threshold for the binarization.
     nscans : int
         Number of scans.
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
+
     Returns
     -------
     corr_map : matrix
@@ -502,7 +400,7 @@ def Greedy_Mod(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", 
 
     """
     print(" ")
-    print("Applying Louvain... ")
+    print("Applying Greedy Modularity... ")
     print(" ")
 
 
@@ -518,8 +416,8 @@ def Greedy_Mod(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", 
 
     coms_labels = np.zeros(corr_map.shape[0])
 
-    for ii in partition:
-        coms_labels[ii] = partition[ii]
+    for num, ii in enumerate(partition):
+        coms_labels[list(ii)] = num + 1
 
     labels = np.transpose(pd.DataFrame([coms_labels, indexes]))
     labels = labels.set_index(1)
@@ -531,125 +429,6 @@ def Greedy_Mod(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", 
 
     print("Greedy Modularity applied")
 
-    vis.plot_labels(final_labels, "Labels for the Greedy Modularity algorithm", task, TR)
-    vis.plot_heatmap(final_labels, "Labels for the Greedy Modularity algorithm", task, TR,  saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
+
     return corr_smooth_binary, final_labels
 
-def Affinity_Propagation(corr_map, indexes, nscans,damping=0.5,seed = 0, task=[], TR=0.5, saving_dir=".", prefix=""):
-    """
-    AffinityPropagation creates clusters by sending messages between pairs of samples until convergence. 
-    A dataset is then described using a small number of exemplars, which are identified as those most representative of other samples. 
-    The messages sent between pairs represent the suitability for one sample to be the exemplar of the other, which is updated in response to the values from other pairs. 
-    This updating happens iteratively until convergence, at which point the final exemplars are chosen, and hence the final clustering is given.
-
-    Parameters
-    ----------
-    corr_map : matrix
-        Correlation map of the data.
-    indexes : numpy array
-        Indexes of the relevant time-points.
-    nscans : int
-        Number of scans.
-    seed : int, optional
-        Random State for the algorithm. The default is 0
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
-
-
-    Returns
-    -------
-    final_labels : numpy array
-        Assigned clusters to each time-point.
-
-    """
-    print(" ")
-    print("Applying Affinity Propagation ...")
-    print(" ")
-
-    print(" ")
-
-    Prop = AffinityPropagation(damping = damping,affinity = 'precomputed')
-    labels = Prop.fit_predict(corr_map)
-
-    labels = np.transpose(
-        pd.DataFrame([labels, indexes])
-    )  # Create a vector that combines the previous indexes and the labels
-    labels = labels.set_index(1)
-
-    final_labels = np.zeros(nscans)
-
-    # assign to each timepoint their label
-
-
-    for i in labels.index:
-        final_labels[i] = labels[0][i] + 1
-    print("Affinity Propagation applied!")
-    vis.plot_labels(final_labels, "Assigned clusters for Affinity Propagation" , task, TR)
-    vis.plot_heatmap(final_labels, "Assigned clusters for Affinity Propagation ", task = task, TR = TR, saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
-    return final_labels
-
-def Mean_Shift(corr_map, indexes, nscans, task=[], TR=0.5, saving_dir=".", prefix=""):
-    """
-    Mean shift clustering aims to discover “blobs” in a smooth density of samples. 
-    It is a centroid-based algorithm, which works by updating candidates for centroids to be the mean of the points within a given region. 
-    These candidates are then filtered in a post-processing stage to eliminate near-duplicates to form the final set of centroids.
-    Parameters
-    ----------
-    corr_map : matrix
-        Correlation map of the data.
-    indexes : numpy array
-        Indexes of the relevant time-points.
-    nscans : int
-        Number of scans.
-    seed : int, optional
-        Random State for the algorithm. The default is 0
-    task : dictionary or list, optional
-        Structure containing the timings of the task. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-    saving_dir : str or path
-        Fullpath of saving directory of the results
-    prefix : str
-        Desired name for the results
-
-
-    Returns
-    -------
-    final_labels : numpy array
-        Assigned clusters to each time-point.
-
-    """
-    print(" ")
-    print("Applying Mean Shift ...")
-    print(" ")
-
-    print(" ")
-
-    MS = MeanShift()
-    labels = MS.fit_predict(corr_map)
-
-    labels = np.transpose(
-        pd.DataFrame([labels, indexes])
-    )  # Create a vector that combines the previous indexes and the labels
-    labels = labels.set_index(1)
-
-    final_labels = np.zeros(nscans)
-
-    # assign to each timepoint their label
-
-
-    for i in labels.index:
-        final_labels[i] = labels[0][i] + 1
-    print("Mean Shift applied!")
-    vis.plot_labels(final_labels, "Assigned clusters for Mean Shift" , task, TR)
-    vis.plot_heatmap(final_labels, "Assigned clusters for Mean Shift", task = task, TR = TR, saving_dir = saving_dir, prefix = prefix)
-    vis.show_table(final_labels, saving_dir, prefix)
-    return final_labels
