@@ -205,6 +205,7 @@ def K_Means(corr_map, indexes, nscans, n_clusters, seed = 0):
     # assign to each timepoint their label
 
     for i in labels.index:
+        i=int(i)
         final_labels[i] = labels[0][i] + 1
     print("K-Means applied!")
 
@@ -259,6 +260,7 @@ def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity = '
     # assign to each timepoint their label
 
     for i in labels.index:
+        i=int(i)
         final_labels[i] = labels[0][i] + 1
     print("Agglomerative Clustering applied!")
 
