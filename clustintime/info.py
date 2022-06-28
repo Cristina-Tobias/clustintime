@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Get version
 spec = importlib.util.spec_from_file_location(
-    "_version", op.join(op.dirname(__file__), "template-package/_version.py")
+    "_version", op.join(op.dirname(__file__), "clustintime/_version.py")
 )
 _version = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(_version)
@@ -39,8 +39,8 @@ LICENSE = "LGPL 2.1"
 MAINTAINER = ""
 EMAIL = ""
 STATUS = "Prototype"
-URL = "https://github.com/ME-ICA/template-package"
-PACKAGENAME = "template-package"
+URL = "https://github.com/ME-ICA/clustintime"
+PACKAGENAME = "clustintime"
 DESCRIPTION = ""
 LONGDESC = longdesc
 

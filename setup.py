@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" template-package setup script """
+""" clustintime setup script """
 
 
 def main():
-    """ Install entry-point """
+    """Install entry-point"""
     import os.path as op
     from inspect import currentframe, getfile
     from io import open
@@ -13,7 +13,7 @@ def main():
 
     import versioneer
 
-    ver_file = op.join("template-package", "info.py")
+    ver_file = op.join("clustintime", "info.py")
     with open(ver_file) as f:
         exec(f.read())
     vars = locals()
@@ -22,7 +22,7 @@ def main():
     cmdclass = versioneer.get_cmdclass()
 
     pkg_data = {
-        "template-package": [
+        "clustintime": [
             "tests/data/*",
         ]
     }
