@@ -19,9 +19,9 @@ exclude = '''
   )/
   | get_version.py
   | versioneer.py
-  | template-package/info.py
-  | template-package/_version.py
-  | template-package/due.py
+  | clustintime/info.py
+  | clustintime/_version.py
+  | clustintime/due.py
 )
 '''
 
