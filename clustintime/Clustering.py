@@ -10,7 +10,6 @@ import networkx as nx  # creation, manipulation and study of the structure, dyna
 import nibabel as nib
 import numpy as np
 import pandas as pd
-import Processing as proc
 import Visualization as vis
 from nilearn.input_data import NiftiMasker
 from sklearn.cluster import KMeans
@@ -87,7 +86,8 @@ def findCommunities(G):
 def K_Means(corr_map, indexes, nscans, n_clusters, task=[], TR=0.5, saving_dir=".", prefix=""):
     """
     K-Means uses a pre-stablished number of centroids and iterations defined by the user.
-    The algorithms places the centroids at random locations (real or imaginary, that represent the centre of the cluster) and then allocates each data point to the nearest cluster.
+    The algorithms places the centroids at random locations (real or imaginary, that represent the centre of
+    the cluster) and then allocates each data point to the nearest cluster.
     Afterwards, it will optimise the position of those centroids in the number of iterations defined.
 
     Parameters
@@ -144,8 +144,11 @@ def K_Means(corr_map, indexes, nscans, n_clusters, task=[], TR=0.5, saving_dir="
 
 def Info_Map(corr_map, indexes, thr, nscans, task=[], TR=0.5, saving_dir=".", prefix=""):
     """
-    InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand the flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.
-    When a random walker enters a network, the probability that it transitions between two nodes is given by its Markov transition matrix. Nonetheless, once the walker find itself inside a region, it is relatively improbable that it transitions onto another.
+    InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand
+    the flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.
+    When a random walker enters a network, the probability that it transitions between two nodes is given by its
+    Markov transition matrix. Nonetheless, once the walker find itself inside a region, it is relatively improbable
+    that it transitions onto another.
     InfoMap uses a random walker and applies the aforementioned theories to to find regions and nodes belonging to them.
 
 

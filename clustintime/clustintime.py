@@ -59,7 +59,8 @@ def clustintime(
         Desired type of processing, the options are `None`, `double`, `thr`, `RSS`, `window`.
         The default is `None`.
     timings : bool, optional
-        Boolean that indicates whether the timings of the task are known or not. If `True`, a path to the timings must be specified in `timings_file`.
+        Boolean that indicates whether the timings of the task are known or not.
+        If `True`, a path to the timings must be specified in `timings_file`.
         The default is True.
     window_size : int, optional
         Window size for the `window` processing option.
@@ -110,7 +111,7 @@ def clustintime(
 
     print("Mask applied!")
     # Create data
-    if timings == True:
+    if timings:
         # Load timings
         # 1D files are a txt file with the times in which the events occur. They are divided by TR
         task = {}
@@ -124,17 +125,17 @@ def clustintime(
     nscans = corr_map.shape[0]
     indexes = range(corr_map.shape[0])
 
-    if processing != None:
+    if processing is not None:
         corr_map, indexes = proc.preprocess(
-            corr_map = corr_map,
-            analysis = processing,
-            data = data,
-            window_size = window_size,
-            near = near,
-            thr = thr,
-            contrast = contrast,
-            task = task,
-            TR = TR
+            corr_map=corr_map,
+            analysis=processing,
+            data=data,
+            window_size=window_size,
+            near=near,
+            thr=thr,
+            contrast=contrast,
+            task=task,
+            TR=TR,
         )
 
     if algorithm == "infomap":
@@ -164,6 +165,6 @@ def clustintime(
             prefix=prefix,
         )
 
-    if save_maps == True:
+    if save_maps:
         clus.generate_maps(labels, saving_dir, data_file, mask_file, prefix)
     vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{algorithm}.html")

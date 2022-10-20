@@ -15,7 +15,8 @@ from scipy.signal import find_peaks
 
 def RSS_peaks(corr_map, near):
     """
-    Calculates the RSS of the correlation maps and returns the indexes of the time-points with the highest scores and the time-points nearby.
+    Calculates the RSS of the correlation maps and returns the indexes of the time-points with the highest
+    scores and the time-points nearby.
 
     Parameters
     ----------
@@ -49,10 +50,10 @@ def RSS_peaks(corr_map, near):
     new_peaks = new_peaks[new_peaks != 0]
     new_peaks = np.array(list(set(new_peaks)))
     plt.plot(RSS_1)
-    
-    filtered_plot = np.array([np.mean(RSS_1)]*len(RSS_1))
+
+    filtered_plot = np.array([np.mean(RSS_1)] * len(RSS_1))
     filtered_plot[new_peaks] = np.array(RSS_1)[new_peaks]
-    
+
     plt.plot(filtered_plot)
     plt.title("RSS of original data vs filtered RSS")
     plt.legend(["Original RSS"], "Filtered RSS")
@@ -121,7 +122,8 @@ def correlation_with_window(data, window_length):
                     (temp, data[timepoint + window_idx + 1, :])
                 )  # The data is concatenated for all the rows in the window
         else:
-            # The last rows will be concatenated (since there are less rows than the specified length once the loop finishes, you can exit it)
+            # The last rows will be concatenated (since there are less rows than the specified length once the
+            # loop finishes, you can exit it)
             for window_idx in range(window_length):
                 if (timepoint + window_idx + 1) < (data.shape[0]):
                     temp = np.concatenate((temp, data[timepoint + window_idx + 1, :]))
@@ -133,7 +135,9 @@ def correlation_with_window(data, window_length):
     return corr_map_window
 
 
-def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, contrast=1, task=[], TR = 0.5):
+def preprocess(
+    corr_map, analysis, data=None, window_size=1, near=1, thr=95, contrast=1, task=[], TR=0.5
+):
     """
     Main workflow for the processing algorithms
 
@@ -169,7 +173,9 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
     indexes = range(corr_map.shape[0])
     if analysis == "thr":
         aux, indexes = thr_index(corr_map, thr)
-        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task, contrast, TR)
+        vis.plot_two_matrixes(
+            corr_map, aux, "Original matrix", "Filtered matrix", task, contrast, TR
+        )
         corr_map, indexes = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = RSS_peaks(corr_map, near)
@@ -180,7 +186,7 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
             "Filtered matrix",
             task,
             contrast,
-            TR
+            TR,
         )
         corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
     elif analysis == "double":
@@ -191,7 +197,7 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
             "Double correlation matrix",
             task,
             contrast,
-            TR
+            TR,
         )
         corr_map = np.nan_to_num(np.corrcoef(corr_map))
     elif analysis == "window":
@@ -202,7 +208,7 @@ def preprocess(corr_map, analysis, data=None, window_size=1, near=1, thr=95, con
             f"Correlation with sliding window size {window_size} ",
             task,
             contrast,
-            TR
+            TR,
         )
         corr_map = correlation_with_window(data, window_size)
     return corr_map, indexes
