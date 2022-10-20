@@ -1,7 +1,6 @@
 certifi==2022.9.24
 charset-normalizer==2.1.1
 citeproc-py==0.6.0
--e git+ssh://git@github.com/itxasos23/clustintime.git@53a16d7e0611c90c907374a761ad39259e2775e4#egg=clustintime
 duecredit==0.9.1
 idna==3.4
 joblib==1.2.0
