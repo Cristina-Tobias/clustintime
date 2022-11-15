@@ -42,7 +42,7 @@ def get_config():
     cfg.style = "pep440"
     cfg.tag_prefix = ""
     cfg.parentdir_prefix = ""
-    cfg.versionfile_source = "template-package/_version.py"
+    cfg.versionfile_source = "clustintime/_version.py"
     cfg.verbose = False
     return cfg
 

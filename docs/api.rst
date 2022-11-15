@@ -1,6 +1,6 @@
 .. _api_ref:
 
-.. currentmodule:: template-package
+.. currentmodule:: clustintime
 
 ###
 API
@@ -10,21 +10,21 @@ API
 .. _api_module_ref:
 
 **************************************************
-:mod:`template-package.module`: Module description
+:mod:`clustintime.module`: Module description
 **************************************************
 
-.. automodule:: template-package.module
+.. automodule:: clustintime.module
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: template-package.module
+.. currentmodule:: clustintime.module
 
 .. autosummary::
    :toctree: generated/
    :template: class.rst
 
-   template-package.module.Class
+   clustintime.module.Class
 
    :template: function.rst
 
-   template-package.module.function
+   clustintime.module.function

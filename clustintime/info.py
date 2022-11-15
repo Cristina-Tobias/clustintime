@@ -39,7 +39,9 @@ LICENSE = "GPL 3.0"
 MAINTAINER = ""
 EMAIL = ""
 STATUS = "Prototype"
+
 URL = "https://github.com/Cristina-Tobias/clustintime"
+
 PACKAGENAME = "clustintime"
 DESCRIPTION = ""
 LONGDESC = longdesc
