@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" template-package setup script """
+""" clustintime setup script """
 
 
 def main():
-    """ Install entry-point """
+    """Install entry-point"""
     import os.path as op
     from inspect import currentframe, getfile
     from io import open
