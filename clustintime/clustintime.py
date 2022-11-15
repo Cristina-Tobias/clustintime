@@ -25,7 +25,31 @@ from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
 from clustintime.cli.run_clime import _get_parser
 
+def load_data(data, mask_file):
+    """
+    Load and mask data with atlas using NiftiLabelsMasker.
+    """
+    # Initialize masker object
+    masker = NiftiMasker(mask_img=mask_file)
+    
+    # If n_echos is 1 (single echo), mask and return data
+    if len(data) == 1:
+        # If data is a list, keep only first element
+        if isinstance(data, list):
+            data = data[0]
+            data_masked = masker.fit_transform(data)
+    else:
+        # If n_echos is > 1 (multi-echo), mask each echo in data list separately and
+        # concatenate the masked data.
+        # If n_echos and len(data) are equal, read data.
+        for echo_idx, echo in enumerate(data):
+            if echo_idx == 0:
+                data_masked = masker.fit_transform(echo)
+            else:
+                data_masked = np.concatenate((data_masked, masker.fit_transform(echo)), axis=0)
+                        #  If n_echos is different from len(data), raise error.
 
+    return data_masked, masker
 
 def clustintime(
     data_file,
@@ -119,12 +143,15 @@ def clustintime(
     None.
 
     """
-
+    
+    
+    # data_prueba = load_data(data_file, mask_file)
+    # data = data_prueba[0]
     masker = NiftiMasker(mask_img=mask_file)
     masker.fit(data_file)
 
-    print("Applying mask ...")
-    print(" ")
+    # print("Applying mask ...")
+    # print(" ")
 
     data = apply_mask(data_file, mask_file)  # apply mask to the fitted signal
     print("Mask applied!")

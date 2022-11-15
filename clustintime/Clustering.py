@@ -12,13 +12,8 @@ import numpy as np
 import pandas as pd
 import random
 
-import clustintime.Visualization as vis
 import clustintime.Processing as proc
 from sklearn.cluster import KMeans
-from sklearn.cluster import DBSCAN
-from sklearn.cluster import OPTICS
-from sklearn.cluster import AffinityPropagation
-from sklearn.cluster import MeanShift
 from sklearn.cluster import AgglomerativeClustering
 from networkx.algorithms import community 
 from community import community_louvain
