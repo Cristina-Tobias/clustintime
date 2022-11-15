@@ -11,13 +11,14 @@ import matplotlib.patches as patches
 import numpy as np
 import pandas as pd
 import seaborn as sns
-# from dyneusr import DyNeuGraph
-# from dyneusr.mapper.utils import optimize_dbscan
+from dyneusr import DyNeuGraph
+from dyneusr.mapper.utils import optimize_dbscan
 from IPython.display import HTML, display
-# from kmapper import Cover, KeplerMapper
-# from sklearn.decomposition import PCA
-# from sklearn.manifold import TSNE
-# from umap.umap_ import UMAP
+from kmapper import Cover, KeplerMapper
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+from umap.umap_ import UMAP
+import networkx as nx
 
 
 def display_table(data):
@@ -212,61 +213,61 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix,task=[]
     fig.colorbar(im)
     plt.savefig(f'{saving_dir}/{prefix}_matrix_comparison.png')
 
-# def Dyn(corr_map, labels, output_file="./dyneusr.html"):
-#     """
-#     DyNeuSR Visualization of the results
+def Dyn(corr_map, labels, output_file="./dyneusr.html"):
+    """
+    DyNeuSR Visualization of the results
 
-#     Parameters
-#     ----------
-#     corr_map : matrix
-#         Analyzed correlation matrix .
-#     labels : numpy array
-#         Array of assigned clusters.
-#     output_file : str or path, optional
-#         Desired saving path for the generated html.
-#         The default is "./dyneusr.html".
+    Parameters
+    ----------
+    corr_map : matrix
+        Analyzed correlation matrix .
+    labels : numpy array
+        Array of assigned clusters.
+    output_file : str or path, optional
+        Desired saving path for the generated html.
+        The default is "./dyneusr.html".
 
-#     Returns
-#     -------
-#     None.
+    Returns
+    -------
+    None.
 
-#     """
-    # y = pd.get_dummies(labels.astype(str))
+    """
+    y = pd.get_dummies(labels.astype(str))
 
-    # mapper = KeplerMapper(verbose=1)
-    # X = corr_map
-    # # Configure projection
-    # pca = PCA(2, random_state=1)
-    # umap = UMAP(n_components=2, init=pca.fit_transform(X))
+    mapper = KeplerMapper(verbose=1)
+    X = corr_map
+    # Configure projection
+    pca = PCA(2, random_state=1)
+    umap = UMAP(n_components=2, init=pca.fit_transform(X))
 
     # Construct lens and generate the shape graph
-    # lens = mapper.fit_transform(umap.fit_transform(X, y=None), projection=[0, 1])
-    # graph = mapper.map(
-    #     lens,
-    #     X=corr_map,
-    #     cover=Cover(20, 0.7),
-    #     clusterer=optimize_dbscan(corr_map, k=3, p=100.0),
-    # )
+    lens = mapper.fit_transform(umap.fit_transform(X, y=None), projection=[0, 1])
+    graph = mapper.map(
+        lens,
+        X=corr_map,
+        cover=Cover(20, 0.7),
+        clusterer=optimize_dbscan(corr_map, k=3, p=100.0),
+    )
 
-    # # Convert to a DyNeuGraph
-    # dG = DyNeuGraph(G=graph, y=y)
+    # Convert to a DyNeuGraph
+    dG = DyNeuGraph(G=graph, y=y)
 
-    # # Define some custom_layouts
-    # dG.add_custom_layout(lens, name="lens")
-    # dG.add_custom_layout(nx.spring_layout, name="nx.spring")
-    # dG.add_custom_layout(nx.kamada_kawai_layout, name="nx.kamada_kawai")
-    # dG.add_custom_layout(nx.spectral_layout, name="nx.spectral")
-    # dG.add_custom_layout(nx.circular_layout, name="nx.circular")
+    # Define some custom_layouts
+    dG.add_custom_layout(lens, name="lens")
+    dG.add_custom_layout(nx.spring_layout, name="nx.spring")
+    dG.add_custom_layout(nx.kamada_kawai_layout, name="nx.kamada_kawai")
+    dG.add_custom_layout(nx.spectral_layout, name="nx.spectral")
+    dG.add_custom_layout(nx.circular_layout, name="nx.circular")
 
-    # # Configure some projections
-    # pca = PCA(2, random_state=1)
-    # tsne = TSNE(2, init="pca", random_state=1)
-    # umap = UMAP(n_components=2, init=pca.fit_transform(corr_map))
+    # Configure some projections
+    pca = PCA(2, random_state=1)
+    tsne = TSNE(2, init="pca", random_state=1)
+    umap = UMAP(n_components=2, init=pca.fit_transform(corr_map))
 
-    # # Add projections as custom_layouts
-    # dG.add_custom_layout(pca.fit_transform(X), name="PCA")
-    # dG.add_custom_layout(tsne.fit_transform(X), name="TSNE")
-    # dG.add_custom_layout(umap.fit_transform(X, y=None), name="UMAP")
+    # Add projections as custom_layouts
+    dG.add_custom_layout(pca.fit_transform(X), name="PCA")
+    dG.add_custom_layout(tsne.fit_transform(X), name="TSNE")
+    dG.add_custom_layout(umap.fit_transform(X, y=None), name="UMAP")
 
-    # # Visualize
-    # dG.visualize(output_file)
+    # Visualize
+    dG.visualize(output_file)

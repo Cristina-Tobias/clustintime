@@ -147,7 +147,7 @@ def _get_parser():
                           help = 'Use consensus in the clustering algorithm.'
                                   'Default is not to use',
                           required = False,
-                          default = '.')
+                          default = False)
     optional.add_argument('-sd', '--saving-dir',
                           dest = 'saving_dir',
                           type = str,
@@ -171,7 +171,7 @@ def _get_parser():
                           default = 0)  
       
     optional.add_argument('-dyn', '--dyneusr',
-                          dest = 'dyn',
+                          dest = 'Dyn',
                           action = 'store_true',
                           help = 'Generate and save DyneuSR map. ' 
                                   'Default is not to save',
