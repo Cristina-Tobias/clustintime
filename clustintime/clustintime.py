@@ -175,7 +175,8 @@ def clustintime(
             corr_map, labels = clus.Info_Map(
                 corr_map,
                 indexes,
-                thr
+                thr,
+                nscans
                 )
 
         vis.plot_two_matrixes(
