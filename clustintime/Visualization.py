@@ -109,10 +109,11 @@ def plot_heatmap(labels, title ,saving_dir,prefix,task=[], TR=0.5):
     heatmatrix = np.zeros([int(labels.max()), len(labels)])
     rownames = np.zeros([int(labels.max())]).astype(str)
     x = np.linspace(0, len(labels) * TR, len(labels)).astype(int)
-    
+    file1d = pd.DataFrame()
     for i in range(int(labels.max())):
         selected_labels = np.array([0] * len(labels))
         selected_labels[np.where(labels == i + 1)] = 1
+        file1d = pd.concat([file1d, pd.DataFrame(selected_labels)], axis=1)
         heatmatrix[i] = selected_labels
         rownames[i] = f'# {i+1}'
     
@@ -131,6 +132,7 @@ def plot_heatmap(labels, title ,saving_dir,prefix,task=[], TR=0.5):
     plt.title(title)
     plt.legend((rectangles),np.array(legends), bbox_to_anchor=[1,0.5], loc = 'center left', handlelength = 1, handleheight = 1)
     plt.savefig(f'{saving_dir}/{prefix}_heatmap.png')
+    np.savetxt(f'{saving_dir}/{prefix}_heatmap.1D', file1d)
     
     
     
