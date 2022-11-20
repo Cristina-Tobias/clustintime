@@ -85,7 +85,7 @@ def rss_peaks(corr_map, near):
     peaks = find_peaks(rss_values)[0]
     new_peaks = [0] * 2 * near * len(peaks)
 
-    for idx, peak in enumerate(peaks):
+    for peak in peaks:
         if peak <= near:
             new_peaks[0:near] = range(near)
         elif peak >= len(rss_values) - near:
@@ -227,9 +227,9 @@ def preprocess(
             aux,
             "Original matrix",
             "Filtered matrix",
-            task=task,
+            tasks=task,
             contrast=contrast,
-            TR=repetition_time,
+            repetition_time=repetition_time,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_thr_{thr}",
         )
@@ -241,9 +241,9 @@ def preprocess(
             pd.DataFrame(corr_map).loc[indexes, indexes],
             "Original matrix",
             "Filtered matrix",
-            task=task,
+            tasks=task,
             contrast=contrast,
-            TR=repetition_time,
+            repetition_time=repetition_time,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_RSS_{near}",
         )
@@ -254,9 +254,9 @@ def preprocess(
             np.nan_to_num(np.corrcoef(corr_map)),
             "Original matrix",
             "Double correlation matrix",
-            task=task,
+            tasks=task,
             contrast=contrast,
-            TR=repetition_time,
+            repetition_time=repetition_time,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_double",
         )

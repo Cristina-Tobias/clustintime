@@ -207,10 +207,10 @@ def clustintime(
             corr_map,
             "Original correlation map",
             "Binary correlation map",
-            task=task,
+            tasks=task,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_binary",
-            TR=repetition_time,
+            repetition_time=repetition_time,
             contrast=contrast,
         )
     elif algorithm == "KMeans":
@@ -244,10 +244,10 @@ def clustintime(
             corr_map,
             "Original correlation map",
             "Binary correlation map",
-            task=task,
+            tasks=task,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_binary",
-            TR=repetition_time,
+            repetition_time=repetition_time,
             contrast=contrast,
         )
     elif algorithm == "Greedy":
@@ -262,20 +262,20 @@ def clustintime(
             corr_map,
             "Original correlation map",
             "Binary correlation map",
-            task=task,
+            tasks=task,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_binary",
-            TR=repetition_time,
+            repetition_time=repetition_time,
             contrast=contrast,
         )
 
-    vis.plot_heatmap(labels, title, task=task, TR=repetition_time, saving_dir=saving_dir, prefix=prefix)
+    vis.plot_heatmap(labels, title, task=task, repetition_time=repetition_time, saving_dir=saving_dir, prefix=prefix)
     vis.show_table(labels, saving_dir, prefix)
     if save_maps:
         clus.generate_maps(labels, saving_dir, data, masker, prefix)
 
     if generate_dyneusr_graph:
-        vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
+        vis.generate_dyneusr_visualization(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
     if fir:
         if os.path.exists(f"{saving_dir}/fir") == 0:
             os.mkdir(f"{saving_dir}/fir")
@@ -290,7 +290,7 @@ def clustintime(
                 f"{saving_dir}/fir",
                 f"{prefix}_fir_{i+1}",
                 task=[fir_timepoints * repetition_time],
-                TR=repetition_time,
+                repetition_time=repetition_time,
             )
             np.savetxt(f"{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D", fir_timepoints * repetition_time)
 

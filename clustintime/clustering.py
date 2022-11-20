@@ -83,8 +83,10 @@ def findCommunities(G):
 
 def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
     """
-    This algorithm samples the data and clusters it with a defined algorithm. With the results of each cluster, it creates a consensus matrix.
-    The consensus matrix is then clustered a hundred times. If the results are the same in every run, that will be the returned labels.
+    This algorithm samples the data and clusters it with a defined algorithm.
+    With the results of each cluster, it creates a consensus matrix.
+    The consensus matrix is then clustered a hundred times.
+    If the results are the same in every run, that will be the returned labels.
     If the results are not unanimous, the algorithm will return to the sampling step.
 
     Parameters
@@ -151,7 +153,8 @@ def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
 def K_Means(corr_map, indexes, nscans, n_clusters, seed=0):
     """
     K-Means uses a pre-stablished number of centroids and iterations defined by the user.
-    The algorithms places the centroids at random locations (real or imaginary, that represent the centre of the cluster) and then allocates each data point to the nearest cluster.
+    The algorithms places the centroids at random locations (real or imaginary,
+    that represent the centre of the cluster) and then allocates each data point to the nearest cluster.
     Afterwards, it will optimise the position of those centroids in the number of iterations defined.
 
     Parameters
@@ -256,8 +259,11 @@ def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity="eu
 
 def Info_Map(corr_map, indexes, thr, nscans):
     """
-    InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand the flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.
-    When a random walker enters a network, the probability that it transitions between two nodes is given by its Markov transition matrix. Nonetheless, once the walker find itself inside a region, it is relatively improbable that it transitions onto another.
+    InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand the
+    flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.
+    When a random walker enters a network, the probability that it transitions between two nodes is given by its
+    Markov transition matrix. Nonetheless, once the walker find itself inside a region, it is relatively improbable
+    that it transitions onto another.
     InfoMap uses a random walker and applies the aforementioned theories to to find regions and nodes belonging to them.
 
 

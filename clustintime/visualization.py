@@ -4,8 +4,10 @@
 Result visualization for clustintime
 """
 
-# import networkx as nx  # creation, manipulation and study of the structure, dynamics and functions of complex networks
-import matplotlib.patches as patches
+# import networkx as nx
+# creation, manipulation and study of the structure, dynamics and functions of complex networks
+
+from matplotlib import patches
 import matplotlib.pyplot as plt  # For graphs
 import networkx as nx
 
@@ -38,51 +40,13 @@ def display_table(data):
     for row in data:
         html += "<tr>"
         for field in row:
-            html += "<td>%s<td>" % (field)
+            html += f"<td>{field}<td>"
         html += "</tr>"
     html += "</table>"
     display(HTML(html))
 
 
-def plot_labels(labels, title, task=[], TR=0.5):
-    """
-    Visualization of all the clusters found along time
-
-    Parameters
-    ----------
-    labels : numpy array
-        Array of assigned clusters.
-    title : str
-        Title for the plot.
-    task : dictionary or list, optional
-        Structure containing the times when the task is performed. The default is [].
-    TR : float, optional
-        TR of the data. The default is 0.5.
-
-    Returns
-    -------
-    None.
-
-    """
-
-    colors = sns.color_palette("bright", len(task))
-
-    plt.figure(figsize=[32, 16])
-    plt.xlim([0, len(labels) * TR])
-    plt.ylim([0, labels.max()])
-    plt.xlabel("Time in seconds", fontsize=30)
-    plt.ylabel("# Cluster", fontsize=30)
-
-    for i in range(int(labels.max())):
-        selected_labels = np.array([0] * len(labels))
-        selected_labels[np.where(labels == i + 1)] = labels[np.where(labels == i + 1)]
-        plt.fill_between(np.linspace(0, len(labels) * TR, len(labels)), selected_labels)
-
-    for i in range(len(task)):
-        plt.vlines(task[i], 0, labels.max(), linewidth=1.2, colors=colors[i])
-
-
-def plot_heatmap(labels, title, saving_dir, prefix, task=[], TR=0.5):
+def plot_heatmap(labels, title, saving_dir, prefix, tasks=None, repetition_time=0.5):
     """
     Visualization of the clusters separately
 
@@ -98,7 +62,7 @@ def plot_heatmap(labels, title, saving_dir, prefix, task=[], TR=0.5):
         Prefix for the image
     task : dictionary or list, optional
         Structure containing the times when the task is performed. The default is [].
-    TR : float, optional
+    repetition_time : float, optional
         TR of the data. The default is 0.5.
 
     Returns
@@ -106,10 +70,14 @@ def plot_heatmap(labels, title, saving_dir, prefix, task=[], TR=0.5):
     None.
 
     """
+
+    if tasks is None:
+        tasks = []
+
     plt.figure(figsize=[8, 8])
     heatmatrix = np.zeros([int(labels.max()), len(labels)])
     rownames = np.zeros([int(labels.max())]).astype(str)
-    x = np.linspace(0, len(labels) * TR, len(labels)).astype(int)
+    x_values = np.linspace(0, len(labels) * repetition_time, len(labels)).astype(int)
     file1d = pd.DataFrame()
     for i in range(int(labels.max())):
         selected_labels = np.array([0] * len(labels))
@@ -118,18 +86,19 @@ def plot_heatmap(labels, title, saving_dir, prefix, task=[], TR=0.5):
         heatmatrix[i] = selected_labels
         rownames[i] = f"# {i+1}"
 
-    heatmatrix = pd.DataFrame(heatmatrix, columns=x, index=rownames)
-    colors = sns.color_palette("Dark2", len(task) + 1)
+    heatmatrix = pd.DataFrame(heatmatrix, columns=x_values, index=rownames)
+    colors = sns.color_palette("Dark2", len(tasks) + 1)
     sns.heatmap(heatmatrix, cmap="Greys", xticklabels=150, cbar=False)
     plt.xlabel("Time in seconds", fontsize=10)
     plt.ylabel("Clusters", fontsize=10)
-    # plt.vlines(cluster_4[0][np.array(indexes)+1],0,labels.max(),linestyles='dashed',colors=colors[2], linewidth = 0.7)
-    legends = np.zeros([len(task)]).astype(str)
+    # plt.vlines(cluster_4[0][np.array(indexes)+1],0,labels.max(),linestyles='dashed',colors=colors[2],
+    # linewidth = 0.7)
+    legends = np.zeros([len(tasks)]).astype(str)
     rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
-    for j in range(len(task)):
-        plt.vlines(task[j] / TR, 0, labels.max(), linewidth=1.2, colors=colors[j], alpha=0.5)
-        legends[j] = f"task {j}"
-        rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[j + 1]))
+    for idx, task in enumerate(tasks):
+        plt.vlines(task / repetition_time, 0, labels.max(), linewidth=1.2, colors=colors[idx], alpha=0.5)
+        legends[idx] = f"task {idx}"
+        rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[idx + 1]))
     plt.title(title)
     plt.legend(
         (rectangles),
@@ -157,8 +126,8 @@ def show_table(labels, saving_dir, prefix):
     None.
 
     """
-    Cluster, Count = np.unique(labels, return_counts=True)
-    array = [Cluster, Count, Count / len(labels)]
+    cluster, count = np.unique(labels, return_counts=True)
+    array = [cluster, count, count / len(labels)]
     display_table(np.transpose([["Cluster"], ["Count"], ["Percentage"]]))
     display_table(np.transpose(array))
     table_result = pd.DataFrame({"Cluster": array[0], "Count": array[1], "Percentage": array[2]})
@@ -166,7 +135,7 @@ def show_table(labels, saving_dir, prefix):
     table_result.to_csv(f"{saving_dir}/{prefix}_Results.csv")
 
 
-def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, task=[], contrast=1, TR=0.5):
+def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, tasks=None, contrast=1, repetition_time=0.5):
     """
     Graphical comparison between two correlation maps
 
@@ -180,11 +149,11 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, task=[
         Title for the first matrix.
     title_2 : str
         Title for the second matrix.
-    task : dictionary or list, optional
+    tasks : dictionary or list, optional
         Structure containing the times when the task is performed. The default is [].
     contrast : int, optional
         Range of values of the correlation matrixes. The default is 1.
-    TR: float, optional
+    repetition_time: float, optional
         TR of the data. The default is 0.5
 
     Returns
@@ -192,35 +161,38 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, task=[
     None.
 
     """
-    fig = plt.figure(figsize=(16, 8))
-    gs = fig.add_gridspec(1, 2, hspace=0)
+    if tasks is None:
+        tasks = []
 
-    (ax1, ax2) = gs.subplots()
+    fig = plt.figure(figsize=(16, 8))
+    grid_spec = fig.add_gridspec(1, 2, hspace=0)
+
+    (ax1, ax2) = grid_spec.subplots()
     ax1.imshow(map_1, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
     # Vertical lines to delimit the instant in which the event occurs
     limit = map_1.shape[0]
-    for i in range(len(task)):
-        ax1.vlines(task[i] / TR, ymin=0, ymax=limit, linewidth=0.7)
-        ax1.hlines(task[i] / TR, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
+    for task in tasks:
+        ax1.vlines(task / repetition_time, ymin=0, ymax=limit, linewidth=0.7)
+        ax1.hlines(task / repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax1.set_title(title_1)
     ax1.set_xlim([0, limit])
     ax1.set_ylim([limit, 0])
 
     # Plot
 
-    im = ax2.imshow(map_2, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
+    image = ax2.imshow(map_2, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
     limit = map_2.shape[0]
-    for i in range(len(task)):
-        ax2.vlines(task[i] / TR, ymin=0, ymax=limit, linewidth=0.7)
-        ax2.hlines(task[i] / TR, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
+    for task in tasks:
+        ax2.vlines(task / repetition_time, ymin=0, ymax=limit, linewidth=0.7)
+        ax2.hlines(task / repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax2.set_title(title_2)
     ax2.set_xlim([0, limit])
     ax2.set_ylim([limit, 0])
-    fig.colorbar(im)
+    fig.colorbar(image)
     plt.savefig(f"{saving_dir}/{prefix}_matrix_comparison.png")
 
 
-def Dyn(corr_map, labels, output_file="./dyneusr.html"):
+def generate_dyneusr_visualization(corr_map, labels, output_file="./dyneusr.html"):
     """
     DyNeuSR Visualization of the results
 
@@ -239,16 +211,15 @@ def Dyn(corr_map, labels, output_file="./dyneusr.html"):
     None.
 
     """
-    y = pd.get_dummies(labels.astype(str))
+    y_values = pd.get_dummies(labels.astype(str))
 
     mapper = KeplerMapper(verbose=1)
-    X = corr_map
     # Configure projection
     pca = PCA(2, random_state=1)
-    umap = UMAP(n_components=2, init=pca.fit_transform(X))
+    umap = UMAP(n_components=2, init=pca.fit_transform(corr_map))
 
     # Construct lens and generate the shape graph
-    lens = mapper.fit_transform(umap.fit_transform(X, y=None), projection=[0, 1])
+    lens = mapper.fit_transform(umap.fit_transform(corr_map, y=None), projection=[0, 1])
     graph = mapper.map(
         lens,
         X=corr_map,
@@ -257,14 +228,14 @@ def Dyn(corr_map, labels, output_file="./dyneusr.html"):
     )
 
     # Convert to a DyNeuGraph
-    dG = DyNeuGraph(G=graph, y=y)
+    dyneusr_graph = DyNeuGraph(G=graph, y=y_values)
 
     # Define some custom_layouts
-    dG.add_custom_layout(lens, name="lens")
-    dG.add_custom_layout(nx.spring_layout, name="nx.spring")
-    dG.add_custom_layout(nx.kamada_kawai_layout, name="nx.kamada_kawai")
-    dG.add_custom_layout(nx.spectral_layout, name="nx.spectral")
-    dG.add_custom_layout(nx.circular_layout, name="nx.circular")
+    dyneusr_graph.add_custom_layout(lens, name="lens")
+    dyneusr_graph.add_custom_layout(nx.spring_layout, name="nx.spring")
+    dyneusr_graph.add_custom_layout(nx.kamada_kawai_layout, name="nx.kamada_kawai")
+    dyneusr_graph.add_custom_layout(nx.spectral_layout, name="nx.spectral")
+    dyneusr_graph.add_custom_layout(nx.circular_layout, name="nx.circular")
 
     # Configure some projections
     pca = PCA(2, random_state=1)
@@ -272,9 +243,9 @@ def Dyn(corr_map, labels, output_file="./dyneusr.html"):
     umap = UMAP(n_components=2, init=pca.fit_transform(corr_map))
 
     # Add projections as custom_layouts
-    dG.add_custom_layout(pca.fit_transform(X), name="PCA")
-    dG.add_custom_layout(tsne.fit_transform(X), name="TSNE")
-    dG.add_custom_layout(umap.fit_transform(X, y=None), name="UMAP")
+    dyneusr_graph.add_custom_layout(pca.fit_transform(corr_map), name="PCA")
+    dyneusr_graph.add_custom_layout(tsne.fit_transform(corr_map), name="TSNE")
+    dyneusr_graph.add_custom_layout(umap.fit_transform(corr_map, y=None), name="UMAP")
 
     # Visualize
-    dG.visualize(output_file)
+    dyneusr_graph.visualize(output_file)
