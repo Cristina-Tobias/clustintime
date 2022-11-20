@@ -123,7 +123,7 @@ def _get_parser():
     optional.add_argument(
         "-tr",
         "--tr",
-        dest="TR",
+        dest="repetition_time",
         type=float,
         help="The name or fullpath to the file containing the mask" "for the data",
         required=False,
@@ -222,7 +222,7 @@ def _get_parser():
     optional.add_argument(
         "-dyn",
         "--dyneusr",
-        dest="Dyn",
+        dest="generate_dyneusr_graph",
         action="store_true",
         help="Generate and save DyneuSR map. " "Default is not to save",
         required=False,
@@ -242,7 +242,7 @@ def _get_parser():
     optional.add_argument(
         "-t",
         "--title",
-        dest="Title",
+        dest="title",
         type=str,
         help="Title for the figures",
         required=False,

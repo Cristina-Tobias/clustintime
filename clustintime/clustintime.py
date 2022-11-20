@@ -22,6 +22,7 @@ from nilearn.masking import apply_mask
 from scipy.signal import find_peaks
 
 import clustintime.clustering as clus
+from clustintime.consensus import Consensus
 import clustintime.processing as proc
 import clustintime.visualization as vis
 from clustintime.cli.run_clime import _get_parser
@@ -198,7 +199,7 @@ def clustintime(
         corr_map_2 = corr_map.copy()
         if consensus:
             algorithm = clus.info_map
-            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+            labels = Consensus(algorithm, thr, n_clusters, nscans).find_clusters_with_consensus(corr_map, indexes)
         else:
             corr_map, labels = clus.info_map(corr_map, indexes, thr, nscans)
 
@@ -269,7 +270,7 @@ def clustintime(
             contrast=contrast,
         )
 
-    vis.plot_heatmap(labels, title, task=task, repetition_time=repetition_time, saving_dir=saving_dir, prefix=prefix)
+    vis.plot_heatmap(labels, title, tasks=task, repetition_time=repetition_time, saving_dir=saving_dir, prefix=prefix)
     vis.show_table(labels, saving_dir, prefix)
     if save_maps:
         clus.generate_maps(labels, saving_dir, data, masker, prefix)
@@ -289,7 +290,7 @@ def clustintime(
                 f"FIR onsets for cluster {i+1}",
                 f"{saving_dir}/fir",
                 f"{prefix}_fir_{i+1}",
-                task=[fir_timepoints * repetition_time],
+                tasks=[fir_timepoints * repetition_time],
                 repetition_time=repetition_time,
             )
             np.savetxt(f"{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D", fir_timepoints * repetition_time)

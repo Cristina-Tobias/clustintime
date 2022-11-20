@@ -111,7 +111,7 @@ def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
 
     are_clusters_stable = False
     while not are_clusters_stable:
-        for _ in range(100):
+        for _ in range(1):
             sampling = np.sort(random.sample(range(npoints), round(npoints * 0.6)))
             index_matrix = pd.DataFrame([0] * npoints)
             index_matrix[0][sampling] = 1
@@ -142,11 +142,11 @@ def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
 
         are_clusters_stable = check_if_clusters_stable(algorithm, _consensus, indexes, thr, npoints, aux)
 
-    return labels[1]
+    return final_labels
 
 
 def check_if_clusters_stable(algorithm, _consensus, indexes, thr, npoints, aux):
-    for _ in range(100):
+    for _ in range(1):
         labels = algorithm(corr_map=_consensus, indexes=indexes, thr=thr, nscans=npoints)
         connect = proc.compute_connectivity_matrix(npoints, labels[1])
 
