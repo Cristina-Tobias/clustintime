@@ -41,9 +41,7 @@ def generate_maps(labels, directory, data, masker, prefix):
 
     """
 
-    unique, counts = np.unique(
-        labels, return_counts=True
-    )  # find the labels and how many in each of them
+    unique, counts = np.unique(labels, return_counts=True)  # find the labels and how many in each of them
     unique = unique[counts > 1]
     counts = counts[counts > 1]
 
@@ -51,9 +49,7 @@ def generate_maps(labels, directory, data, masker, prefix):
         mean_img = np.mean(data[labels == map_idx + 1], axis=0)
         if mean_img.min() / mean_img.max() < 0.9:
             mean_img = mean_img / mean_img.max()
-        mean_img_3d = masker.inverse_transform(
-            mean_img
-        )  # Transform the averaged image into a 3D image
+        mean_img_3d = masker.inverse_transform(mean_img)  # Transform the averaged image into a 3D image
 
         nib.save(
             mean_img_3d,
@@ -75,11 +71,7 @@ def findCommunities(G):
     print("Find communities with Infomap...")
     infomapX.run()
 
-    print(
-        "Found {} modules with codelength: {}".format(
-            infomapX.numTopModules(), infomapX.codelength
-        )
-    )
+    print("Found {} modules with codelength: {}".format(infomapX.numTopModules(), infomapX.codelength))
 
     communities = {}
     for node in infomapX.iterLeafNodes():
@@ -207,9 +199,7 @@ def K_Means(corr_map, indexes, nscans, n_clusters, seed=0):
     return final_labels
 
 
-def Agglomerative_Clustering(
-    corr_map, indexes, nscans, n_clusters, affinity="euclidean", linkage="ward"
-):
+def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity="euclidean", linkage="ward"):
     """
     Agglomerative Clustering recursively merges the pair of clusters that minimally increases a given linkage distance.
 

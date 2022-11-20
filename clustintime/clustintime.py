@@ -218,9 +218,7 @@ def clustintime(
             algorithm = clus.K_Means
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            labels = clus.K_Means(
-                corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed
-            )
+            labels = clus.K_Means(corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed)
     elif algorithm == "Agglomerative":
         if consensus:
             algorithm = clus.Agglomerative_Clustering

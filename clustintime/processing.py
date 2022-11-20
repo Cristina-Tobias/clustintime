@@ -90,9 +90,7 @@ def RSS_peaks(corr_map, near):
         elif peaks[i] >= len(RSS_1) - near:
             new_peaks[(len(RSS_1) - near) : peaks[i]] = range((len(RSS_1) - near), peaks[i])
         else:
-            new_peaks[(peaks[i] - near) : (peaks[i] + near)] = range(
-                (peaks[i] - near), (peaks[i] + near)
-            )
+            new_peaks[(peaks[i] - near) : (peaks[i] + near)] = range((peaks[i] - near), (peaks[i] + near))
     new_peaks = np.array(new_peaks)
     new_peaks = new_peaks[new_peaks != 0]
     new_peaks = np.array(list(set(new_peaks)))
@@ -179,9 +177,7 @@ def correlation_with_window(data, window_length):
     return corr_map_window
 
 
-def preprocess(
-    corr_map, analysis, saving_dir=".", prefix="", near=1, thr=95, contrast=1, task=[], TR=0.5
-):
+def preprocess(corr_map, analysis, saving_dir=".", prefix="", near=1, thr=95, contrast=1, task=[], TR=0.5):
     """
     Main workflow for the processing algorithms
 

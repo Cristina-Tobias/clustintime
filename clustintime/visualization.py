@@ -166,9 +166,7 @@ def show_table(labels, saving_dir, prefix):
     table_result.to_csv(f"{saving_dir}/{prefix}_Results.csv")
 
 
-def plot_two_matrixes(
-    map_1, map_2, title_1, title_2, saving_dir, prefix, task=[], contrast=1, TR=0.5
-):
+def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, task=[], contrast=1, TR=0.5):
     """
     Graphical comparison between two correlation maps
 
