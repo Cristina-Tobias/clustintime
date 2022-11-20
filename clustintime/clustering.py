@@ -57,27 +57,27 @@ def generate_maps(labels, directory, data, masker, prefix):
         )
 
 
-def findCommunities(G):
+def find_communities(graph):
     """
     Partition network with the Infomap algorithm.
     Annotates nodes with 'community' id and return number of communities found.
     """
-    infomapX = infomap.Infomap("--two-level")
+    infomap_network = infomap.Infomap("--two-level")
 
     print("Building Infomap network from a NetworkX graph...")
-    for e in G.edges():
-        infomapX.network.addLink(*e)
+    for edge in graph.edges():
+        infomap_network.network.addLink(*edge)
 
     print("Find communities with Infomap...")
-    infomapX.run()
+    infomap_network.run()
 
-    print("Found {} modules with codelength: {}".format(infomapX.numTopModules(), infomapX.codelength))
+    print(f"Found {infomap_network.numTopModules()} modules with codelength: {infomap_network.codelength}")
 
     communities = {}
-    for node in infomapX.iterLeafNodes():
+    for node in infomap_network.iterLeafNodes():
         communities[node.physicalId] = node.moduleIndex()
 
-    nx.set_node_attributes(G, values=communities, name="community")
+    nx.set_node_attributes(graph, values=communities, name="community")
     return communities
 
 
@@ -106,17 +106,19 @@ def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
 
     """
     npoints = len(indexes)
-    M_sum = np.zeros([npoints, npoints])
-    I_sum = np.zeros([npoints, npoints])
-    while 1:
-        for i in range(100):
+    sum_connectivity_matrix = np.zeros([npoints, npoints])
+    index_matrix_sum = np.zeros([npoints, npoints])
+
+    are_clusters_stable = False
+    while not are_clusters_stable:
+        for _ in range(100):
             sampling = np.sort(random.sample(range(npoints), round(npoints * 0.6)))
-            I = pd.DataFrame([0] * npoints)
-            I[0][sampling] = 1
-            I_sum = I_sum + np.dot(I, np.transpose(I))
+            index_matrix = pd.DataFrame([0] * npoints)
+            index_matrix[0][sampling] = 1
+            index_matrix_sum = index_matrix_sum + np.dot(index_matrix, np.transpose(index_matrix))
             data_sampled = corr_map[sampling, :][:, sampling]
-            if algorithm == Info_Map or algorithm == Greedy_Mod or algorithm == Louvain:
-                corr_mat, idx = algorithm(data_sampled, indexes, thr, nscans)
+            if algorithm in (info_map, greedy_mod, louvain):  # pylint: disable=comparison-with-callable
+                _, idx = algorithm(data_sampled, indexes, thr, nscans)
                 idx = np.transpose(
                     pd.DataFrame([idx, sampling])
                 )  # Create a vector that combines the previous indexes and the labels
@@ -129,28 +131,32 @@ def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
             idx = idx[np.logical_not(np.isnan(idx[0]))]
             labels = np.array([0] * npoints)
             labels[sampling] = idx[0]
-            M = proc.compute_connectivity_matrix(npoints, labels)
-        M_sum = M_sum + M
-        Consensus = np.divide(M_sum, I_sum)
-        Consensus[Consensus < proc.find_threshold_bfs(Consensus)] = 0
-        final_labels = algorithm(Consensus, indexes, 0, nscans)
-        thr = proc.find_threshold_bfs(Consensus)
-        Consensus[Consensus <= thr] = 0
+            connectivity_matrix = proc.compute_connectivity_matrix(npoints, labels)
+        sum_connectivity_matrix = sum_connectivity_matrix + connectivity_matrix
+        _consensus = np.divide(sum_connectivity_matrix, index_matrix_sum)
+        _consensus[_consensus < proc.find_threshold_bfs(_consensus)] = 0
+        final_labels = algorithm(_consensus, indexes, 0, nscans)
+        thr = proc.find_threshold_bfs(_consensus)
+        _consensus[_consensus <= thr] = 0
         aux = proc.compute_connectivity_matrix(npoints, final_labels[1])
-        boolean = True
-        for i in range(100):
-            labels = algorithm(corr_map=Consensus, indexes=indexes, thr=thr, nscans=npoints)
-            connect = proc.compute_connectivity_matrix(npoints, labels[1])
 
-            if np.array_equal(aux, connect) == False:
-                boolean = False
-                break
-        if boolean:
-            break
+        are_clusters_stable = check_if_clusters_stable(algorithm, _consensus, indexes, thr, npoints, aux)
+
     return labels[1]
 
 
-def K_Means(corr_map, indexes, nscans, n_clusters, seed=0):
+def check_if_clusters_stable(algorithm, _consensus, indexes, thr, npoints, aux):
+    for _ in range(100):
+        labels = algorithm(corr_map=_consensus, indexes=indexes, thr=thr, nscans=npoints)
+        connect = proc.compute_connectivity_matrix(npoints, labels[1])
+
+        if not np.array_equal(aux, connect):
+            return False
+
+    return True
+
+
+def k_means(corr_map, indexes, nscans, n_clusters, seed=0):
     """
     K-Means uses a pre-stablished number of centroids and iterations defined by the user.
     The algorithms places the centroids at random locations (real or imaginary,
@@ -182,8 +188,8 @@ def K_Means(corr_map, indexes, nscans, n_clusters, seed=0):
 
     print(" ")
 
-    KM = KMeans(n_clusters=n_clusters, random_state=seed)
-    labels = KM.fit_predict(corr_map)
+    k_m = KMeans(n_clusters=n_clusters, random_state=seed)
+    labels = k_m.fit_predict(corr_map)
 
     labels = np.transpose(
         pd.DataFrame([labels, indexes])
@@ -202,7 +208,7 @@ def K_Means(corr_map, indexes, nscans, n_clusters, seed=0):
     return final_labels
 
 
-def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity="euclidean", linkage="ward"):
+def agglomerative_clustering(corr_map, indexes, nscans, n_clusters, affinity="euclidean", linkage="ward"):
     """
     Agglomerative Clustering recursively merges the pair of clusters that minimally increases a given linkage distance.
 
@@ -238,8 +244,8 @@ def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity="eu
 
     print(" ")
 
-    AG = AgglomerativeClustering(n_clusters=n_clusters, affinity=affinity, linkage=linkage)
-    labels = AG.fit_predict(corr_map)
+    agglo_clustering = AgglomerativeClustering(n_clusters=n_clusters, affinity=affinity, linkage=linkage)
+    labels = agglo_clustering.fit_predict(corr_map)
 
     labels = np.transpose(
         pd.DataFrame([labels, indexes])
@@ -258,7 +264,7 @@ def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity="eu
     return final_labels
 
 
-def Info_Map(corr_map, indexes, thr, nscans):
+def info_map(corr_map, indexes, thr, nscans):
     """
     InfoMap uses information theory to find communities. In particular, it employs the Huffman code to understand the
     flow of information within a graph. This code assigns a prefix to each node, then a prefix to each community.
@@ -294,13 +300,13 @@ def Info_Map(corr_map, indexes, thr, nscans):
     corr_map = proc.thr_index(corr_map, thr)
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
 
-    G = nx.from_numpy_matrix(np.matrix(corr_smooth_binary))  # Again the binary
-    coms = findCommunities(G)  # Clustering
+    graph = nx.from_numpy_matrix(np.matrix(corr_smooth_binary))  # Again the binary
+    coms = find_communities(graph)  # Clustering
 
     coms_labels = np.zeros(corr_map.shape[0])
 
-    for ii in coms:
-        coms_labels[ii] = coms[ii]
+    for key, value in coms.items():
+        coms_labels[key] = value
 
     labels = np.transpose(pd.DataFrame([coms_labels, indexes]))
     labels = labels.set_index(1)
@@ -315,7 +321,7 @@ def Info_Map(corr_map, indexes, thr, nscans):
     return corr_smooth_binary, final_labels
 
 
-def Louvain(corr_map, indexes, thr, nscans):
+def louvain(corr_map, indexes, thr, nscans):
     """
     Louvain's algorithm maximises modularity and implements an extra step to ensure community properties in the network.
 
@@ -348,13 +354,13 @@ def Louvain(corr_map, indexes, thr, nscans):
 
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
 
-    G = nx.from_numpy_matrix(corr_smooth_binary)  # Again the binary
-    partition = community_louvain.best_partition(G)
+    graph = nx.from_numpy_matrix(corr_smooth_binary)  # Again the binary
+    partition = community_louvain.best_partition(graph)
 
     coms_labels = np.zeros(corr_map.shape[0])
 
-    for ii in partition:
-        coms_labels[ii] = partition[ii]
+    for key, value in partition.items():
+        coms_labels[key] = value
 
     labels = np.transpose(pd.DataFrame([coms_labels, indexes]))
     labels = labels.set_index(1)
@@ -369,7 +375,7 @@ def Louvain(corr_map, indexes, thr, nscans):
     return corr_smooth_binary, final_labels
 
 
-def Greedy_Mod(corr_map, indexes, thr, nscans):
+def greedy_mod(corr_map, indexes, thr, nscans):
     """
     Greedy modularity maximises modularity.
 
@@ -402,13 +408,13 @@ def Greedy_Mod(corr_map, indexes, thr, nscans):
 
     corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
 
-    G = nx.from_numpy_matrix(corr_smooth_binary)  # Again the binary
-    partition = list(community.greedy_modularity_communities(G))
+    graph = nx.from_numpy_matrix(corr_smooth_binary)  # Again the binary
+    partition = list(community.greedy_modularity_communities(graph))
 
     coms_labels = np.zeros(corr_map.shape[0])
 
-    for num, ii in enumerate(partition):
-        coms_labels[list(ii)] = num + 1
+    for idx, com in enumerate(partition):
+        coms_labels[list(com)] = idx + 1
 
     labels = np.transpose(pd.DataFrame([coms_labels, indexes]))
     labels = labels.set_index(1)

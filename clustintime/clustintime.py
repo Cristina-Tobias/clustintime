@@ -197,10 +197,10 @@ def clustintime(
     if algorithm == "infomap":
         corr_map_2 = corr_map.copy()
         if consensus:
-            algorithm = clus.Info_Map
+            algorithm = clus.info_map
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.Info_Map(corr_map, indexes, thr, nscans)
+            corr_map, labels = clus.info_map(corr_map, indexes, thr, nscans)
 
         vis.plot_two_matrixes(
             corr_map_2,
@@ -215,16 +215,16 @@ def clustintime(
         )
     elif algorithm == "KMeans":
         if consensus:
-            algorithm = clus.K_Means
+            algorithm = clus.k_means
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            labels = clus.K_Means(corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed)
+            labels = clus.k_means(corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed)
     elif algorithm == "Agglomerative":
         if consensus:
-            algorithm = clus.Agglomerative_Clustering
+            algorithm = clus.agglomerative_clustering
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            labels = clus.Agglomerative_Clustering(
+            labels = clus.agglomerative_clustering(
                 corr_map=corr_map,
                 indexes=indexes,
                 nscans=nscans,
@@ -235,10 +235,10 @@ def clustintime(
     elif algorithm == "Louvain":
         corr_map_2 = corr_map.copy()
         if consensus:
-            algorithm = clus.Louvain
+            algorithm = clus.louvain
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.Louvain(corr_map, indexes, thr, nscans=nscans)
+            corr_map, labels = clus.louvain(corr_map, indexes, thr, nscans=nscans)
         vis.plot_two_matrixes(
             corr_map_2,
             corr_map,
@@ -253,10 +253,10 @@ def clustintime(
     elif algorithm == "Greedy":
         corr_map_2 = corr_map.copy()
         if consensus:
-            algorithm = clus.Greedy_Mod
+            algorithm = clus.greedy_mod
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.Greedy_Mod(corr_map, indexes, thr, nscans=nscans)
+            corr_map, labels = clus.greedy_mod(corr_map, indexes, thr, nscans=nscans)
         vis.plot_two_matrixes(
             corr_map_2,
             corr_map,
