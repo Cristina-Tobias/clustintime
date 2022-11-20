@@ -222,7 +222,8 @@ def Agglomerative_Clustering(corr_map, indexes, nscans, n_clusters, affinity="eu
         If `precomputed`, a distance matrix (instead of a similarity matrix) is needed as input for the fit method.
         The default is `euclidean`
     linkage : str, optional:
-        Linkage criterion to use. The linkage criterion determines which distance to use between sets of observation. The algorithm will merge the pairs of cluster that minimize this criterion.
+        Linkage criterion to use. The linkage criterion determines which distance to use between sets of observation.
+        The algorithm will merge the pairs of cluster that minimize this criterion.
         The options are `ward`, `complete`, `average`, `single`
 
     Returns
