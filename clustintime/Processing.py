@@ -12,13 +12,15 @@ import pandas as pd
 import clustintime.Visualization as vis
 from scipy.signal import find_peaks
 
+
 def compute_connectivity_matrix(n_items, labels):
     M = np.zeros([n_items, n_items])
     for j in range(n_items):
-        if labels[j]>0:
+        if labels[j] > 0:
             m = np.where(labels == labels[j])
-            M[j,m]=1  
-    return(M)
+            M[j, m] = 1
+    return M
+
 
 def find_threshold_bfs(array):
     first_node = 0
@@ -83,11 +85,9 @@ def RSS_peaks(corr_map, near):
 
     for i in range(len(peaks)):
         if peaks[i] <= near:
-            new_peaks[0 : near] = range(near)
-        elif peaks[i] >= len(RSS_1)-near:
-            new_peaks[(len(RSS_1) - near) : peaks[i]] = range(
-                (len(RSS_1) - near), peaks[i]
-                )            
+            new_peaks[0:near] = range(near)
+        elif peaks[i] >= len(RSS_1) - near:
+            new_peaks[(len(RSS_1) - near) : peaks[i]] = range((len(RSS_1) - near), peaks[i])
         else:
             new_peaks[(peaks[i] - near) : (peaks[i] + near)] = range(
                 (peaks[i] - near), (peaks[i] + near)
@@ -95,17 +95,17 @@ def RSS_peaks(corr_map, near):
     new_peaks = np.array(new_peaks)
     new_peaks = new_peaks[new_peaks != 0]
     new_peaks = np.array(list(set(new_peaks)))
-    plt.figure(figsize = [16, 8])
+    plt.figure(figsize=[16, 8])
     plt.plot(RSS_1)
-    
-    filtered_plot = np.array([np.mean(RSS_1)]*len(RSS_1))
+
+    filtered_plot = np.array([np.mean(RSS_1)] * len(RSS_1))
     filtered_plot[[new_peaks]] = np.array(RSS_1)[new_peaks]
-    
+
     plt.plot(filtered_plot)
     plt.title("RSS of original data vs filtered RSS")
-    plt.legend(["Original RSS","Filtered RSS"])
-    plt.xlabel('TR', fontsize = 10)
-    plt.ylabel('RSS', fontsize = 10)
+    plt.legend(["Original RSS", "Filtered RSS"])
+    plt.xlabel("TR", fontsize=10)
+    plt.ylabel("RSS", fontsize=10)
 
     return new_peaks
 
@@ -131,9 +131,9 @@ def thr_index(corr_map, thr):
     """
 
     if corr_map.max().max() == 0:
-        corr_map[abs(corr_map) < np.percentile(abs(corr_map),thr)] = 0  
+        corr_map[abs(corr_map) < np.percentile(abs(corr_map), thr)] = 0
     else:
-        corr_map[corr_map < np.percentile(corr_map,thr)] = 0
+        corr_map[corr_map < np.percentile(corr_map, thr)] = 0
     return corr_map
 
 
@@ -178,7 +178,9 @@ def correlation_with_window(data, window_length):
     return corr_map_window
 
 
-def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95, contrast=1, task=[], TR = 0.5):
+def preprocess(
+    corr_map, analysis, saving_dir=".", prefix="", near=1, thr=95, contrast=1, task=[], TR=0.5
+):
     """
     Main workflow for the processing algorithms
 
@@ -215,7 +217,17 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
     if analysis == "thr":
         aux = corr_map.copy()
         aux = thr_index(aux, thr)
-        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task = task, contrast = contrast, TR= TR,saving_dir = saving_dir, prefix = f'{prefix}_orig_thr_{thr}')
+        vis.plot_two_matrixes(
+            corr_map,
+            aux,
+            "Original matrix",
+            "Filtered matrix",
+            task=task,
+            contrast=contrast,
+            TR=TR,
+            saving_dir=saving_dir,
+            prefix=f"{prefix}_orig_thr_{thr}",
+        )
         corr_map = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = RSS_peaks(corr_map, near)
@@ -224,11 +236,11 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
             pd.DataFrame(corr_map).loc[indexes, indexes],
             "Original matrix",
             "Filtered matrix",
-            task = task,
-            contrast = contrast,
-            TR = TR,
-            saving_dir = saving_dir, 
-            prefix = f'{prefix}_orig_RSS_{near}',
+            task=task,
+            contrast=contrast,
+            TR=TR,
+            saving_dir=saving_dir,
+            prefix=f"{prefix}_orig_RSS_{near}",
         )
         corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
     elif analysis == "double":
@@ -237,13 +249,12 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
             np.nan_to_num(np.corrcoef(corr_map)),
             "Original matrix",
             "Double correlation matrix",
-            task = task,
-            contrast = contrast,
-            TR = TR,
-            saving_dir = saving_dir, 
-            prefix = f'{prefix}_orig_double',
+            task=task,
+            contrast=contrast,
+            TR=TR,
+            saving_dir=saving_dir,
+            prefix=f"{prefix}_orig_double",
         )
         corr_map = np.nan_to_num(np.corrcoef(corr_map))
-
 
     return corr_map, indexes

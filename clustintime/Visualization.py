@@ -5,8 +5,10 @@ Result visualization for clustintime
 """
 
 import matplotlib.pyplot as plt  # For graphs
+
 # import networkx as nx  # creation, manipulation and study of the structure, dynamics and functions of complex networks
 import matplotlib.patches as patches
+
 # Libraries
 import numpy as np
 import pandas as pd
@@ -81,7 +83,7 @@ def plot_labels(labels, title, task=[], TR=0.5):
         plt.vlines(task[i], 0, labels.max(), linewidth=1.2, colors=colors[i])
 
 
-def plot_heatmap(labels, title ,saving_dir,prefix,task=[], TR=0.5):
+def plot_heatmap(labels, title, saving_dir, prefix, task=[], TR=0.5):
     """
     Visualization of the clusters separately
 
@@ -105,7 +107,7 @@ def plot_heatmap(labels, title ,saving_dir,prefix,task=[], TR=0.5):
     None.
 
     """
-    plt.figure(figsize = [8,8])
+    plt.figure(figsize=[8, 8])
     heatmatrix = np.zeros([int(labels.max()), len(labels)])
     rownames = np.zeros([int(labels.max())]).astype(str)
     x = np.linspace(0, len(labels) * TR, len(labels)).astype(int)
@@ -115,28 +117,31 @@ def plot_heatmap(labels, title ,saving_dir,prefix,task=[], TR=0.5):
         selected_labels[np.where(labels == i + 1)] = 1
         file1d = pd.concat([file1d, pd.DataFrame(selected_labels)], axis=1)
         heatmatrix[i] = selected_labels
-        rownames[i] = f'# {i+1}'
-    
-    heatmatrix = pd.DataFrame(heatmatrix,columns = x ,index = rownames)
-    colors = sns.color_palette("Dark2", len(task)+1)
-    sns.heatmap(heatmatrix,  cmap = 'Greys', xticklabels = 150, cbar = False)
-    plt.xlabel('Time in seconds', fontsize = 10)
-    plt.ylabel('Clusters', fontsize = 10)
+        rownames[i] = f"# {i+1}"
+
+    heatmatrix = pd.DataFrame(heatmatrix, columns=x, index=rownames)
+    colors = sns.color_palette("Dark2", len(task) + 1)
+    sns.heatmap(heatmatrix, cmap="Greys", xticklabels=150, cbar=False)
+    plt.xlabel("Time in seconds", fontsize=10)
+    plt.ylabel("Clusters", fontsize=10)
     # plt.vlines(cluster_4[0][np.array(indexes)+1],0,labels.max(),linestyles='dashed',colors=colors[2], linewidth = 0.7)
     legends = np.zeros([len(task)]).astype(str)
-    rectangles = [patches.Rectangle((0,0),1,1, facecolor = colors[0])]
+    rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
     for j in range(len(task)):
-        plt.vlines(task[j]/TR, 0, labels.max() ,linewidth=1.2, colors=colors[j], alpha = 0.5)
-        legends[j] = f'task {j}'
-        rectangles.append(patches.Rectangle((0,0),1,1, facecolor = colors[j+1]))
+        plt.vlines(task[j] / TR, 0, labels.max(), linewidth=1.2, colors=colors[j], alpha=0.5)
+        legends[j] = f"task {j}"
+        rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[j + 1]))
     plt.title(title)
-    plt.legend((rectangles),np.array(legends), bbox_to_anchor=[1,0.5], loc = 'center left', handlelength = 1, handleheight = 1)
-    plt.savefig(f'{saving_dir}/{prefix}_heatmap.png')
-    np.savetxt(f'{saving_dir}/{prefix}_heatmap.1D', file1d)
-    
-    
-    
-        
+    plt.legend(
+        (rectangles),
+        np.array(legends),
+        bbox_to_anchor=[1, 0.5],
+        loc="center left",
+        handlelength=1,
+        handleheight=1,
+    )
+    plt.savefig(f"{saving_dir}/{prefix}_heatmap.png")
+    np.savetxt(f"{saving_dir}/{prefix}_heatmap.1D", file1d)
 
 
 def show_table(labels, saving_dir, prefix):
@@ -162,7 +167,9 @@ def show_table(labels, saving_dir, prefix):
     table_result.to_csv(f"{saving_dir}/{prefix}_Results.csv")
 
 
-def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix,task=[], contrast=1, TR = 0.5):
+def plot_two_matrixes(
+    map_1, map_2, title_1, title_2, saving_dir, prefix, task=[], contrast=1, TR=0.5
+):
     """
     Graphical comparison between two correlation maps
 
@@ -196,8 +203,8 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix,task=[]
     # Vertical lines to delimit the instant in which the event occurs
     limit = map_1.shape[0]
     for i in range(len(task)):
-        ax1.vlines(task[i]/TR, ymin=0, ymax=limit, linewidth=0.7)
-        ax1.hlines(task[i]/TR , xmin=0, xmax=limit, linewidth=0.7) # Same for horizontal
+        ax1.vlines(task[i] / TR, ymin=0, ymax=limit, linewidth=0.7)
+        ax1.hlines(task[i] / TR, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax1.set_title(title_1)
     ax1.set_xlim([0, limit])
     ax1.set_ylim([limit, 0])
@@ -207,13 +214,14 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix,task=[]
     im = ax2.imshow(map_2, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
     limit = map_2.shape[0]
     for i in range(len(task)):
-        ax2.vlines(task[i]/TR, ymin=0, ymax=limit, linewidth=0.7)
-        ax2.hlines(task[i]/TR, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
+        ax2.vlines(task[i] / TR, ymin=0, ymax=limit, linewidth=0.7)
+        ax2.hlines(task[i] / TR, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax2.set_title(title_2)
     ax2.set_xlim([0, limit])
     ax2.set_ylim([limit, 0])
     fig.colorbar(im)
-    plt.savefig(f'{saving_dir}/{prefix}_matrix_comparison.png')
+    plt.savefig(f"{saving_dir}/{prefix}_matrix_comparison.png")
+
 
 def Dyn(corr_map, labels, output_file="./dyneusr.html"):
     """

@@ -25,13 +25,14 @@ from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
 from clustintime.cli.run_clime import _get_parser
 
+
 def load_data(data, mask_file):
     """
     Load and mask data with atlas using NiftiLabelsMasker.
     """
     # Initialize masker object
     masker = NiftiMasker(mask_img=mask_file)
-    
+
     # If n_echos is 1 (single echo), mask and return data
     if len(data) == 1:
         # If data is a list, keep only first element
@@ -47,24 +48,25 @@ def load_data(data, mask_file):
                 data_masked = masker.fit_transform(echo)
             else:
                 data_masked = np.concatenate((data_masked, masker.fit_transform(echo)), axis=0)
-                        #  If n_echos is different from len(data), raise error.
+                #  If n_echos is different from len(data), raise error.
 
     return data_masked, masker
+
 
 def clustintime(
     data_file,
     mask_file,
-    component = 'whole',
-    timings_file = None,
-    correlation = 'standard',
+    component="whole",
+    timings_file=None,
+    correlation="standard",
     processing=None,
     window_size=1,
     near=1,
     thr=95,
     contrast=1,
     TR=0.5,
-    affinity = 'euclidean',
-    linkage = 'ward',
+    affinity="euclidean",
+    linkage="ward",
     algorithm="infomap",
     consensus=False,
     n_clusters=7,
@@ -72,9 +74,9 @@ def clustintime(
     saving_dir=".",
     prefix="",
     seed=0,
-    Dyn = False,
-    fir = False,
-    Title = ""
+    Dyn=False,
+    fir=False,
+    Title="",
 ):
     """
     Run main workflow of clustintime.
@@ -143,8 +145,7 @@ def clustintime(
     None.
 
     """
-    
-    
+
     # data_prueba = load_data(data_file, mask_file)
     # data = data_prueba[0]
     masker = NiftiMasker(mask_img=mask_file)
@@ -155,13 +156,12 @@ def clustintime(
 
     data = apply_mask(data_file, mask_file)  # apply mask to the fitted signal
     print("Mask applied!")
-    
-    if component == 'negative':
-        data[data>0] = 0
-    elif component == 'positive':
-        data[data<0] = 0
 
-    
+    if component == "negative":
+        data[data > 0] = 0
+    elif component == "positive":
+        data[data < 0] = 0
+
     # Create data
     if timings_file != None:
         # Load timings
@@ -174,23 +174,23 @@ def clustintime(
 
     else:
         task = []
-    if correlation == 'standard':
+    if correlation == "standard":
         corr_map = np.nan_to_num(np.corrcoef(data))
     else:
-         corr_map = np.nan_to_num(proc.correlation_with_window(data, window_size)  )
-    
+        corr_map = np.nan_to_num(proc.correlation_with_window(data, window_size))
+
     nscans = corr_map.shape[0]
     indexes = range(corr_map.shape[0])
 
     if processing != None:
         corr_map, indexes = proc.preprocess(
-            corr_map = corr_map,
-            analysis = processing,
-            near = near,
-            thr = thr,
-            contrast = contrast,
-            task = task,
-            TR = TR
+            corr_map=corr_map,
+            analysis=processing,
+            near=near,
+            thr=thr,
+            contrast=contrast,
+            task=task,
+            TR=TR,
         )
 
     if algorithm == "infomap":
@@ -199,15 +199,18 @@ def clustintime(
             algorithm = clus.Info_Map
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.Info_Map(
-                corr_map,
-                indexes,
-                thr,
-                nscans
-                )
+            corr_map, labels = clus.Info_Map(corr_map, indexes, thr, nscans)
 
         vis.plot_two_matrixes(
-            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,  saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',TR= TR ,contrast = contrast
+            corr_map_2,
+            corr_map,
+            "Original correlation map",
+            "Binary correlation map",
+            task=task,
+            saving_dir=saving_dir,
+            prefix=f"{prefix}_orig_binary",
+            TR=TR,
+            contrast=contrast,
         )
     elif algorithm == "KMeans":
         if consensus:
@@ -215,13 +218,9 @@ def clustintime(
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
             labels = clus.K_Means(
-                corr_map=corr_map,
-                indexes=indexes,
-                nscans=nscans,
-                n_clusters=n_clusters,
-                seed = seed
-                )
-    elif algorithm == 'Agglomerative':
+                corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed
+            )
+    elif algorithm == "Agglomerative":
         if consensus:
             algorithm = clus.Agglomerative_Clustering
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
@@ -231,23 +230,26 @@ def clustintime(
                 indexes=indexes,
                 nscans=nscans,
                 n_clusters=n_clusters,
-                affinity = affinity,
-                linkage = linkage,
-                )
+                affinity=affinity,
+                linkage=linkage,
+            )
     elif algorithm == "Louvain":
         corr_map_2 = corr_map.copy()
         if consensus:
             algorithm = clus.Louvain
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.Louvain(
-                corr_map,
-                indexes,
-                thr,
-                nscans=nscans
-                )
+            corr_map, labels = clus.Louvain(corr_map, indexes, thr, nscans=nscans)
         vis.plot_two_matrixes(
-            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task, saving_dir = saving_dir, prefix = f'{prefix}_orig_binary', TR= TR ,contrast = contrast
+            corr_map_2,
+            corr_map,
+            "Original correlation map",
+            "Binary correlation map",
+            task=task,
+            saving_dir=saving_dir,
+            prefix=f"{prefix}_orig_binary",
+            TR=TR,
+            contrast=contrast,
         )
     elif algorithm == "Greedy":
         corr_map_2 = corr_map.copy()
@@ -255,37 +257,48 @@ def clustintime(
             algorithm = clus.Greedy_Mod
             labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.Greedy_Mod(
-                corr_map,
-                indexes,
-                thr,
-                nscans=nscans
-                )
+            corr_map, labels = clus.Greedy_Mod(corr_map, indexes, thr, nscans=nscans)
         vis.plot_two_matrixes(
-            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',  TR= TR ,contrast = contrast
+            corr_map_2,
+            corr_map,
+            "Original correlation map",
+            "Binary correlation map",
+            task=task,
+            saving_dir=saving_dir,
+            prefix=f"{prefix}_orig_binary",
+            TR=TR,
+            contrast=contrast,
         )
 
-    vis.plot_heatmap(labels, Title, task = task, TR = TR,  saving_dir = saving_dir, prefix = prefix)
+    vis.plot_heatmap(labels, Title, task=task, TR=TR, saving_dir=saving_dir, prefix=prefix)
     vis.show_table(labels, saving_dir, prefix)
     if save_maps:
         clus.generate_maps(labels, saving_dir, data, masker, prefix)
-    
+
     if Dyn:
         vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
     if fir:
-        if os.path.exists(f'{saving_dir}/fir')==0:
-            os.mkdir(f'{saving_dir}/fir')
+        if os.path.exists(f"{saving_dir}/fir") == 0:
+            os.mkdir(f"{saving_dir}/fir")
         for i in range(int(max(labels))):
-            all_time_points = np.where(labels == i+1)[0]
+            all_time_points = np.where(labels == i + 1)[0]
             difference = np.diff(all_time_points)
             select = find_peaks(difference)[0]
-            fir_timepoints = np.insert(all_time_points[select+1],0, all_time_points[0])
-            vis.plot_heatmap(labels, f'FIR onsets for cluster {i+1}' ,f'{saving_dir}/fir',f'{prefix}_fir_{i+1}',task=[fir_timepoints*TR], TR=TR)
-            np.savetxt(f'{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D',fir_timepoints*TR)
+            fir_timepoints = np.insert(all_time_points[select + 1], 0, all_time_points[0])
+            vis.plot_heatmap(
+                labels,
+                f"FIR onsets for cluster {i+1}",
+                f"{saving_dir}/fir",
+                f"{prefix}_fir_{i+1}",
+                task=[fir_timepoints * TR],
+                TR=TR,
+            )
+            np.savetxt(f"{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D", fir_timepoints * TR)
 
-def _main(argv = None):
+
+def _main(argv=None):
     print(sys.argv)
     options = _get_parser().parse_args(argv)
     clustintime(**vars(options))
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         _main(sys.argv[1:])
