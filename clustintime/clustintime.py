@@ -12,13 +12,13 @@ It requires python 3.6 or above, as well as the modules:
 """
 
 
-import clustintime.Clustering as clus
+import clustintime.clustering as clus
 
 # Libraries
 import numpy as np
 import os
-import clustintime.Processing as proc
-import clustintime.Visualization as vis
+import clustintime.processing as proc
+import clustintime.visualization as vis
 from scipy.signal import find_peaks
 import sys
 from nilearn.input_data import NiftiMasker

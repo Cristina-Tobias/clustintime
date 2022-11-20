@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt  # For graphs
 # Libraries
 import numpy as np
 import pandas as pd
-import clustintime.Visualization as vis
+import clustintime.visualization as vis
 from scipy.signal import find_peaks
 
 

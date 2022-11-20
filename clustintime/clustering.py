@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import random
 
-import clustintime.Processing as proc
+import clustintime.processing as proc
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
 from networkx.algorithms import community
