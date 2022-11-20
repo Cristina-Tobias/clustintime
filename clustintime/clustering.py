@@ -4,19 +4,18 @@
 Clustering library for clustintime
 """
 import os
+import random
 
 import infomap
 import networkx as nx  # creation, manipulation and study of the structure, dynamics and functions of complex networks
 import nibabel as nib
 import numpy as np
 import pandas as pd
-import random
+from community import community_louvain
+from networkx.algorithms import community
+from sklearn.cluster import AgglomerativeClustering, KMeans
 
 import clustintime.processing as proc
-from sklearn.cluster import KMeans
-from sklearn.cluster import AgglomerativeClustering
-from networkx.algorithms import community
-from community import community_louvain
 
 
 def generate_maps(labels, directory, data, masker, prefix):

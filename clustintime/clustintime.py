@@ -12,17 +12,18 @@ It requires python 3.6 or above, as well as the modules:
 """
 
 
-import clustintime.clustering as clus
+import os
+import sys
 
 # Libraries
 import numpy as np
-import os
-import clustintime.processing as proc
-import clustintime.visualization as vis
-from scipy.signal import find_peaks
-import sys
 from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
+from scipy.signal import find_peaks
+
+import clustintime.clustering as clus
+import clustintime.processing as proc
+import clustintime.visualization as vis
 from clustintime.cli.run_clime import _get_parser
 
 
@@ -163,7 +164,7 @@ def clustintime(
         data[data < 0] = 0
 
     # Create data
-    if timings_file != None:
+    if timings_file is not None:
         # Load timings
         # 1D files are a txt file with the times in which the events occur. They are divided by TR
         task = {}

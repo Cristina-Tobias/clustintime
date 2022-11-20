@@ -4,10 +4,10 @@
 Result visualization for clustintime
 """
 
-import matplotlib.pyplot as plt  # For graphs
-
 # import networkx as nx  # creation, manipulation and study of the structure, dynamics and functions of complex networks
 import matplotlib.patches as patches
+import matplotlib.pyplot as plt  # For graphs
+import networkx as nx
 
 # Libraries
 import numpy as np
@@ -20,7 +20,6 @@ from kmapper import Cover, KeplerMapper
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from umap.umap_ import UMAP
-import networkx as nx
 
 
 def display_table(data):
