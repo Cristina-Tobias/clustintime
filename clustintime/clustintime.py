@@ -65,7 +65,7 @@ def clustintime(
     near=1,
     thr=95,
     contrast=1,
-    TR=0.5,
+    repetition_time=0.5,
     affinity="euclidean",
     linkage="ward",
     algorithm="infomap",
@@ -75,9 +75,9 @@ def clustintime(
     saving_dir=".",
     prefix="",
     seed=0,
-    Dyn=False,
+    generate_dyneusr_graph=False,
     fir=False,
-    Title="",
+    title="",
 ):
     """
     Run main workflow of clustintime.
@@ -116,7 +116,7 @@ def clustintime(
     contrast : float, optional
         Range of values for the correlation matrixes.
         The default is 1.
-    TR : float, optional
+    repetition_time : float, optional
         TR of the data.
         The default is 0.5.
     algorithm : str, optional
@@ -136,9 +136,9 @@ def clustintime(
         The default is ".".
     prefix: str, optional
         Prefix for the saved outcomes
-    Dyn : bool, optional
+    generate_dyneusr_graph : bool, optional
         Generate a DyNeuSR graph. Default is `False`
-    Title: str, optional
+    title: str, optional
         Title for the graphs
 
     Returns
@@ -168,10 +168,10 @@ def clustintime(
         # Load timings
         # 1D files are a txt file with the times in which the events occur. They are divided by TR
         task = {}
-        if type(timings_file) == str:
+        if isinstance(timings_file, str):
             timings_file = [timings_file]
-        for i in range(len(timings_file)):
-            task[i] = np.loadtxt(timings_file[i])
+        for idx, _dir in enumerate(timings_file):
+            task[idx] = np.loadtxt(_dir)
 
     else:
         task = []
@@ -183,7 +183,7 @@ def clustintime(
     nscans = corr_map.shape[0]
     indexes = range(corr_map.shape[0])
 
-    if processing != None:
+    if processing is not None:
         corr_map, indexes = proc.preprocess(
             corr_map=corr_map,
             analysis=processing,
@@ -191,7 +191,7 @@ def clustintime(
             thr=thr,
             contrast=contrast,
             task=task,
-            TR=TR,
+            TR=repetition_time,
         )
 
     if algorithm == "infomap":
@@ -210,7 +210,7 @@ def clustintime(
             task=task,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_binary",
-            TR=TR,
+            TR=repetition_time,
             contrast=contrast,
         )
     elif algorithm == "KMeans":
@@ -247,7 +247,7 @@ def clustintime(
             task=task,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_binary",
-            TR=TR,
+            TR=repetition_time,
             contrast=contrast,
         )
     elif algorithm == "Greedy":
@@ -265,16 +265,16 @@ def clustintime(
             task=task,
             saving_dir=saving_dir,
             prefix=f"{prefix}_orig_binary",
-            TR=TR,
+            TR=repetition_time,
             contrast=contrast,
         )
 
-    vis.plot_heatmap(labels, Title, task=task, TR=TR, saving_dir=saving_dir, prefix=prefix)
+    vis.plot_heatmap(labels, title, task=task, TR=repetition_time, saving_dir=saving_dir, prefix=prefix)
     vis.show_table(labels, saving_dir, prefix)
     if save_maps:
         clus.generate_maps(labels, saving_dir, data, masker, prefix)
 
-    if Dyn:
+    if generate_dyneusr_graph:
         vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
     if fir:
         if os.path.exists(f"{saving_dir}/fir") == 0:
@@ -289,10 +289,10 @@ def clustintime(
                 f"FIR onsets for cluster {i+1}",
                 f"{saving_dir}/fir",
                 f"{prefix}_fir_{i+1}",
-                task=[fir_timepoints * TR],
-                TR=TR,
+                task=[fir_timepoints * repetition_time],
+                TR=repetition_time,
             )
-            np.savetxt(f"{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D", fir_timepoints * TR)
+            np.savetxt(f"{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D", fir_timepoints * repetition_time)
 
 
 def _main(argv=None):
