@@ -191,7 +191,7 @@ def clustintime(
             thr=thr,
             contrast=contrast,
             task=task,
-            TR=repetition_time,
+            repetition_time=repetition_time,
         )
 
     if algorithm == "infomap":
