@@ -117,7 +117,7 @@ def implement_algorithm(
             corr_map, labels = clustering.greedy_mod(corr_map, indexes, thr, nscans=nscans)
 
     if algorithm == "infomap" or "Louvain" or "Greedy":
-        visualization_parameters.plot_two_matrixes(
+        visualization_parameters.plot_two_matrices(
             corr_map_2, corr_map, "Original correlation map", "Binary correlation map", contrast=contrast
         )
     return labels
@@ -261,7 +261,7 @@ def clustintime(
             title=None,
             labels=None,
             prefix=f"{prefix}_orig_{proc}_{parameter}",
-        ).plot_two_matrixes(corr_map, new_corr_map, "Original matrix", "Filtered matrix", contrast)
+        ).plot_two_matrices(corr_map, new_corr_map, "Original matrix", "Filtered matrix", contrast)
         corr_map = new_corr_map
 
     visualization_parameters = Visualization(

@@ -113,13 +113,11 @@ class Visualization:
         """
         cluster, count = np.unique(self.labels, return_counts=True)
         array = [cluster, count, count / len(self.labels)]
-        # display_table(np.transpose([["Cluster"], ["Count"], ["Percentage"]]))
-        # display_table(np.transpose(array))
         table_result = pd.DataFrame({"Cluster": array[0], "Count": array[1], "Percentage": array[2]})
         print(table_result)
         table_result.to_csv(f"{self.saving_dir}/{self.prefix}_Results.csv")
 
-    def plot_two_matrixes(self, map_1, map_2, title_1, title_2, contrast=1):
+    def plot_two_matrices(self, map_1, map_2, title_1, title_2, contrast=1):
         """
         Graphical comparison between two correlation maps
 
