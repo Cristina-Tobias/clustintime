@@ -12,7 +12,6 @@ It requires python 3.6 or above, as well as the modules:
 """
 
 
-
 import sys
 
 # Libraries
@@ -54,47 +53,75 @@ def load_data(data, mask_directory):
 
     return data_masked, masker
 
-def implement_algorithm(algorithm, consensus, thr, n_clusters, nscans, corr_map, indexes, seed, affinity, linkage, visualization_parameters, contrast):
+
+def implement_algorithm(
+    algorithm,
+    consensus,
+    thr,
+    n_clusters,
+    nscans,
+    corr_map,
+    indexes,
+    seed,
+    affinity,
+    linkage,
+    visualization_parameters,
+    contrast,
+):
     if algorithm == "infomap":
         corr_map_2 = corr_map.copy()
         if consensus:
-            labels = Consensus(clustering.info_map, thr, n_clusters, nscans).find_clusters_with_consensus(corr_map, indexes)
+            labels = Consensus(clustering.info_map, thr, n_clusters, nscans).find_clusters_with_consensus(
+                corr_map, indexes
+            )
         else:
             corr_map, labels = clustering.info_map(corr_map, indexes, thr, nscans=nscans)
     elif algorithm == "KMeans":
         if consensus:
-            labels = Consensus(clustering.k_means, thr, n_clusters, nscans).find_clusters_with_consensus(corr_map, indexes)
+            labels = Consensus(clustering.k_means, thr, n_clusters, nscans).find_clusters_with_consensus(
+                corr_map, indexes
+            )
         else:
-            labels = clustering.k_means(corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed)
+            labels = clustering.k_means(
+                corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed
+            )
     elif algorithm == "Agglomerative":
         if consensus:
-            labels = Consensus(clustering.agglomerative_clustering, thr, n_clusters, nscans).find_clusters_with_consensus(corr_map, indexes)
+            labels = Consensus(
+                clustering.agglomerative_clustering, thr, n_clusters, nscans
+            ).find_clusters_with_consensus(corr_map, indexes)
         else:
-            labels = clustering.agglomerative_clustering(corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, affinity=affinity,linkage=linkage)
+            labels = clustering.agglomerative_clustering(
+                corr_map=corr_map,
+                indexes=indexes,
+                nscans=nscans,
+                n_clusters=n_clusters,
+                affinity=affinity,
+                linkage=linkage,
+            )
     elif algorithm == "Louvain":
         corr_map_2 = corr_map.copy()
         if consensus:
-            labels = Consensus(clustering.louvain, thr, n_clusters, nscans).find_clusters_with_consensus(corr_map, indexes)
+            labels = Consensus(clustering.louvain, thr, n_clusters, nscans).find_clusters_with_consensus(
+                corr_map, indexes
+            )
         else:
             corr_map, labels = clustering.louvain(corr_map, indexes, thr, nscans=nscans)
     elif algorithm == "Greedy":
         corr_map_2 = corr_map.copy()
         if consensus:
-            labels = Consensus(clustering.greedy_mod, thr, n_clusters, nscans).find_clusters_with_consensus(corr_map, indexes)
+            labels = Consensus(clustering.greedy_mod, thr, n_clusters, nscans).find_clusters_with_consensus(
+                corr_map, indexes
+            )
         else:
             corr_map, labels = clustering.greedy_mod(corr_map, indexes, thr, nscans=nscans)
 
-    if algorithm  == "infomap" or "Louvain" or "Greedy":
+    if algorithm == "infomap" or "Louvain" or "Greedy":
         visualization_parameters.plot_two_matrixes(
-            corr_map_2,
-            corr_map,
-            "Original correlation map",
-            "Binary correlation map",
-            contrast=contrast
+            corr_map_2, corr_map, "Original correlation map", "Binary correlation map", contrast=contrast
         )
     return labels
-    
-    
+
 
 def clustintime(
     data_directory,
@@ -187,7 +214,7 @@ def clustintime(
     None.
 
     """
-  
+
     # data_prueba = load_data(data_directory, mask_directory)
     # data = data_prueba[0]
     masker = NiftiMasker(mask_img=mask_directory)
@@ -224,45 +251,61 @@ def clustintime(
 
     if proc is not None:
         new_corr_map, corr_map, indexes, parameter = processing.preprocess(
-            corr_map=corr_map,
-            analysis=processing,
-            near=near,
-            thr=thr
+            corr_map=corr_map, analysis=processing, near=near, thr=thr
         )
-        Visualization(tasks=task, contrast=contrast,
-                  repetition_time=repetition_time,
-                  saving_dir=saving_dir, title=None,
-                  labels=None, prefix=f"{prefix}_orig_{proc}_{parameter}").plot_two_matrixes(corr_map,
-                                                                                                 new_corr_map,
-                                                                                                 "Original matrix",
-                                                                                                 "Filtered matrix",
-                                                                                                 contrast)
+        Visualization(
+            tasks=task,
+            contrast=contrast,
+            repetition_time=repetition_time,
+            saving_dir=saving_dir,
+            title=None,
+            labels=None,
+            prefix=f"{prefix}_orig_{proc}_{parameter}",
+        ).plot_two_matrixes(corr_map, new_corr_map, "Original matrix", "Filtered matrix", contrast)
         corr_map = new_corr_map
-        
-    visualization_parameters = Visualization(tasks=task, saving_dir=saving_dir, 
-                                             repetition_time=repetition_time, 
-                                             prefix=f"{prefix}_orig_binary", 
-                                             labels=None, title=title)
 
-    labels = implement_algorithm(algorithm, consensus, thr, n_clusters, nscans, corr_map, indexes, seed, affinity, linkage, visualization_parameters, contrast)
-    
-    Visualization(tasks=task, saving_dir=saving_dir, 
-                                             repetition_time=repetition_time, 
-                                             prefix=prefix, 
-                                             labels=labels, title=title).plot_heatmap()
-    Visualization(tasks=task, saving_dir=saving_dir, 
-                                             repetition_time=repetition_time, 
-                                             prefix=prefix, 
-                                             labels=labels, title=title).show_table()
+    visualization_parameters = Visualization(
+        tasks=task,
+        saving_dir=saving_dir,
+        repetition_time=repetition_time,
+        prefix=f"{prefix}_orig_binary",
+        labels=None,
+        title=title,
+    )
+
+    labels = implement_algorithm(
+        algorithm,
+        consensus,
+        thr,
+        n_clusters,
+        nscans,
+        corr_map,
+        indexes,
+        seed,
+        affinity,
+        linkage,
+        visualization_parameters,
+        contrast,
+    )
+
+    Visualization(
+        tasks=task, saving_dir=saving_dir, repetition_time=repetition_time, prefix=prefix, labels=labels, title=title
+    ).plot_heatmap()
+    Visualization(
+        tasks=task, saving_dir=saving_dir, repetition_time=repetition_time, prefix=prefix, labels=labels, title=title
+    ).show_table()
     if save_maps:
         clustering.generate_maps(labels, saving_dir, data, masker, prefix)
 
     if generate_dyneusr_graph:
-        Visualization(tasks=task, saving_dir=saving_dir, 
-                                             repetition_time=repetition_time, 
-                                             prefix=prefix, 
-                                             labels=labels, title=title).generate_dyneusr_visualization(corr_map)
-
+        Visualization(
+            tasks=task,
+            saving_dir=saving_dir,
+            repetition_time=repetition_time,
+            prefix=prefix,
+            labels=labels,
+            title=title,
+        ).generate_dyneusr_visualization(corr_map)
 
 
 def _main(argv=None):

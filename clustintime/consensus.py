@@ -5,7 +5,6 @@ import pandas as pd
 from clustintime.clustering import info_map, louvain, greedy_mod
 
 
-
 def compute_connectivity_matrix(n_items, labels):
     connectivity_matrix = np.zeros([n_items, n_items])
     for j in range(n_items):
@@ -78,9 +77,7 @@ class Consensus:
 
                 idx = self.get_indexes(data_sampled, indexes)
 
-                idx = np.transpose(
-                    pd.DataFrame([idx, sampling])
-                )
+                idx = np.transpose(pd.DataFrame([idx, sampling]))
                 idx = idx.set_index(1)
                 idx = idx[np.logical_not(np.isnan(idx[0]))]
                 labels = np.array([0] * npoints)
@@ -98,7 +95,9 @@ class Consensus:
                 final_labels = final_labels[1]
             whole_connectivity_matrix = compute_connectivity_matrix(npoints, final_labels)
 
-            are_clusters_stable = self.check_if_clusters_stable(_consensus, indexes, npoints, whole_connectivity_matrix)
+            are_clusters_stable = self.check_if_clusters_stable(
+                _consensus, indexes, npoints, whole_connectivity_matrix
+            )
 
         return final_labels
 

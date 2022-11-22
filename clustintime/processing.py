@@ -13,7 +13,6 @@ from scipy.signal import find_peaks
 from clustintime.visualization import Visualization
 
 
-
 def rss_peaks(corr_map, near):
     """
     Calculates the RSS of the correlation maps and returns the indexes of the time-points with the highest scores
@@ -59,6 +58,8 @@ def rss_peaks(corr_map, near):
     plt.ylabel("RSS", fontsize=10)
 
     return new_peaks
+
+
 def thr_index(corr_map, thr):
     """
     Removes time-points that have a correlation under a certain threshold
@@ -84,6 +85,8 @@ def thr_index(corr_map, thr):
     else:
         corr_map[corr_map < np.percentile(corr_map, thr)] = 0
     return corr_map
+
+
 def correlation_with_window(data, window_length):
     """
     Calculates the correlation using a sliding window
@@ -124,6 +127,8 @@ def correlation_with_window(data, window_length):
     corr_map_window = np.corrcoef(concat_data, rowvar=True)
 
     return corr_map_window
+
+
 def preprocess(corr_map, analysis, near=1, thr=95):
     """
     Main workflow for the processing algorithms
@@ -159,9 +164,9 @@ def preprocess(corr_map, analysis, near=1, thr=95):
     """
 
     indexes = range(corr_map.shape[0])
-    
+
     if analysis == "thr":
-        parameter = thr    
+        parameter = thr
         new_corr_map = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = rss_peaks(corr_map, near)
@@ -170,9 +175,5 @@ def preprocess(corr_map, analysis, near=1, thr=95):
     elif analysis == "double":
         parameter = "correlation"
         new_corr_map = np.nan_to_num(np.corrcoef(corr_map))
-        
-
-    
-        
 
     return new_corr_map, corr_map, indexes, parameter

@@ -56,7 +56,7 @@ class Visualization:
     def plot_heatmap(self):
         """
         Visualization of the clusters separately
-    
+
         Parameters
         ----------
         labels : numpy array
@@ -71,16 +71,16 @@ class Visualization:
             Structure containing the times when the task is performed. The default is [].
         repetition_time : float, optional
             TR of the data. The default is 0.5.
-    
+
         Returns
         -------
         None.
-    
+
         """
-    
+
         if self.tasks is None:
             self.tasks = []
-    
+
         plt.figure(figsize=[8, 8])
         heatmatrix = np.zeros([int(self.labels.max()), len(self.labels)])
         rownames = np.zeros([int(self.labels.max())]).astype(str)
@@ -92,7 +92,7 @@ class Visualization:
             file1d = pd.concat([file1d, pd.DataFrame(selected_labels)], axis=1)
             heatmatrix[i] = selected_labels
             rownames[i] = f"# {i+1}"
-    
+
         heatmatrix = pd.DataFrame(heatmatrix, columns=x_values, index=rownames)
         colors = sns.color_palette("Dark2", len(self.tasks) + 1)
         sns.heatmap(heatmatrix, cmap="Greys", xticklabels=150, cbar=False)
@@ -115,21 +115,20 @@ class Visualization:
         )
         plt.savefig(f"{self.saving_dir}/{self.prefix}_heatmap.png")
         np.savetxt(f"{self.saving_dir}/{self.prefix}_heatmap.1D", file1d)
-    
-    
+
     def show_table(self):
         """
         Table display of the results
-    
+
         Parameters
         ----------
         labels : numpy array
             Array of assigned clusters.
-    
+
         Returns
         -------
         None.
-    
+
         """
         cluster, count = np.unique(self.labels, return_counts=True)
         array = [cluster, count, count / len(self.labels)]
@@ -138,12 +137,11 @@ class Visualization:
         table_result = pd.DataFrame({"Cluster": array[0], "Count": array[1], "Percentage": array[2]})
         print(table_result)
         table_result.to_csv(f"{self.saving_dir}/{self.prefix}_Results.csv")
-    
-    
+
     def plot_two_matrixes(self, map_1, map_2, title_1, title_2, contrast=1):
         """
         Graphical comparison between two correlation maps
-    
+
         Parameters
         ----------
         map_1 : matrix
@@ -160,18 +158,18 @@ class Visualization:
             Range of values of the correlation matrixes. The default is 1.
         repetition_time: float, optional
             TR of the data. The default is 0.5
-    
+
         Returns
         -------
         None.
-    
+
         """
         if self.tasks is None:
             self.tasks = []
-    
+
         fig = plt.figure(figsize=(16, 8))
         grid_spec = fig.add_gridspec(1, 2, hspace=0)
-    
+
         (ax1, ax2) = grid_spec.subplots()
         ax1.imshow(map_1, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
         # Vertical lines to delimit the instant in which the event occurs
@@ -182,9 +180,9 @@ class Visualization:
         ax1.set_title(title_1)
         ax1.set_xlim([0, limit])
         ax1.set_ylim([limit, 0])
-    
+
         # Plot
-    
+
         image = ax2.imshow(map_2, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
         limit = map_2.shape[0]
         for task in self.tasks.values():
@@ -195,12 +193,11 @@ class Visualization:
         ax2.set_ylim([limit, 0])
         fig.colorbar(image)
         plt.savefig(f"{self.saving_dir}/{self.prefix}_matrix_comparison.png")
-    
-    
+
     def generate_dyneusr_visualization(self, corr_map):
         """
         DyNeuSR Visualization of the results
-    
+
         Parameters
         ----------
         corr_map : matrix
@@ -210,19 +207,19 @@ class Visualization:
         output_file : str or path, optional
             Desired saving path for the generated html.
             The default is "./dyneusr.html".
-    
+
         Returns
         -------
         None.
-    
+
         """
         y_values = pd.get_dummies(self.labels.astype(str))
-    
+
         mapper = KeplerMapper(verbose=1)
         # Configure projection
         pca = PCA(2, random_state=1)
         umap = UMAP(n_components=2, init=pca.fit_transform(corr_map))
-    
+
         # Construct lens and generate the shape graph
         lens = mapper.fit_transform(umap.fit_transform(corr_map, y=None), projection=[0, 1])
         graph = mapper.map(
@@ -231,27 +228,27 @@ class Visualization:
             cover=Cover(20, 0.7),
             clusterer=optimize_dbscan(corr_map, k=3, p=100.0),
         )
-    
+
         # Convert to a DyNeuGraph
         dyneusr_graph = DyNeuGraph(G=graph, y=y_values)
-    
+
         # Define some custom_layouts
         dyneusr_graph.add_custom_layout(lens, name="lens")
         dyneusr_graph.add_custom_layout(nx.spring_layout, name="nx.spring")
         dyneusr_graph.add_custom_layout(nx.kamada_kawai_layout, name="nx.kamada_kawai")
         dyneusr_graph.add_custom_layout(nx.spectral_layout, name="nx.spectral")
         dyneusr_graph.add_custom_layout(nx.circular_layout, name="nx.circular")
-    
+
         # Configure some projections
         pca = PCA(2, random_state=1)
         tsne = TSNE(2, init="pca", random_state=1)
         umap = UMAP(n_components=2, init=pca.fit_transform(corr_map))
-    
+
         # Add projections as custom_layouts
         dyneusr_graph.add_custom_layout(pca.fit_transform(corr_map), name="PCA")
         dyneusr_graph.add_custom_layout(tsne.fit_transform(corr_map), name="TSNE")
         dyneusr_graph.add_custom_layout(umap.fit_transform(corr_map, y=None), name="UMAP")
-    
+
         # Visualize
         output_file = f"{self.saving_dir}_{self.prefix}_dyneusr.html"
         dyneusr_graph.visualize(output_file)
