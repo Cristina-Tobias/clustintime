@@ -10,57 +10,8 @@ import matplotlib.pyplot as plt  # For graphs
 import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks
+from clustintime.visualization import Visualization
 
-import clustintime.visualization as visualization
-
-
-def compute_connectivity_matrix(n_items, labels):
-    connectivity_matrix = np.zeros([n_items, n_items])
-    for j in range(n_items):
-        if labels[j] > 0:
-            row = np.where(labels == labels[j])
-            connectivity_matrix[j, row] = 1
-    return connectivity_matrix
-
-
-def find_threshold_bfs(array):
-    first_node = 0
-    last_node = len(array) - 1
-    probabilities = np.unique(array.ravel())
-    low = 0
-    high = len(probabilities)
-
-    while high - low > 1:
-        i = (high + low) // 2
-        prob = probabilities[i]
-        copied_array = np.array(array)
-        copied_array[copied_array < prob] = 0.0
-        if bfs(copied_array, first_node, last_node):
-            low = i
-        else:
-            high = i
-
-    return probabilities[low]
-
-
-def bfs(graph, source, dest):
-    """Perform breadth-first search starting at source. If dest is reached,
-    return True, otherwise, return False."""
-    # Based on http://www.ics.uci.edu/~eppstein/PADS/BFS.py
-    # by D. Eppstein, July 2004.
-    visited = set([source])
-    nodes = np.arange(0, len(graph))
-    stack = [(source, nodes[graph[source] > 0])]
-    while stack:
-        _, children = stack[0]
-        for child in children:
-            if child == dest:
-                return True
-            if child not in visited:
-                visited.add(child)
-                stack.append((child, nodes[graph[child] > 0]))
-        stack.pop(0)
-    return False
 
 
 def rss_peaks(corr_map, near):
@@ -108,8 +59,6 @@ def rss_peaks(corr_map, near):
     plt.ylabel("RSS", fontsize=10)
 
     return new_peaks
-
-
 def thr_index(corr_map, thr):
     """
     Removes time-points that have a correlation under a certain threshold
@@ -135,8 +84,6 @@ def thr_index(corr_map, thr):
     else:
         corr_map[corr_map < np.percentile(corr_map, thr)] = 0
     return corr_map
-
-
 def correlation_with_window(data, window_length):
     """
     Calculates the correlation using a sliding window
@@ -177,11 +124,7 @@ def correlation_with_window(data, window_length):
     corr_map_window = np.corrcoef(concat_data, rowvar=True)
 
     return corr_map_window
-
-
-def preprocess(
-    corr_map, analysis, saving_dir=".", prefix="", near=1, thr=95, contrast=1, task=None, repetition_time=0.5
-):
+def preprocess(corr_map, analysis, near=1, thr=95):
     """
     Main workflow for the processing algorithms
 
@@ -215,51 +158,21 @@ def preprocess(
 
     """
 
-    if task is None:
-        task = []
-
     indexes = range(corr_map.shape[0])
+    
     if analysis == "thr":
-        aux = corr_map.copy()
-        aux = thr_index(aux, thr)
-        visualization.plot_two_matrixes(
-            corr_map,
-            aux,
-            "Original matrix",
-            "Filtered matrix",
-            tasks=task,
-            contrast=contrast,
-            repetition_time=repetition_time,
-            saving_dir=saving_dir,
-            prefix=f"{prefix}_orig_thr_{thr}",
-        )
-        corr_map = thr_index(corr_map, thr)
+        parameter = thr    
+        new_corr_map = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = rss_peaks(corr_map, near)
-        visualization.plot_two_matrixes(
-            corr_map,
-            pd.DataFrame(corr_map).loc[indexes, indexes],
-            "Original matrix",
-            "Filtered matrix",
-            tasks=task,
-            contrast=contrast,
-            repetition_time=repetition_time,
-            saving_dir=saving_dir,
-            prefix=f"{prefix}_orig_RSS_{near}",
-        )
-        corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
+        parameter = near
+        new_corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
     elif analysis == "double":
-        visualization.plot_two_matrixes(
-            corr_map,
-            np.nan_to_num(np.corrcoef(corr_map)),
-            "Original matrix",
-            "Double correlation matrix",
-            tasks=task,
-            contrast=contrast,
-            repetition_time=repetition_time,
-            saving_dir=saving_dir,
-            prefix=f"{prefix}_orig_double",
-        )
-        corr_map = np.nan_to_num(np.corrcoef(corr_map))
+        parameter = "correlation"
+        new_corr_map = np.nan_to_num(np.corrcoef(corr_map))
+        
 
-    return corr_map, indexes
+    
+        
+
+    return new_corr_map, corr_map, indexes, parameter
