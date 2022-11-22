@@ -24,26 +24,6 @@ from sklearn.manifold import TSNE
 from umap.umap_ import UMAP
 
 
-# def display_table(data):
-#     """
-#     HTML code for showing a table of the results
-
-#     Parameters
-#     ----------
-#     data : numpy array
-#     Returns
-#     -------
-#     None.
-
-#     """
-#     html = "<table>"
-#     for row in data:
-#         html += "<tr>"
-#         for field in row:
-#             html += f"<td>{field}<td>"
-#         html += "</tr>"
-#     html += "</table>"
-#     display(HTML(html))
 class Visualization:
     def __init__(self, title, saving_dir, prefix, tasks, repetition_time, labels):
         self.title = title
