@@ -95,7 +95,7 @@ def plot_heatmap(labels, title, saving_dir, prefix, tasks=None, repetition_time=
     # linewidth = 0.7)
     legends = np.zeros([len(tasks)]).astype(str)
     rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
-    for idx, task in enumerate(tasks):
+    for idx, task in enumerate(tasks.values()):
         plt.vlines(task / repetition_time, 0, labels.max(), linewidth=1.2, colors=colors[idx], alpha=0.5)
         legends[idx] = f"task {idx}"
         rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[idx + 1]))
@@ -171,7 +171,7 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, tasks=
     ax1.imshow(map_1, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
     # Vertical lines to delimit the instant in which the event occurs
     limit = map_1.shape[0]
-    for task in tasks:
+    for task in tasks.values():
         ax1.vlines(task / repetition_time, ymin=0, ymax=limit, linewidth=0.7)
         ax1.hlines(task / repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax1.set_title(title_1)
@@ -182,7 +182,7 @@ def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, tasks=
 
     image = ax2.imshow(map_2, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
     limit = map_2.shape[0]
-    for task in tasks:
+    for task in tasks.values():
         ax2.vlines(task / repetition_time, ymin=0, ymax=limit, linewidth=0.7)
         ax2.hlines(task / repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax2.set_title(title_2)

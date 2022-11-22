@@ -21,11 +21,11 @@ from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
 from scipy.signal import find_peaks
 
-import clustintime.clustering as clus
+import clustintime.clustering as clustering
 from clustintime.consensus import Consensus
-import clustintime.processing as proc
-import clustintime.visualization as vis
-from clustintime.cli.run_clime import _get_parser
+import clustintime.processing as processing
+import clustintime.visualization as visualization
+from clustintime.cli.run_clustintime import _get_parser
 
 
 def load_data(data, mask_file):
@@ -61,7 +61,7 @@ def clustintime(
     component="whole",
     timings_file=None,
     correlation="standard",
-    processing=None,
+    proc=None,
     window_size=1,
     near=1,
     thr=95,
@@ -77,7 +77,6 @@ def clustintime(
     prefix="",
     seed=0,
     generate_dyneusr_graph=False,
-    fir=False,
     title="",
 ):
     """
@@ -179,13 +178,13 @@ def clustintime(
     if correlation == "standard":
         corr_map = np.nan_to_num(np.corrcoef(data))
     else:
-        corr_map = np.nan_to_num(proc.correlation_with_window(data, window_size))
+        corr_map = np.nan_to_num(processing.correlation_with_window(data, window_size))
 
     nscans = corr_map.shape[0]
     indexes = range(corr_map.shape[0])
 
-    if processing is not None:
-        corr_map, indexes = proc.preprocess(
+    if proc is not None:
+        corr_map, indexes = processing.preprocess(
             corr_map=corr_map,
             analysis=processing,
             near=near,
@@ -198,12 +197,12 @@ def clustintime(
     if algorithm == "infomap":
         corr_map_2 = corr_map.copy()
         if consensus:
-            algorithm = clus.info_map
+            algorithm = clustering.info_map
             labels = Consensus(algorithm, thr, n_clusters, nscans).find_clusters_with_consensus(corr_map, indexes)
         else:
-            corr_map, labels = clus.info_map(corr_map, indexes, thr, nscans)
+            corr_map, labels = clustering.info_map(corr_map, indexes, thr, nscans)
 
-        vis.plot_two_matrixes(
+        visualization.plot_two_matrixes(
             corr_map_2,
             corr_map,
             "Original correlation map",
@@ -216,16 +215,16 @@ def clustintime(
         )
     elif algorithm == "KMeans":
         if consensus:
-            algorithm = clus.k_means
-            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+            algorithm = clustering.k_means
+            labels = clustering.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            labels = clus.k_means(corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed)
+            labels = clustering.k_means(corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed)
     elif algorithm == "Agglomerative":
         if consensus:
-            algorithm = clus.agglomerative_clustering
-            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+            algorithm = clustering.agglomerative_clustering
+            labels = clustering.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            labels = clus.agglomerative_clustering(
+            labels = clustering.agglomerative_clustering(
                 corr_map=corr_map,
                 indexes=indexes,
                 nscans=nscans,
@@ -236,11 +235,11 @@ def clustintime(
     elif algorithm == "Louvain":
         corr_map_2 = corr_map.copy()
         if consensus:
-            algorithm = clus.louvain
-            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+            algorithm = clustering.louvain
+            labels = clustering.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.louvain(corr_map, indexes, thr, nscans=nscans)
-        vis.plot_two_matrixes(
+            corr_map, labels = clustering.louvain(corr_map, indexes, thr, nscans=nscans)
+        visualization.plot_two_matrixes(
             corr_map_2,
             corr_map,
             "Original correlation map",
@@ -254,11 +253,11 @@ def clustintime(
     elif algorithm == "Greedy":
         corr_map_2 = corr_map.copy()
         if consensus:
-            algorithm = clus.greedy_mod
-            labels = clus.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
+            algorithm = clustering.greedy_mod
+            labels = clustering.consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr)
         else:
-            corr_map, labels = clus.greedy_mod(corr_map, indexes, thr, nscans=nscans)
-        vis.plot_two_matrixes(
+            corr_map, labels = clustering.greedy_mod(corr_map, indexes, thr, nscans=nscans)
+        visualization.plot_two_matrixes(
             corr_map_2,
             corr_map,
             "Original correlation map",
@@ -270,30 +269,14 @@ def clustintime(
             contrast=contrast,
         )
 
-    vis.plot_heatmap(labels, title, tasks=task, repetition_time=repetition_time, saving_dir=saving_dir, prefix=prefix)
-    vis.show_table(labels, saving_dir, prefix)
+    visualization.plot_heatmap(labels, title, tasks=task, repetition_time=repetition_time, saving_dir=saving_dir, prefix=prefix)
+    visualization.show_table(labels, saving_dir, prefix)
     if save_maps:
-        clus.generate_maps(labels, saving_dir, data, masker, prefix)
+        clustering.generate_maps(labels, saving_dir, data, masker, prefix)
 
     if generate_dyneusr_graph:
-        vis.generate_dyneusr_visualization(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
-    if fir:
-        if os.path.exists(f"{saving_dir}/fir") == 0:
-            os.mkdir(f"{saving_dir}/fir")
-        for i in range(int(max(labels))):
-            all_time_points = np.where(labels == i + 1)[0]
-            difference = np.diff(all_time_points)
-            select = find_peaks(difference)[0]
-            fir_timepoints = np.insert(all_time_points[select + 1], 0, all_time_points[0])
-            vis.plot_heatmap(
-                labels,
-                f"FIR onsets for cluster {i+1}",
-                f"{saving_dir}/fir",
-                f"{prefix}_fir_{i+1}",
-                tasks=[fir_timepoints * repetition_time],
-                repetition_time=repetition_time,
-            )
-            np.savetxt(f"{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D", fir_timepoints * repetition_time)
+        visualization.generate_dyneusr_visualization(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
+
 
 
 def _main(argv=None):

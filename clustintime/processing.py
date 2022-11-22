@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks
 
-import clustintime.visualization as vis
+import clustintime.visualization as visualization
 
 
 def compute_connectivity_matrix(n_items, labels):
@@ -222,7 +222,7 @@ def preprocess(
     if analysis == "thr":
         aux = corr_map.copy()
         aux = thr_index(aux, thr)
-        vis.plot_two_matrixes(
+        visualization.plot_two_matrixes(
             corr_map,
             aux,
             "Original matrix",
@@ -236,7 +236,7 @@ def preprocess(
         corr_map = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = rss_peaks(corr_map, near)
-        vis.plot_two_matrixes(
+        visualization.plot_two_matrixes(
             corr_map,
             pd.DataFrame(corr_map).loc[indexes, indexes],
             "Original matrix",
@@ -249,7 +249,7 @@ def preprocess(
         )
         corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
     elif analysis == "double":
-        vis.plot_two_matrixes(
+        visualization.plot_two_matrixes(
             corr_map,
             np.nan_to_num(np.corrcoef(corr_map)),
             "Original matrix",
