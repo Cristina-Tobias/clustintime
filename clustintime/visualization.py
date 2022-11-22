@@ -26,6 +26,10 @@ from umap.umap_ import UMAP
 
 class Visualization:
     def __init__(self, title, saving_dir, prefix, tasks, repetition_time, labels):
+
+        if tasks is None:
+            tasks = []
+
         self.title = title
         self.saving_dir = saving_dir
         self.prefix = prefix
@@ -57,9 +61,6 @@ class Visualization:
         None.
 
         """
-
-        if self.tasks is None:
-            self.tasks = []
 
         plt.figure(figsize=[8, 8])
         heatmatrix = np.zeros([int(self.labels.max()), len(self.labels)])
