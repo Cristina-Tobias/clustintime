@@ -50,7 +50,7 @@ class Consensus:
 
             are_clusters_stable = self.check_if_clusters_stable(_consensus, indexes, npoints, whole_connectivity_matrix)
 
-        return labels[1]
+        return final_labels[1]
 
     def get_indexes(self, data_sampled, indexes):
         labels = self.get_labels(data_sampled, indexes)
