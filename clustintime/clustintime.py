@@ -38,7 +38,7 @@ def clustintime(
     near=1,
     thr=95,
     contrast=1,
-    TR=0.5,
+    repetition_time=0.5,
     affinity = 'euclidean',
     linkage = 'ward',
     algorithm="infomap",
@@ -48,9 +48,9 @@ def clustintime(
     saving_dir=".",
     prefix="",
     seed=0,
-    Dyn = False,
+    generate_dyneusr_graph = False,
     fir = False,
-    Title = ""
+    title = ""
 ):
     """
     Run main workflow of clustintime.
@@ -89,8 +89,8 @@ def clustintime(
     contrast : float, optional
         Range of values for the correlation matrixes.
         The default is 1.
-    TR : float, optional
-        TR of the data.
+    repetition_time : float, optional
+        Repetition time of the data.
         The default is 0.5.
     algorithm : str, optional
         Desired clustering algorithm for the analysis, the options are `infomap` and `KMeans`.
@@ -109,9 +109,9 @@ def clustintime(
         The default is ".".
     prefix: str, optional
         Prefix for the saved outcomes
-    Dyn : bool, optional
+    generate_dyneusr_graph : bool, optional
         Generate a DyNeuSR graph. Default is `False`
-    Title: str, optional
+    title: str, optional
         Title for the graphs
 
     Returns
@@ -138,7 +138,7 @@ def clustintime(
     # Create data
     if timings_file != None:
         # Load timings
-        # 1D files are a txt file with the times in which the events occur. They are divided by TR
+        # 1D files are a txt file with the times in which the events occur. They are divided by the repetition_time. 
         task = {}
         if type(timings_file) == str:
             timings_file = [timings_file]
@@ -163,7 +163,7 @@ def clustintime(
             thr = thr,
             contrast = contrast,
             task = task,
-            TR = TR
+            TR = repetition_time
         )
 
     if algorithm == "infomap":
@@ -180,7 +180,7 @@ def clustintime(
                 )
 
         vis.plot_two_matrixes(
-            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,  saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',TR= TR ,contrast = contrast
+            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,  saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',TR= repetition_time ,contrast = contrast
         )
     elif algorithm == "KMeans":
         if consensus:
@@ -220,7 +220,7 @@ def clustintime(
                 nscans=nscans
                 )
         vis.plot_two_matrixes(
-            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task, saving_dir = saving_dir, prefix = f'{prefix}_orig_binary', TR= TR ,contrast = contrast
+            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task, saving_dir = saving_dir, prefix = f'{prefix}_orig_binary', TR= repetition_time ,contrast = contrast
         )
     elif algorithm == "Greedy":
         corr_map_2 = corr_map.copy()
@@ -235,15 +235,15 @@ def clustintime(
                 nscans=nscans
                 )
         vis.plot_two_matrixes(
-            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',  TR= TR ,contrast = contrast
+            corr_map_2, corr_map, "Original correlation map", "Binary correlation map",task = task,saving_dir = saving_dir, prefix = f'{prefix}_orig_binary',  TR= repetition_time ,contrast = contrast
         )
 
-    vis.plot_heatmap(labels, Title, task = task, TR = TR,  saving_dir = saving_dir, prefix = prefix)
+    vis.plot_heatmap(labels, title, task = task, TR = repetition_time,  saving_dir = saving_dir, prefix = prefix)
     vis.show_table(labels, saving_dir, prefix)
     if save_maps:
         clus.generate_maps(labels, saving_dir, data, masker, prefix)
     
-    if Dyn:
+    if generate_dyneusr_graph:
         vis.Dyn(corr_map, labels, output_file=f"{saving_dir}/dyneusr_{prefix}.html")
     if fir:
         if os.path.exists(f'{saving_dir}/fir')==0:
@@ -253,8 +253,8 @@ def clustintime(
             difference = np.diff(all_time_points)
             select = find_peaks(difference)[0]
             fir_timepoints = np.insert(all_time_points[select+1],0, all_time_points[0])
-            vis.plot_heatmap(labels, f'FIR onsets for cluster {i+1}' ,f'{saving_dir}/fir',f'{prefix}_fir_{i+1}',task=[fir_timepoints*TR], TR=TR)
-            np.savetxt(f'{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D',fir_timepoints*TR)
+            vis.plot_heatmap(labels, f'FIR onsets for cluster {i+1}' ,f'{saving_dir}/fir',f'{prefix}_fir_{i+1}',task=[fir_timepoints*repetition_time], TR=repetition_time)
+            np.savetxt(f'{saving_dir}/fir/{prefix}_FIR_Cluster_{i+1}.1D',fir_timepoints*repetition_time)
 
 def _main(argv = None):
     print(sys.argv)
