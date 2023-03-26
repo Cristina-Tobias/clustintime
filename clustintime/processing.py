@@ -11,63 +11,11 @@ import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks
 
-import clustintime.Visualization as vis
 
-
-def compute_connectivity_matrix(n_items, labels):
-    M = np.zeros([n_items, n_items])
-    for j in range(n_items):
-        if labels[j] > 0:
-            m = np.where(labels == labels[j])
-            M[j, m] = 1
-    return M
-
-
-def find_threshold_bfs(array):
-    first_node = 0
-    last_node = len(array) - 1
-    probabilities = np.unique(array.ravel())
-    low = 0
-    high = len(probabilities)
-
-    while high - low > 1:
-        i = (high + low) // 2
-        prob = probabilities[i]
-        copied_array = np.array(array)
-        copied_array[copied_array < prob] = 0.0
-        if bfs(copied_array, first_node, last_node):
-            low = i
-        else:
-            high = i
-
-    return probabilities[low]
-
-
-def bfs(graph, source, dest):
-    """Perform breadth-first search starting at source. If dest is reached,
-    return True, otherwise, return False."""
-    # Based on http://www.ics.uci.edu/~eppstein/PADS/BFS.py
-    # by D. Eppstein, July 2004.
-    visited = set([source])
-    nodes = np.arange(0, len(graph))
-    stack = [(source, nodes[graph[source] > 0])]
-    while stack:
-        parent, children = stack[0]
-        for child in children:
-            if child == dest:
-                return True
-            if child not in visited:
-                visited.add(child)
-                stack.append((child, nodes[graph[child] > 0]))
-        stack.pop(0)
-    return False
-
-
-def RSS_peaks(corr_map, near):
+def rss_peaks(corr_map, near):
     """
-    Calculates the RSS of the correlation maps and returns the indexes of the time-points with
-    the highest scores and the time-points nearby.
-
+    Calculates the RSS of the correlation maps and returns the indexes of the time-points with the highest scores
+    and the time-points nearby.
     Parameters
     ----------
     corr_map : matrix
@@ -81,28 +29,24 @@ def RSS_peaks(corr_map, near):
         Array containing the indexes of the most relevant time-points.
 
     """
-    RSS_1 = [np.sum(np.square(i)) ** 0.5 for i in corr_map]
-    peaks = find_peaks(RSS_1)[0]
+    rss_values = [np.sum(np.square(i)) ** 0.5 for i in corr_map]
+    peaks = find_peaks(rss_values)[0]
     new_peaks = [0] * 2 * near * len(peaks)
 
-    for i in range(len(peaks)):
-        if peaks[i] <= near:
+    for peak in peaks:
+        if peak <= near:
             new_peaks[0:near] = range(near)
-        elif peaks[i] >= len(RSS_1) - near:
-            new_peaks[(len(RSS_1) - near) : peaks[i]] = range((len(RSS_1) - near), peaks[i])
+        elif peak >= len(rss_values) - near:
+            new_peaks[(len(rss_values) - near) : peak] = range((len(rss_values) - near), peak)
         else:
-            new_peaks[(peaks[i] - near) : (peaks[i] + near)] = range(
-                (peaks[i] - near), (peaks[i] + near)
-            )
+            new_peaks[(peak - near) : (peak + near)] = range((peak - near), (peak + near))
     new_peaks = np.array(new_peaks)
     new_peaks = new_peaks[new_peaks != 0]
     new_peaks = np.array(list(set(new_peaks)))
     plt.figure(figsize=[16, 8])
-    plt.plot(RSS_1)
-
-    filtered_plot = np.array([np.mean(RSS_1)] * len(RSS_1))
-    filtered_plot[[new_peaks]] = np.array(RSS_1)[new_peaks]
-
+    plt.plot(rss_values)
+    filtered_plot = np.array([np.mean(rss_values)] * len(rss_values))
+    filtered_plot[[new_peaks]] = np.array(rss_values)[new_peaks]
     plt.plot(filtered_plot)
     plt.title("RSS of original data vs filtered RSS")
     plt.legend(["Original RSS", "Filtered RSS"])
@@ -170,6 +114,7 @@ def correlation_with_window(data, window_length):
         else:
             # The last rows will be concatenated (since there are less rows than the specified length
             # once the loop finishes, you can exit it)
+
             for window_idx in range(window_length):
                 if (timepoint + window_idx + 1) < (data.shape[0]):
                     temp = np.concatenate((temp, data[timepoint + window_idx + 1, :]))
@@ -181,17 +126,8 @@ def correlation_with_window(data, window_length):
     return corr_map_window
 
 
-def preprocess(
-    corr_map,
-    analysis,
-    saving_dir=".",
-    prefix="",
-    near=1,
-    thr=95,
-    contrast=1,
-    task=[],
-    repetition_time=0.5,
-):
+def preprocess(corr_map, analysis, near=1, thr=95):
+
     """
     Main workflow for the processing algorithms
 
@@ -203,7 +139,7 @@ def preprocess(
         Desired type of processing, the options are `double`, `thr`, `RSS`.
     saving_dir : str or path
         Saving directory for figures
-    Prefix : str
+    prefix : str
         Prefix for figure names
     near : int, optional
         Desired size of RSS peaks for the option `RSS`. The default is 1.
@@ -215,7 +151,6 @@ def preprocess(
         Structure containing the timings when the task is performed. The default is [].
     repetition_time: float, optional
         Repetition time (TR) of the data. The default is 0.5
-
     Returns
     -------
     corr_map : matrix
@@ -224,48 +159,18 @@ def preprocess(
         Array specifying the relevant time-points.
 
     """
-    indexes = range(corr_map.shape[0])
-    if analysis == "thr":
-        aux = corr_map.copy()
-        aux = thr_index(aux, thr)
-        vis.plot_two_matrixes(
-            corr_map,
-            aux,
-            "Original matrix",
-            "Filtered matrix",
-            task=task,
-            contrast=contrast,
-            repetition_time=repetition_time,
-            saving_dir=saving_dir,
-            prefix=f"{prefix}_orig_thr_{thr}",
-        )
-        corr_map = thr_index(corr_map, thr)
-    elif analysis == "RSS":
-        indexes = RSS_peaks(corr_map, near)
-        vis.plot_two_matrixes(
-            corr_map,
-            pd.DataFrame(corr_map).loc[indexes, indexes],
-            "Original matrix",
-            "Filtered matrix",
-            task=task,
-            contrast=contrast,
-            repetition_time=repetition_time,
-            saving_dir=saving_dir,
-            prefix=f"{prefix}_orig_RSS_{near}",
-        )
-        corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
-    elif analysis == "double":
-        vis.plot_two_matrixes(
-            corr_map,
-            np.nan_to_num(np.corrcoef(corr_map)),
-            "Original matrix",
-            "Double correlation matrix",
-            task=task,
-            contrast=contrast,
-            TR=repetition_time,
-            saving_dir=saving_dir,
-            prefix=f"{prefix}_orig_double",
-        )
-        corr_map = np.nan_to_num(np.corrcoef(corr_map))
 
-    return corr_map, indexes
+    indexes = range(corr_map.shape[0])
+
+    if analysis == "thr":
+        parameter = thr
+        new_corr_map = thr_index(corr_map, thr)
+    elif analysis == "RSS":
+        indexes = rss_peaks(corr_map, near)
+        parameter = near
+        new_corr_map = pd.DataFrame(corr_map).loc[indexes, indexes]
+    elif analysis == "double":
+        parameter = "correlation"
+        new_corr_map = np.nan_to_num(np.corrcoef(corr_map))
+
+    return new_corr_map, corr_map, indexes, parameter

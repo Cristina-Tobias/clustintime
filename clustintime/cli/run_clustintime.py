@@ -24,7 +24,7 @@ def _get_parser():
     required.add_argument(
         "-i",
         "--input-file",
-        dest="data_file",
+        dest="data_paths",
         type=str,
         help="The name or fullpath to the file containing the fMRI data",
         required=True,
@@ -33,7 +33,7 @@ def _get_parser():
     required.add_argument(
         "-m",
         "--mask-file",
-        dest="mask_file",
+        dest="mask_path",
         type=str,
         help="The name or fullpath to the file containing the mask" "for the data",
         required=True,
@@ -43,8 +43,7 @@ def _get_parser():
         "--component",
         dest="component",
         type=str,
-        help="Desired component of the signal to analyze, the options are `whole`,"
-        "`positive`, `negative`.",
+        help="Desired component of the signal to analyze, the options are `whole`," "`positive`, `negative`.",
         required=False,
         default="whole",
     )
@@ -64,8 +63,7 @@ def _get_parser():
         "--correlation",
         dest="correlation",
         type=str,
-        help="Desired type of correlation, the options are `standard`, `window`"
-        "Default is `standard`",
+        help="Desired type of correlation, the options are `standard`, `window`" "Default is `standard`",
         required=False,
         default="standard",
     )
@@ -73,7 +71,7 @@ def _get_parser():
     optional.add_argument(
         "-p",
         "--processing",
-        dest="processing",
+        dest="process_type",
         type=str,
         help="The name of the desired type of processing." "Default is None",
         required=False,
@@ -107,8 +105,7 @@ def _get_parser():
         "--threshold",
         dest="thr",
         type=int,
-        help="If '-p' is used and takes the value 'thr', "
-        "It will be used as a threshold percentile",
+        help="If '-p' is used and takes the value 'thr', " "It will be used as a threshold percentile",
         required=False,
         default=95,
     )
@@ -198,8 +195,7 @@ def _get_parser():
         "--saving-dir",
         dest="saving_dir",
         type=str,
-        help="The name or fullpath to saving directory."
-        "Default is to save in the current directory",
+        help="The name or fullpath to saving directory." "Default is to save in the current directory",
         required=False,
         default=".",
     )
@@ -232,16 +228,6 @@ def _get_parser():
         help="Generate and save DyneuSR map. " "Default is not to save",
         required=False,
         default=False,
-    )
-
-    optional.add_argument(
-        "-f",
-        "--fir",
-        dest="fir",
-        action="store_true",
-        help="Save the onset for FIR analysis in each cluster" "Default is not to save",
-        required=False,
-        default=".",
     )
 
     optional.add_argument(
