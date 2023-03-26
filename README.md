@@ -28,7 +28,7 @@ Optional arguments are:
 5. thr: necessary argument if Processing takes the value of 'thr'
 6. contrast: contrast for the correlation maps
 7. dir_path: directory for the finger_tapping timings
-8. TR: TR of the data, only necessary in finger_tapping events
+8. repetition_time: Repetition Time (TR) of the data, only necessary in finger_tapping events
 9. Algorithm: the possible values are 'infomap' or 'KMeans' 
 10. thr_infomap: necessary argument if the selected algorithm is infomap
 11. n_clusters: necessary argument if the selected algorithm is KMeans

@@ -12,19 +12,19 @@ It requires python 3.6 or above, as well as the modules:
 """
 
 
+
 import sys
 
 # Libraries
 import numpy as np
 from nilearn.input_data import NiftiMasker
-from nilearn.masking import apply_mask
-
-
-import clustintime.clustering as clustering
-from clustintime.consensus import Consensus
-import clustintime.processing as processing
-from clustintime.visualization import Visualization
 from clustintime.cli.run_clustintime import _get_parser
+
+from clustintime import clustering
+from clustintime.consensus import Consensus
+from clustintime import processing
+from clustintime.visualization import Visualization
+
 
 
 def load_data(data_paths, mask_paths):
@@ -128,7 +128,7 @@ def clustintime(
     component="whole",
     timings_file=None,
     correlation="standard",
-    proc=None,
+    process_type=None,
     window_size=1,
     near=1,
     thr=95,
@@ -168,7 +168,7 @@ def clustintime(
     correlation : str, optional
         Desired type of correlation, the options are `standard`, `window`
         The default is `standard`
-    processing : str, optional
+    process_type : str, optional
         Desired type of processing, the options are `None`, `double`, `thr`, `RSS`, `window`.
         The default is `None`.
     window_size : int, optional
@@ -184,7 +184,7 @@ def clustintime(
         Range of values for the correlation matrixes.
         The default is 1.
     repetition_time : float, optional
-        TR of the data.
+        Repetition time of the data.
         The default is 0.5.
     algorithm : str, optional
         Desired clustering algorithm for the analysis, the options are `infomap`, `Agglomerative`, `Louvain`, `Greedy` and `KMeans`.
@@ -227,7 +227,7 @@ def clustintime(
     # Create data
     if timings_file is not None:
         # Load timings
-        # 1D files are a txt file with the times in which the events occur. They are divided by TR
+        # 1D files are a txt file with the times in which the events occur. They are divided by the repetition_time.
         task = {}
         if isinstance(timings_file, str):
             timings_file = [timings_file]
@@ -241,9 +241,9 @@ def clustintime(
 
     indexes = range(corr_map.shape[0])
 
-    if proc is not None:
+    if process_type is not None:
         new_corr_map, corr_map, indexes, parameter = processing.preprocess(
-            corr_map=corr_map, analysis=processing, near=near, thr=thr
+            corr_map=corr_map, analysis=process_type, near=near, thr=thr
         )
         Visualization(
             tasks=task,
@@ -252,7 +252,7 @@ def clustintime(
             saving_dir=saving_dir,
             title=None,
             labels=None,
-            prefix=f"{prefix}_orig_{proc}_{parameter}",
+            prefix=f"{prefix}_orig_{process_type}_{parameter}",
         ).plot_two_matrixes(corr_map, new_corr_map, "Original matrix", "Filtered matrix", contrast)
         corr_map = new_corr_map
 
@@ -298,7 +298,6 @@ def clustintime(
             labels=labels,
             title=title,
         ).generate_dyneusr_visualization(corr_map)
-
 
 def _main(argv=None):
     print(sys.argv)

@@ -17,7 +17,6 @@ def rss_peaks(corr_map, near):
     """
     Calculates the RSS of the correlation maps and returns the indexes of the time-points with the highest scores
     and the time-points nearby.
-
     Parameters
     ----------
     corr_map : matrix
@@ -47,10 +46,8 @@ def rss_peaks(corr_map, near):
     new_peaks = np.array(list(set(new_peaks)))
     plt.figure(figsize=[16, 8])
     plt.plot(rss_values)
-
     filtered_plot = np.array([np.mean(rss_values)] * len(rss_values))
     filtered_plot[[new_peaks]] = np.array(rss_values)[new_peaks]
-
     plt.plot(filtered_plot)
     plt.title("RSS of original data vs filtered RSS")
     plt.legend(["Original RSS", "Filtered RSS"])
@@ -116,8 +113,9 @@ def correlation_with_window(data, window_length):
                     (temp, data[timepoint + window_idx + 1, :])
                 )  # The data is concatenated for all the rows in the window
         else:
-            # The last rows will be concatenated (since there are less rows than the specified length once the loop
-            # finishes, you can exit it)
+            # The last rows will be concatenated (since there are less rows than the specified length
+            # once the loop finishes, you can exit it)
+
             for window_idx in range(window_length):
                 if (timepoint + window_idx + 1) < (data.shape[0]):
                     temp = np.concatenate((temp, data[timepoint + window_idx + 1, :]))
@@ -129,7 +127,9 @@ def correlation_with_window(data, window_length):
     return corr_map_window
 
 
+
 def preprocess(corr_map, analysis, near=1, thr=95):
+
     """
     Main workflow for the processing algorithms
 
@@ -152,8 +152,7 @@ def preprocess(corr_map, analysis, near=1, thr=95):
     task : dictionary or list, optional
         Structure containing the timings when the task is performed. The default is [].
     repetition_time: float, optional
-        TR of the data. The default is 0.5
-
+        Repetition time (TR) of the data. The default is 0.5
     Returns
     -------
     corr_map : matrix

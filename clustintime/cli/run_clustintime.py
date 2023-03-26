@@ -43,7 +43,8 @@ def _get_parser():
         "--component",
         dest="component",
         type=str,
-        help="Desired component of the signal to analyze, the options are `whole`," "`positive`, `negative`.",
+        help="Desired component of the signal to analyze, the options are `whole`,"
+        "`positive`, `negative`.",
         required=False,
         default="whole",
     )
@@ -63,7 +64,8 @@ def _get_parser():
         "--correlation",
         dest="correlation",
         type=str,
-        help="Desired type of correlation, the options are `standard`, `window`" "Default is `standard`",
+        help="Desired type of correlation, the options are `standard`, `window`"
+        "Default is `standard`",
         required=False,
         default="standard",
     )
@@ -105,7 +107,8 @@ def _get_parser():
         "--threshold",
         dest="thr",
         type=int,
-        help="If '-p' is used and takes the value 'thr', " "It will be used as a threshold percentile",
+        help="If '-p' is used and takes the value 'thr', "
+        "It will be used as a threshold percentile",
         required=False,
         default=95,
     )
@@ -155,7 +158,8 @@ def _get_parser():
         "--linkage",
         dest="linkage",
         type=str,
-        help="Linkage criterion for the 'Agglomerative Clustering' algorithm. To see the available options see documentation of each algorithm"
+        help="Linkage criterion for the 'Agglomerative Clustering' algorithm."
+        "To see the available options see documentation of each algorithm"
         "Default is `ward`",
         required=False,
         default="ward",
@@ -194,7 +198,8 @@ def _get_parser():
         "--saving-dir",
         dest="saving_dir",
         type=str,
-        help="The name or fullpath to saving directory." "Default is to save in the current directory",
+        help="The name or fullpath to saving directory."
+        "Default is to save in the current directory",
         required=False,
         default=".",
     )
@@ -255,7 +260,7 @@ def _get_parser():
 if __name__ == "__main__":
 
     raise RuntimeError(
-        "clustintime/cli/run_clime.py should not be run directly; \n"
+        "clustintime/cli/run_clustintime.py should not be run directly; \n"
         "Please `pip install` clustintime and use the"
         "`clustintime` command"
     )
