@@ -65,7 +65,8 @@ def bfs(graph, source, dest):
 
 def RSS_peaks(corr_map, near):
     """
-    Calculates the RSS of the correlation maps and returns the indexes of the time-points with the highest scores and the time-points nearby.
+    Calculates the RSS of the correlation maps and returns the indexes of the time-points with
+    the highest scores and the time-points nearby.
 
     Parameters
     ----------
@@ -167,7 +168,8 @@ def correlation_with_window(data, window_length):
                     (temp, data[timepoint + window_idx + 1, :])
                 )  # The data is concatenated for all the rows in the window
         else:
-            # The last rows will be concatenated (since there are less rows than the specified length once the loop finishes, you can exit it)
+            # The last rows will be concatenated (since there are less rows than the specified length
+            # once the loop finishes, you can exit it)
             for window_idx in range(window_length):
                 if (timepoint + window_idx + 1) < (data.shape[0]):
                     temp = np.concatenate((temp, data[timepoint + window_idx + 1, :]))
