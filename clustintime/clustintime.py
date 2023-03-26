@@ -23,7 +23,7 @@ from scipy.signal import find_peaks
 import sys
 from nilearn.input_data import NiftiMasker
 from nilearn.masking import apply_mask
-from clustintime.cli.run_clime import _get_parser
+from clustintime.cli.run_clustintime import _get_parser
 
 
 

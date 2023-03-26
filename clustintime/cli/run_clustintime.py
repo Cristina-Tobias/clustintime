@@ -260,7 +260,7 @@ def _get_parser():
 if __name__ == "__main__":
 
     raise RuntimeError(
-        "clustintime/cli/run_clime.py should not be run directly; \n"
+        "clustintime/cli/run_clustintime.py should not be run directly; \n"
         "Please `pip install` clustintime and use the"
         "`clustintime` command"
     )
