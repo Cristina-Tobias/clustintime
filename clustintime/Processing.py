@@ -178,7 +178,7 @@ def correlation_with_window(data, window_length):
     return corr_map_window
 
 
-def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95, contrast=1, task=[], TR = 0.5):
+def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95, contrast=1, task=[], repetition_time = 0.5):
     """
     Main workflow for the processing algorithms
 
@@ -200,8 +200,8 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
         Range of values of the correlation maps. The default is 1.
     task : dictionary or list, optional
         Structure containing the timings when the task is performed. The default is [].
-    TR: float, optional
-        TR of the data. The default is 0.5
+    repetition_time: float, optional
+        Repetition time (TR) of the data. The default is 0.5
 
     Returns
     -------
@@ -215,7 +215,7 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
     if analysis == "thr":
         aux = corr_map.copy()
         aux = thr_index(aux, thr)
-        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task = task, contrast = contrast, TR= TR,saving_dir = saving_dir, prefix = f'{prefix}_orig_thr_{thr}')
+        vis.plot_two_matrixes(corr_map, aux, "Original matrix", "Filtered matrix", task = task, contrast = contrast, repetition_time= repetition_time,saving_dir = saving_dir, prefix = f'{prefix}_orig_thr_{thr}')
         corr_map = thr_index(corr_map, thr)
     elif analysis == "RSS":
         indexes = RSS_peaks(corr_map, near)
@@ -226,7 +226,7 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
             "Filtered matrix",
             task = task,
             contrast = contrast,
-            TR = TR,
+            repetition_time = repetition_time,
             saving_dir = saving_dir, 
             prefix = f'{prefix}_orig_RSS_{near}',
         )
@@ -239,7 +239,7 @@ def preprocess(corr_map, analysis, saving_dir = '.', prefix = "",near=1, thr=95,
             "Double correlation matrix",
             task = task,
             contrast = contrast,
-            TR = TR,
+            TR = repetition_time,
             saving_dir = saving_dir, 
             prefix = f'{prefix}_orig_double',
         )
