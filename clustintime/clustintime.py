@@ -135,7 +135,7 @@ def clustintime(
         data[data < 0] = 0
 
     # Create data
-    if timings_file != None:
+    if timings_file is not None:
         # Load timings
         # 1D files are a txt file with the times in which the events occur. They are divided by the repetition_time.
         task = {}
@@ -154,7 +154,7 @@ def clustintime(
     nscans = corr_map.shape[0]
     indexes = range(corr_map.shape[0])
 
-    if processing != None:
+    if processing is not None:
         corr_map, indexes = proc.preprocess(
             corr_map=corr_map,
             analysis=processing,
