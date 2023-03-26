@@ -76,9 +76,7 @@ def plot_labels(labels, title, task=[], repetition_time=0.5):
     for i in range(int(labels.max())):
         selected_labels = np.array([0] * len(labels))
         selected_labels[np.where(labels == i + 1)] = labels[np.where(labels == i + 1)]
-        plt.fill_between(
-            np.linspace(0, len(labels) * repetition_time, len(labels)), selected_labels
-        )
+        plt.fill_between(np.linspace(0, len(labels) * repetition_time, len(labels)), selected_labels)
 
     for i in range(len(task)):
         plt.vlines(task[i], 0, labels.max(), linewidth=1.2, colors=colors[i])
@@ -128,9 +126,7 @@ def plot_heatmap(labels, title, saving_dir, prefix, task=[], repetition_time=0.5
     legends = np.zeros([len(task)]).astype(str)
     rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
     for j in range(len(task)):
-        plt.vlines(
-            task[j] / repetition_time, 0, labels.max(), linewidth=1.2, colors=colors[j], alpha=0.5
-        )
+        plt.vlines(task[j] / repetition_time, 0, labels.max(), linewidth=1.2, colors=colors[j], alpha=0.5)
         legends[j] = f"task {j}"
         rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[j + 1]))
     plt.title(title)
@@ -168,9 +164,7 @@ def show_table(labels, saving_dir, prefix):
     table_result.to_csv(f"{saving_dir}/{prefix}_Results.csv")
 
 
-def plot_two_matrixes(
-    map_1, map_2, title_1, title_2, saving_dir, prefix, task=[], contrast=1, repetition_time=0.5
-):
+def plot_two_matrixes(map_1, map_2, title_1, title_2, saving_dir, prefix, task=[], contrast=1, repetition_time=0.5):
     """
     Graphical comparison between two correlation maps
 
@@ -205,9 +199,7 @@ def plot_two_matrixes(
     limit = map_1.shape[0]
     for i in range(len(task)):
         ax1.vlines(task[i] / repetition_time, ymin=0, ymax=limit, linewidth=0.7)
-        ax1.hlines(
-            task[i] / repetition_time, xmin=0, xmax=limit, linewidth=0.7
-        )  # Same for horizontal
+        ax1.hlines(task[i] / repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax1.set_title(title_1)
     ax1.set_xlim([0, limit])
     ax1.set_ylim([limit, 0])
@@ -218,9 +210,7 @@ def plot_two_matrixes(
     limit = map_2.shape[0]
     for i in range(len(task)):
         ax2.vlines(task[i] / repetition_time, ymin=0, ymax=limit, linewidth=0.7)
-        ax2.hlines(
-            task[i] / repetition_time, xmin=0, xmax=limit, linewidth=0.7
-        )  # Same for horizontal
+        ax2.hlines(task[i] / repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
     ax2.set_title(title_2)
     ax2.set_xlim([0, limit])
     ax2.set_ylim([limit, 0])

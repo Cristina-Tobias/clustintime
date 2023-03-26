@@ -12,19 +12,16 @@ It requires python 3.6 or above, as well as the modules:
 """
 
 
-
 import sys
 
 # Libraries
 import numpy as np
 from nilearn.input_data import NiftiMasker
+
+from clustintime import clustering, processing
 from clustintime.cli.run_clustintime import _get_parser
-
-from clustintime import clustering
 from clustintime.consensus import Consensus
-from clustintime import processing
 from clustintime.visualization import Visualization
-
 
 
 def load_data(data_paths, mask_paths):
@@ -36,8 +33,8 @@ def load_data(data_paths, mask_paths):
 
     # If n_pathss is 1 mask and return data
     if not isinstance(data_paths, list):
-            data_masked = masker.fit_transform(data_paths) 
-            nscans = [data_masked.shape[0]]
+        data_masked = masker.fit_transform(data_paths)
+        nscans = [data_masked.shape[0]]
     else:
         # If n_pathss is > 1, mask each paths in data list separately and
         # concatenate the masked data.
@@ -49,7 +46,6 @@ def load_data(data_paths, mask_paths):
                 next_subject = masker.fit_transform(path)
                 data_masked = np.concatenate((data_masked, next_subject), axis=0)
                 nscans = np.append(nscans, next_subject.shape[0])
-              
 
     return data_masked, masker, nscans
 
@@ -216,7 +212,6 @@ def clustintime(
     """
 
     data, masker, nscans = load_data(data_paths, mask_path)
-   
 
     print("Mask applied!")
 
@@ -235,7 +230,7 @@ def clustintime(
         for idx, _dir in enumerate(timings_file):
             task[idx] = np.loadtxt(_dir)
     else:
-        task = None 
+        task = None
 
     if correlation == "standard":
         corr_map = np.nan_to_num(np.corrcoef(data))
@@ -280,7 +275,7 @@ def clustintime(
         affinity,
         linkage,
         visualization_parameters,
-        contrast
+        contrast,
     )
 
     Visualization(
@@ -301,6 +296,7 @@ def clustintime(
             labels=labels,
             title=title,
         ).generate_dyneusr_visualization(corr_map)
+
 
 def _main(argv=None):
     print(sys.argv)

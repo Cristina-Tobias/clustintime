@@ -13,10 +13,8 @@ import numpy as np
 import pandas as pd
 from community import community_louvain
 from networkx.algorithms import community
-from sklearn.cluster import (
-    AgglomerativeClustering,
-    KMeans,
-)
+from sklearn.cluster import AgglomerativeClustering, KMeans
+
 import clustintime.processing as proc
 
 
@@ -51,9 +49,7 @@ def generate_maps(labels, directory, data, masker, prefix):
         mean_img = np.mean(data[labels == map_idx + 1], axis=0)
         if mean_img.min() / mean_img.max() < 0.9:
             mean_img = mean_img / mean_img.max()
-        mean_img_3d = masker.inverse_transform(
-            mean_img
-        )  # Transform the averaged image into a 3D image
+        mean_img_3d = masker.inverse_transform(mean_img)  # Transform the averaged image into a 3D image
         nib.save(
             mean_img_3d,
             os.path.join(directory, f"{directory}/{prefix}_cluster_{map_idx+1}.nii.gz"),
@@ -191,7 +187,6 @@ def k_means(corr_map, indexes, nscans, n_clusters, seed=0):
 
     print(" ")
 
-
     k_m = KMeans(n_clusters=n_clusters, random_state=seed)
     labels = k_m.fit_predict(corr_map)
     labels = np.transpose(
@@ -211,9 +206,8 @@ def k_means(corr_map, indexes, nscans, n_clusters, seed=0):
     return final_labels
 
 
-
 def agglomerative_clustering(corr_map, indexes, nscans, n_clusters, affinity="euclidean", linkage="ward"):
-    
+
     """
     Agglomerative Clustering recursively merges the pair of clusters that minimally increases a given linkage distance.
 

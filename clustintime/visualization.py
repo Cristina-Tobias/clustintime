@@ -7,7 +7,6 @@ Result visualization for clustintime
 # import networkx as nx
 # creation, manipulation and study of the structure, dynamics and functions of complex networks
 
-from matplotlib import patches
 import matplotlib.pyplot as plt  # For graphs
 import networkx as nx
 
@@ -17,9 +16,11 @@ import pandas as pd
 import seaborn as sns
 from dyneusr import DyNeuGraph
 from kmapper import Cover, KeplerMapper
+from matplotlib import patches
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from umap.umap_ import UMAP
+
 # from itertools import groupby
 
 # def add_line(ax, xpos, ypos):
@@ -45,7 +46,6 @@ from umap.umap_ import UMAP
 #         xpos -= .2
 
 
-
 class Visualization:
     def __init__(self, title, saving_dir, prefix, tasks, repetition_time, labels):
 
@@ -58,17 +58,22 @@ class Visualization:
         self.tasks = tasks
         self.repetition_time = repetition_time
         self.labels = labels
-        
+
     def create_multiindex(self, nscans):
-        
-        time_in_secs = [ list(range(nscans[i])) for i in range(len(nscans))] 
-        time_in_secs = np.resize(time_in_secs, [sum(nscans)])*self.repetition_time
-        subjects = [[f'subject_{idx}',]*nscan for idx, nscan in enumerate(nscans)]
+
+        time_in_secs = [list(range(nscans[i])) for i in range(len(nscans))]
+        time_in_secs = np.resize(time_in_secs, [sum(nscans)]) * self.repetition_time
+        subjects = [
+            [
+                f"subject_{idx}",
+            ]
+            * nscan
+            for idx, nscan in enumerate(nscans)
+        ]
         subjects = np.resize(subjects, [sum(nscans)])
         tuples = list(zip(time_in_secs, subjects))
-        index = pd.MultiIndex.from_tuples(tuples, names=['time_in_secs', 'Subject'])
+        index = pd.MultiIndex.from_tuples(tuples, names=["time_in_secs", "Subject"])
         return index
-    
 
     def plot_heatmap(self, nscans):
         """
@@ -99,7 +104,7 @@ class Visualization:
         ax = fig.add_subplot(111)
         heatmatrix = np.zeros([int(self.labels.max()), len(self.labels)])
         rownames = np.zeros([int(self.labels.max())]).astype(str)
-        
+
         file1d = pd.DataFrame()
         for i in range(int(self.labels.max())):
             selected_labels = np.array([0] * len(self.labels))
@@ -108,7 +113,13 @@ class Visualization:
             heatmatrix[i] = selected_labels
             rownames[i] = f"# {i+1}"
 
-        heatmatrix = pd.DataFrame(heatmatrix,  index=rownames, columns = Visualization(self.title, self.saving_dir, self.prefix, self.tasks, self.repetition_time, self.labels).create_multiindex(nscans))
+        heatmatrix = pd.DataFrame(
+            heatmatrix,
+            index=rownames,
+            columns=Visualization(
+                self.title, self.saving_dir, self.prefix, self.tasks, self.repetition_time, self.labels
+            ).create_multiindex(nscans),
+        )
         colors = sns.color_palette("Dark2", len(self.tasks) + 1)
         sns.heatmap(heatmatrix, cmap="Greys", xticklabels=150, cbar=False)
         plt.xlabel("Time in seconds", fontsize=10)
@@ -120,15 +131,15 @@ class Visualization:
             legends[idx] = f"task {idx}"
             rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[idx + 1]))
         plt.title(self.title)
-        labels = ['' for item in ax.get_xticklabels()]
+        labels = ["" for item in ax.get_xticklabels()]
         ax.set_xticklabels(labels)
-        ax.set_xlabel('')
+        ax.set_xlabel("")
         # label_group_plot(ax, heatmatrix)
-        
+
         # fig.subplots_adjust(bottom=.1*heatmatrix.columns.nlevels)
         # ax.set_xticks([int(heatmatrix.shape[1]*0.25), int(heatmatrix.shape[1]*0.75)], minor=True)
         # ax.set_xticklabels(heatmatrix.columns.levels[1], minor=True)
-        ax.tick_params(axis='x', which='minor', length=0, pad=18)
+        ax.tick_params(axis="x", which="minor", length=0, pad=18)
         plt.legend(
             (rectangles),
             np.array(legends),

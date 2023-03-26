@@ -2,7 +2,8 @@ import random
 
 import numpy as np
 import pandas as pd
-from clustintime.clustering import info_map, louvain, greedy_mod
+
+from clustintime.clustering import greedy_mod, info_map, louvain
 
 
 def compute_connectivity_matrix(n_items, labels):
