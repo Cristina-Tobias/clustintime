@@ -27,31 +27,30 @@ from clustintime.visualization import Visualization
 from clustintime.cli.run_clustintime import _get_parser
 
 
-def load_data(data, mask_directory):
+def load_data(data_paths, mask_paths):
     """
     Load and mask data with atlas using NiftiLabelsMasker.
     """
     # Initialize masker object
-    masker = NiftiMasker(mask_img=mask_directory)
+    masker = NiftiMasker(mask_img=mask_paths)
 
-    # If n_echos is 1 (single echo), mask and return data
-    if len(data) == 1:
-        # If data is a list, keep only first element
-        if isinstance(data, list):
-            data = data[0]
-            data_masked = masker.fit_transform(data)
+    # If n_pathss is 1 mask and return data
+    if not isinstance(data_paths, list):
+            data_masked = masker.fit_transform(data_paths) 
     else:
-        # If n_echos is > 1 (multi-echo), mask each echo in data list separately and
+        # If n_pathss is > 1, mask each paths in data list separately and
         # concatenate the masked data.
-        # If n_echos and len(data) are equal, read data.
-        for echo_idx, echo in enumerate(data):
-            if echo_idx == 0:
-                data_masked = masker.fit_transform(echo)
+        for path_idx, path in enumerate(data_paths):
+            if path_idx == 0:
+                data_masked = masker.fit_transform(path)
+                nscans = data_masked.shape[0]
             else:
-                data_masked = np.concatenate((data_masked, masker.fit_transform(echo)), axis=0)
-                #  If n_echos is different from len(data), raise error.
+                next_subject = masker.fit_transform(path)
+                data_masked = np.concatenate((data_masked, next_subject), axis=0)
+                nscans = np.append(nscans, next_subject.shape[0])
+              
 
-    return data_masked, masker
+    return data_masked, masker, nscans
 
 
 def implement_algorithm(
@@ -124,8 +123,8 @@ def implement_algorithm(
 
 
 def clustintime(
-    data_directory,
-    mask_directory,
+    data_paths,
+    mask_path,
     component="whole",
     timings_file=None,
     correlation="standard",
@@ -156,9 +155,9 @@ def clustintime(
 
     Parameters
     ----------
-    data_directory : str or path
+    data_paths : str or path
         Fullpath to the data to be analyzed.
-    mask_directory : str or path
+    mask_path : str or path
         Fullpath to the corresponding mask.
     component : str, optional
         Desired component of the signal to analyze, the options are `whole`, `positive`, `negative`.
@@ -200,7 +199,7 @@ def clustintime(
         Boolean that indicates whether the results must be saved or not.
         The default is True.
     saving_dir : str or path, optional
-        Fullpath to the saving directory.
+        Fullpath to the saving path.
         The default is ".".
     prefix: str, optional
         Prefix for the saved outcomes
@@ -215,15 +214,9 @@ def clustintime(
 
     """
 
-    # data_prueba = load_data(data_directory, mask_directory)
-    # data = data_prueba[0]
-    masker = NiftiMasker(mask_img=mask_directory)
-    masker.fit(data_directory)
+    data, masker, nscans = load_data(data_paths, mask_path)
+   
 
-    # print("Applying mask ...")
-    # print(" ")
-
-    data = apply_mask(data_directory, mask_directory)  # apply mask to the fitted signal
     print("Mask applied!")
 
     if component == "negative":
@@ -246,7 +239,6 @@ def clustintime(
     else:
         corr_map = np.nan_to_num(processing.correlation_with_window(data, window_size))
 
-    nscans = corr_map.shape[0]
     indexes = range(corr_map.shape[0])
 
     if proc is not None:
@@ -285,12 +277,12 @@ def clustintime(
         affinity,
         linkage,
         visualization_parameters,
-        contrast,
+        contrast
     )
 
     Visualization(
         tasks=task, saving_dir=saving_dir, repetition_time=repetition_time, prefix=prefix, labels=labels, title=title
-    ).plot_heatmap()
+    ).plot_heatmap(nscans)
     Visualization(
         tasks=task, saving_dir=saving_dir, repetition_time=repetition_time, prefix=prefix, labels=labels, title=title
     ).show_table()

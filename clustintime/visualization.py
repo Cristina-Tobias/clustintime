@@ -16,12 +16,34 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from dyneusr import DyNeuGraph
-from dyneusr.mapper.utils import optimize_dbscan
-from IPython.display import HTML, display
 from kmapper import Cover, KeplerMapper
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from umap.umap_ import UMAP
+# from itertools import groupby
+
+# def add_line(ax, xpos, ypos):
+#     line = plt.Line2D([ypos, ypos], [xpos, xpos + .2], color='black', transform=ax.transAxes)
+#     line.set_clip_on(False)
+#     ax.add_line(line)
+
+# def label_len(my_index, level):
+#     labels = my_index.get_level_values(level)
+#     return [(k, sum(1 for i in g)) for k,g in groupby(labels)]
+
+# def label_group_plot(ax, df):
+#     xpos = -.2
+#     scale = 1/df.columns.size
+#     for level in range(df.columns.nlevels):
+#         pos = df.columns.size
+#         for label, rpos in label_len(df.columns, level):
+#             add_line(ax, pos*scale, xpos)
+#             pos -=rpos
+#             lypos = (pos + .5*rpos)*scale
+#             ax.text(xpos + .1, lypos, label, ha = 'center', transform=ax.transAxes)
+#         add_line(ax, pos*scale, xpos)
+#         xpos -= .2
+
 
 
 class Visualization:
@@ -36,8 +58,19 @@ class Visualization:
         self.tasks = tasks
         self.repetition_time = repetition_time
         self.labels = labels
+        
+    def create_multiindex(self, nscans):
+        
+        time_in_secs = [ list(range(nscans[i])) for i in range(len(nscans))] 
+        time_in_secs = np.resize(time_in_secs, [sum(nscans)])*self.repetition_time
+        subjects = [[f'subject_{idx}',]*nscan for idx, nscan in enumerate(nscans)]
+        subjects = np.resize(subjects, [sum(nscans)])
+        tuples = list(zip(time_in_secs, subjects))
+        index = pd.MultiIndex.from_tuples(tuples, names=['time_in_secs', 'Subject'])
+        return index
+    
 
-    def plot_heatmap(self):
+    def plot_heatmap(self, nscans):
         """
         Visualization of the clusters separately
 
@@ -62,10 +95,11 @@ class Visualization:
 
         """
 
-        plt.figure(figsize=[8, 8])
+        fig = plt.figure(figsize=[8, 8])
+        ax = fig.add_subplot(111)
         heatmatrix = np.zeros([int(self.labels.max()), len(self.labels)])
         rownames = np.zeros([int(self.labels.max())]).astype(str)
-        x_values = np.linspace(0, len(self.labels) * self.repetition_time, len(self.labels)).astype(int)
+        
         file1d = pd.DataFrame()
         for i in range(int(self.labels.max())):
             selected_labels = np.array([0] * len(self.labels))
@@ -74,7 +108,7 @@ class Visualization:
             heatmatrix[i] = selected_labels
             rownames[i] = f"# {i+1}"
 
-        heatmatrix = pd.DataFrame(heatmatrix, columns=x_values, index=rownames)
+        heatmatrix = pd.DataFrame(heatmatrix,  index=rownames, columns = Visualization(self.title, self.saving_dir, self.prefix, self.tasks, self.repetition_time, self.labels).create_multiindex(nscans))
         colors = sns.color_palette("Dark2", len(self.tasks) + 1)
         sns.heatmap(heatmatrix, cmap="Greys", xticklabels=150, cbar=False)
         plt.xlabel("Time in seconds", fontsize=10)
@@ -86,6 +120,15 @@ class Visualization:
             legends[idx] = f"task {idx}"
             rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[idx + 1]))
         plt.title(self.title)
+        labels = ['' for item in ax.get_xticklabels()]
+        ax.set_xticklabels(labels)
+        ax.set_xlabel('')
+        # label_group_plot(ax, heatmatrix)
+        
+        # fig.subplots_adjust(bottom=.1*heatmatrix.columns.nlevels)
+        ax.set_xticks([int(heatmatrix.shape[1]*0.25), int(heatmatrix.shape[1]*0.75)], minor=True)
+        ax.set_xticklabels(heatmatrix.columns.levels[1], minor=True)
+        ax.tick_params(axis='x', which='minor', length=0, pad=18)
         plt.legend(
             (rectangles),
             np.array(legends),
@@ -207,7 +250,7 @@ class Visualization:
             lens,
             X=corr_map,
             cover=Cover(20, 0.7),
-            clusterer=optimize_dbscan(corr_map, k=3, p=100.0),
+            # clusterer=optimize_dbscan(corr_map, k=3, p=100.0),
         )
 
         # Convert to a DyNeuGraph
