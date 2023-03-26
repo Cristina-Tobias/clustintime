@@ -37,6 +37,7 @@ def load_data(data_paths, mask_paths):
     # If n_pathss is 1 mask and return data
     if not isinstance(data_paths, list):
             data_masked = masker.fit_transform(data_paths) 
+            nscans = [data_masked.shape[0]]
     else:
         # If n_pathss is > 1, mask each paths in data list separately and
         # concatenate the masked data.
@@ -233,6 +234,8 @@ def clustintime(
             timings_file = [timings_file]
         for idx, _dir in enumerate(timings_file):
             task[idx] = np.loadtxt(_dir)
+    else:
+        task = None 
 
     if correlation == "standard":
         corr_map = np.nan_to_num(np.corrcoef(data))

@@ -314,7 +314,7 @@ def info_map(corr_map, indexes, thr, nscans):
     labels = np.transpose(pd.DataFrame([coms_labels, indexes]))
     labels = labels.set_index(1)
 
-    final_labels = np.zeros(sum(nscans))
+    final_labels = np.zeros(nscans)
 
     for i in labels.index:
         final_labels[int(i)] = labels[0][int(i)] + 1

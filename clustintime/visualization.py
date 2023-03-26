@@ -115,7 +115,7 @@ class Visualization:
         plt.ylabel("Clusters", fontsize=10)
         legends = np.zeros([len(self.tasks)]).astype(str)
         rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
-        for idx, task in enumerate(self.tasks.values()):
+        for idx, task in enumerate(self.tasks):
             plt.vlines(task / self.repetition_time, 0, self.labels.max(), linewidth=1.2, colors=colors[idx], alpha=0.5)
             legends[idx] = f"task {idx}"
             rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[idx + 1]))
@@ -126,8 +126,8 @@ class Visualization:
         # label_group_plot(ax, heatmatrix)
         
         # fig.subplots_adjust(bottom=.1*heatmatrix.columns.nlevels)
-        ax.set_xticks([int(heatmatrix.shape[1]*0.25), int(heatmatrix.shape[1]*0.75)], minor=True)
-        ax.set_xticklabels(heatmatrix.columns.levels[1], minor=True)
+        # ax.set_xticks([int(heatmatrix.shape[1]*0.25), int(heatmatrix.shape[1]*0.75)], minor=True)
+        # ax.set_xticklabels(heatmatrix.columns.levels[1], minor=True)
         ax.tick_params(axis='x', which='minor', length=0, pad=18)
         plt.legend(
             (rectangles),
@@ -198,7 +198,7 @@ class Visualization:
         ax1.imshow(map_1, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
         # Vertical lines to delimit the instant in which the event occurs
         limit = map_1.shape[0]
-        for task in self.tasks.values():
+        for task in self.tasks:
             ax1.vlines(task / self.repetition_time, ymin=0, ymax=limit, linewidth=0.7)
             ax1.hlines(task / self.repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
         ax1.set_title(title_1)
@@ -209,7 +209,7 @@ class Visualization:
 
         image = ax2.imshow(map_2, aspect="equal", vmin=-contrast, vmax=contrast, cmap="RdBu_r")
         limit = map_2.shape[0]
-        for task in self.tasks.values():
+        for task in self.tasks:
             ax2.vlines(task / self.repetition_time, ymin=0, ymax=limit, linewidth=0.7)
             ax2.hlines(task / self.repetition_time, xmin=0, xmax=limit, linewidth=0.7)  # Same for horizontal
         ax2.set_title(title_2)
