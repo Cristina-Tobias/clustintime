@@ -184,7 +184,8 @@ def clustintime(
         Repetition time of the data.
         The default is 0.5.
     algorithm : str, optional
-        Desired clustering algorithm for the analysis, the options are `infomap`, `Agglomerative`, `Louvain`, `Greedy` and `KMeans`.
+        Desired clustering algorithm for the analysis, the options are `infomap`, `Agglomerative`,
+        `Louvain`, `Greedy` and `KMeans`.
         The default is "infomap".
     consensus : bool, optional
         Boolean that indicates whether to use consensus clustering in the algorithm or not.

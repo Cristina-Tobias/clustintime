@@ -111,8 +111,7 @@ class Consensus:
     def get_labels(self, data_sampled, indexes):
         if self.algorithm in (info_map, greedy_mod, louvain):  # pylint: disable=comparison-with-callable
             return self.algorithm(data_sampled, indexes, self.threshold, self.n_scans)
-        else:
-            return self.algorithm(data_sampled, indexes, self.n_scans, self.n_clusters)
+        return self.algorithm(data_sampled, indexes, self.n_scans, self.n_clusters)
 
     def check_if_clusters_stable(self, _consensus, indexes, npoints, whole_connectivity_matrix):
         for _ in range(100):

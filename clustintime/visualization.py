@@ -23,26 +23,26 @@ from umap.umap_ import UMAP
 
 # from itertools import groupby
 
-# def add_line(ax, xpos, ypos):
-#     line = plt.Line2D([ypos, ypos], [xpos, xpos + .2], color='black', transform=ax.transAxes)
+# def add_line(axis, xpos, ypos):
+#     line = plt.Line2D([ypos, ypos], [xpos, xpos + .2], color='black', transform=axis.transAxes)
 #     line.set_clip_on(False)
-#     ax.add_line(line)
+#     axis.add_line(line)
 
 # def label_len(my_index, level):
 #     labels = my_index.get_level_values(level)
 #     return [(k, sum(1 for i in g)) for k,g in groupby(labels)]
 
-# def label_group_plot(ax, df):
+# def label_group_plot(axis, df):
 #     xpos = -.2
 #     scale = 1/df.columns.size
 #     for level in range(df.columns.nlevels):
 #         pos = df.columns.size
 #         for label, rpos in label_len(df.columns, level):
-#             add_line(ax, pos*scale, xpos)
+#             add_line(axis, pos*scale, xpos)
 #             pos -=rpos
 #             lypos = (pos + .5*rpos)*scale
-#             ax.text(xpos + .1, lypos, label, ha = 'center', transform=ax.transAxes)
-#         add_line(ax, pos*scale, xpos)
+#             axis.text(xpos + .1, lypos, label, ha = 'center', transform=axis.transAxes)
+#         add_line(axis, pos*scale, xpos)
 #         xpos -= .2
 
 
@@ -101,7 +101,7 @@ class Visualization:
         """
 
         fig = plt.figure(figsize=[8, 8])
-        ax = fig.add_subplot(111)
+        axis = fig.add_subplot(111)
         heatmatrix = np.zeros([int(self.labels.max()), len(self.labels)])
         rownames = np.zeros([int(self.labels.max())]).astype(str)
 
@@ -131,15 +131,15 @@ class Visualization:
             legends[idx] = f"task {idx}"
             rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[idx + 1]))
         plt.title(self.title)
-        labels = ["" for item in ax.get_xticklabels()]
-        ax.set_xticklabels(labels)
-        ax.set_xlabel("")
-        # label_group_plot(ax, heatmatrix)
+        labels = ["" for item in axis.get_xticklabels()]
+        axis.set_xticklabels(labels)
+        axis.set_xlabel("")
+        # label_group_plot(axis, heatmatrix)
 
         # fig.subplots_adjust(bottom=.1*heatmatrix.columns.nlevels)
-        # ax.set_xticks([int(heatmatrix.shape[1]*0.25), int(heatmatrix.shape[1]*0.75)], minor=True)
-        # ax.set_xticklabels(heatmatrix.columns.levels[1], minor=True)
-        ax.tick_params(axis="x", which="minor", length=0, pad=18)
+        # axis.set_xticks([int(heatmatrix.shape[1]*0.25), int(heatmatrix.shape[1]*0.75)], minor=True)
+        # axis.set_xticklabels(heatmatrix.columns.levels[1], minor=True)
+        axis.tick_params(axis="x", which="minor", length=0, pad=18)
         plt.legend(
             (rectangles),
             np.array(legends),

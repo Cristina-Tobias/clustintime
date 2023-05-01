@@ -16,6 +16,7 @@ from networkx.algorithms import community
 from sklearn.cluster import AgglomerativeClustering, KMeans
 
 import clustintime.processing as proc
+from clustintime import consensus
 
 
 def generate_maps(labels, directory, data, masker, prefix):
@@ -130,14 +131,14 @@ def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
             idx = idx[np.logical_not(np.isnan(idx[0]))]
             labels = np.array([0] * npoints)
             labels[sampling] = idx[0]
-            connectivity_matrix = proc.compute_connectivity_matrix(npoints, labels)
+            connectivity_matrix = consensus.compute_connectivity_matrix(npoints, labels)
         sum_connectivity_matrix = sum_connectivity_matrix + connectivity_matrix
         _consensus = np.divide(sum_connectivity_matrix, index_matrix_sum)
-        _consensus[_consensus < proc.find_threshold_bfs(_consensus)] = 0
+        _consensus[_consensus < consensus.find_threshold_bfs(_consensus)] = 0
         final_labels = algorithm(_consensus, indexes, 0, nscans)
-        thr = proc.find_threshold_bfs(_consensus)
+        thr = consensus.find_threshold_bfs(_consensus)
         _consensus[_consensus <= thr] = 0
-        aux = proc.compute_connectivity_matrix(npoints, final_labels[1])
+        aux = consensus.compute_connectivity_matrix(npoints, final_labels[1])
 
         are_clusters_stable = check_if_clusters_stable(algorithm, _consensus, indexes, thr, npoints, aux)
 
@@ -147,7 +148,7 @@ def consensus(corr_map, indexes, nscans, n_clusters, algorithm, thr):
 def check_if_clusters_stable(algorithm, _consensus, indexes, thr, npoints, aux):
     for _ in range(1):
         labels = algorithm(corr_map=_consensus, indexes=indexes, thr=thr, nscans=npoints)
-        connect = proc.compute_connectivity_matrix(npoints, labels[1])
+        connect = consensus.compute_connectivity_matrix(npoints, labels[1])
 
         if not np.array_equal(aux, connect):
             return False
