@@ -49,24 +49,20 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting our
-[Code of Conduct Enforcement Team](https://tedana.readthedocs.io/en/stable/governance.html#leadership):
-[Elizabeth DuPre](https://github.com/emdupre),
-[Dan Handwerker](https://github.com/handwerkerd),
-and [Stefano Moia](https://github.com/smoia).
+reported by contacting the authors 
+[Cris Tobias](https://github.com/Cristina-Tobias),
+[Itxaso Aizpurua](https://github.com/itxasos23).
+
 Confidentiality will be respected in reporting.
 The Code of Conduct Enforcement Team any take any action they deem
-necessary for the safety of the `tedana` community, including but not
+necessary for the safety of the community, including but not
 limited to:
 
 * facilitating a conversation between the two parties involved in the violation of the code of conduct
 * requesting a contributor apologize for their behaviour
 * asking a contributor or multiple contributors to enter a cooling off period that puts a
   time-limited pause on a particular discussion topic
-* asking a contributor to no longer participate in the development of `tedana`
-
-For more details on the enforcement process, please see our documentation
-on [governance](https://tedana.readthedocs.io/en/stable/governance.html).
+* asking a contributor to no longer participate in the development of this project. 
 
 ## Attribution
 
