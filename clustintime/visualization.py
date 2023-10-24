@@ -21,30 +21,6 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from umap.umap_ import UMAP
 
-# from itertools import groupby
-
-# def add_line(ax, xpos, ypos):
-#     line = plt.Line2D([ypos, ypos], [xpos, xpos + .2], color='black', transform=ax.transAxes)
-#     line.set_clip_on(False)
-#     ax.add_line(line)
-
-# def label_len(my_index, level):
-#     labels = my_index.get_level_values(level)
-#     return [(k, sum(1 for i in g)) for k,g in groupby(labels)]
-
-# def label_group_plot(ax, df):
-#     xpos = -.2
-#     scale = 1/df.columns.size
-#     for level in range(df.columns.nlevels):
-#         pos = df.columns.size
-#         for label, rpos in label_len(df.columns, level):
-#             add_line(ax, pos*scale, xpos)
-#             pos -=rpos
-#             lypos = (pos + .5*rpos)*scale
-#             ax.text(xpos + .1, lypos, label, ha = 'center', transform=ax.transAxes)
-#         add_line(ax, pos*scale, xpos)
-#         xpos -= .2
-
 
 class Visualization:
     def __init__(self, title, saving_dir, prefix, tasks, repetition_time, labels):
