@@ -16,12 +16,14 @@ import sys
 
 # Libraries
 import numpy as np
+import pandas as pd
 from nilearn.input_data import NiftiMasker
 
-from clustintime import clustering, processing
+from clustintime.clustering import Clustering
 from clustintime.cli.run_clustintime import _get_parser
 from clustintime.consensus import Consensus
 from clustintime.visualization import Visualization
+from clustintime.processing import Processing
 
 
 def load_data(data_paths, mask_paths):
@@ -49,7 +51,6 @@ def load_data(data_paths, mask_paths):
 
     return data_masked, masker, nscans
 
-
 def implement_algorithm(
     algorithm,
     consensus,
@@ -57,40 +58,35 @@ def implement_algorithm(
     n_clusters,
     nscans,
     corr_map,
-    indexes,
+    indices,
     seed,
     affinity,
     linkage,
     visualization_parameters,
     contrast,
 ):
+    clustering_parameters = Clustering(corr_map, indices, nscans)
     if algorithm == "infomap":
         corr_map_2 = corr_map.copy()
         if consensus:
-            labels = Consensus(clustering.info_map, thr, n_clusters, nscans).find_clusters_with_consensus(
-                corr_map, indexes
-            )
+            labels = Consensus(clustering_parameters.info_map(thr)).find_clusters_with_consensus()
         else:
-            corr_map, labels = clustering.info_map(corr_map, indexes, thr, nscans=nscans)
+            corr_map, labels = clustering_parameters.info_map(thr=thr)
     elif algorithm == "KMeans":
         if consensus:
-            labels = Consensus(clustering.k_means, thr, n_clusters, nscans).find_clusters_with_consensus(
-                corr_map, indexes
-            )
+            labels = Consensus(clustering_parameters.k_means(n_clusters)).find_clusters_with_consensus()
         else:
-            labels = clustering.k_means(
-                corr_map=corr_map, indexes=indexes, nscans=nscans, n_clusters=n_clusters, seed=seed
+            labels = clustering_parameters.k_means(
+                n_clusters=n_clusters, seed=seed
             )
     elif algorithm == "Agglomerative":
         if consensus:
             labels = Consensus(
-                clustering.agglomerative_clustering, thr, n_clusters, nscans
-            ).find_clusters_with_consensus(corr_map, indexes)
+                clustering_parameters.agglomerative_clustering_parameters(n_clusters=n_clusters,
+                affinity=affinity,
+                linkage=linkage)).find_clusters_with_consensus()
         else:
-            labels = clustering.agglomerative_clustering(
-                corr_map=corr_map,
-                indexes=indexes,
-                nscans=nscans,
+            labels = clustering_parameters.agglomerative_clustering_parameters(
                 n_clusters=n_clusters,
                 affinity=affinity,
                 linkage=linkage,
@@ -98,19 +94,15 @@ def implement_algorithm(
     elif algorithm == "Louvain":
         corr_map_2 = corr_map.copy()
         if consensus:
-            labels = Consensus(clustering.louvain, thr, n_clusters, nscans).find_clusters_with_consensus(
-                corr_map, indexes
-            )
+            labels = Consensus(clustering_parameters.louvain(thr)).find_clusters_with_consensus()
         else:
-            corr_map, labels = clustering.louvain(corr_map, indexes, thr, nscans=nscans)
+            corr_map, labels = clustering_parameters.louvain(thr)
     elif algorithm == "Greedy":
         corr_map_2 = corr_map.copy()
         if consensus:
-            labels = Consensus(clustering.greedy_mod, thr, n_clusters, nscans).find_clusters_with_consensus(
-                corr_map, indexes
-            )
+            labels = Consensus(clustering_parameters.greedy_mod(thr)).find_clusters_with_consensus()
         else:
-            corr_map, labels = clustering.greedy_mod(corr_map, indexes, thr, nscans=nscans)
+            corr_map, labels = clustering_parameters.greedy_mod(thr)
 
     if algorithm == "infomap" or "Louvain" or "Greedy":
         visualization_parameters.plot_two_matrixes(
@@ -118,6 +110,58 @@ def implement_algorithm(
         )
     return labels
 
+def preprocess(corr_map, analysis, near, thr):
+    indices = range(corr_map.shape[0])
+    if analysis == "thr":
+        parameter = thr
+        new_corr_map = Processing(corr_map).thr_index(thr)
+    elif analysis == "RSS":
+        indices = Processing(corr_map).rss_peaks(near)
+        parameter = near
+        new_corr_map = pd.DataFrame(corr_map).loc[indices, indices]
+    return new_corr_map, corr_map, indices, parameter
+
+def correlation_with_window(data, window_length):
+    """
+    Calculates the correlation using a sliding window
+
+    Parameters
+    ----------
+    data : matrix
+        fMRI data.
+    window_length : int
+        size of the sliding window.
+
+    Returns
+    -------
+    self.corr_map_window : matrix
+        Correlation map of the data with the selected window.
+
+    """
+    concat_data = np.zeros((data.shape[0], data.shape[1] * (window_length + 1)))
+
+    for timepoint in range(data.shape[0]):
+        temp = data[timepoint, :]  # Select a whole row
+
+        if timepoint < (data.shape[0] - window_length):
+            # The first rows (those whose index is between nrow - window lenght) will follow this sequence:
+            for window_idx in range(window_length):  # the loop runs for the whole window length
+                temp = np.concatenate(
+                    (temp, data[timepoint + window_idx + 1, :])
+                )  # The data is concatenated for all the rows in the window
+        else:
+            # The last rows will be concatenated (since there are less rows than the specified length
+            # once the loop finishes, you can exit it)
+
+            for window_idx in range(window_length):
+                if (timepoint + window_idx + 1) < (data.shape[0]):
+                    temp = np.concatenate((temp, data[timepoint + window_idx + 1, :]))
+                else:
+                    break
+        concat_data[timepoint, range(len(temp))] = temp
+    corr_map_window = np.corrcoef(concat_data, rowvar=True)
+
+    return corr_map_window        
 
 def clustintime(
     data_paths,
@@ -213,7 +257,6 @@ def clustintime(
 
     data, masker, nscans = load_data(data_paths, mask_path)
 
-    print("Mask applied!")
 
     if component == "negative":
         data[data > 0] = 0
@@ -235,14 +278,15 @@ def clustintime(
     if correlation == "standard":
         corr_map = np.nan_to_num(np.corrcoef(data))
     else:
-        corr_map = np.nan_to_num(processing.correlation_with_window(data, window_size))
+        corr_map = np.nan_to_num(correlation_with_window(data, window_size))
 
     indexes = range(corr_map.shape[0])
 
     if process_type is not None:
-        new_corr_map, corr_map, indexes, parameter = processing.preprocess(
+        new_corr_map, corr_map, indexes, parameter = preprocess(
             corr_map=corr_map, analysis=process_type, near=near, thr=thr
         )
+        
         Visualization(
             tasks=task,
             contrast=contrast,
@@ -285,7 +329,7 @@ def clustintime(
         tasks=task, saving_dir=saving_dir, repetition_time=repetition_time, prefix=prefix, labels=labels, title=title
     ).show_table()
     if save_maps:
-        clustering.generate_maps(labels, saving_dir, data, masker, prefix)
+        Clustering.generate_maps(labels, saving_dir, data, masker, prefix)
 
     if generate_dyneusr_graph:
         Visualization(

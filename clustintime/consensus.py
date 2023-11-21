@@ -3,8 +3,7 @@ import random
 import numpy as np
 import pandas as pd
 
-from clustintime.clustering import greedy_mod, info_map, louvain
-
+from clustintime.clustering import Clustering
 
 def compute_connectivity_matrix(n_items, labels):
     connectivity_matrix = np.zeros([n_items, n_items])
@@ -56,14 +55,12 @@ def bfs(graph, source, dest):
 
 
 class Consensus:
-    def __init__(self, algorithm, thr, n_clusters, n_scans):
+    def __init__(self, algorithm):
         self.algorithm = algorithm
-        self.threshold = thr
-        self.n_clusters = n_clusters
-        self.n_scans = n_scans
 
-    def find_clusters_with_consensus(self, corr_map, indexes):
-        npoints = len(indexes)
+
+    def find_clusters_with_consensus(self):
+        npoints = len(self.algorithm.indices)
         sum_connectivity_matrix = np.zeros([npoints, npoints])
         index_matrix_sum = np.zeros([npoints, npoints])
 
@@ -74,9 +71,9 @@ class Consensus:
                 index_matrix = pd.DataFrame([0] * npoints)
                 index_matrix[0][sampling] = 1
                 index_matrix_sum = index_matrix_sum + np.dot(index_matrix, np.transpose(index_matrix))
-                data_sampled = corr_map[sampling, :][:, sampling]
+                data_sampled = self.algorithm.corr_map[sampling, :][:, sampling]
 
-                idx = self.get_indexes(data_sampled, indexes)
+                idx = self.get_indices(data_sampled, self.algorithm.indices)
 
                 idx = np.transpose(pd.DataFrame([idx, sampling]))
                 idx = idx.set_index(1)
@@ -88,36 +85,36 @@ class Consensus:
             _consensus = np.divide(sum_connectivity_matrix, index_matrix_sum)
             _consensus[_consensus < find_threshold_bfs(_consensus)] = 0
 
-            final_labels = self.get_labels(_consensus, indexes)
+            final_labels = self.get_labels(_consensus, self.algorithm.indices)
 
             thr = find_threshold_bfs(_consensus)
             _consensus[_consensus <= thr] = 0
-            if self.algorithm in (info_map, greedy_mod, louvain):
+            if self.algorithm in (Clustering.info_map, Clustering.greedy_mod, Clustering.louvain):
                 final_labels = final_labels[1]
             whole_connectivity_matrix = compute_connectivity_matrix(npoints, final_labels)
 
             are_clusters_stable = self.check_if_clusters_stable(
-                _consensus, indexes, npoints, whole_connectivity_matrix
+                _consensus, self.algorithm.indices, npoints, whole_connectivity_matrix
             )
 
         return final_labels
 
-    def get_indexes(self, data_sampled, indexes):
-        indexes = self.get_labels(data_sampled, indexes)
-        if self.algorithm in (info_map, greedy_mod, louvain):
-            return indexes[1]
-        return indexes
+    def get_indices(self, data_sampled, indices):
+        indices = self.get_labels(data_sampled, indices)
+        if self.algorithm in (Clustering.info_map, Clustering.greedy_mod, Clustering.louvain):
+            return indices[1]
+        return indices
 
-    def get_labels(self, data_sampled, indexes):
-        if self.algorithm in (info_map, greedy_mod, louvain):  # pylint: disable=comparison-with-callable
-            return self.algorithm(data_sampled, indexes, self.threshold, self.n_scans)
+    def get_labels(self, data_sampled, indices):
+        if self.algorithm in (Clustering.info_map, Clustering.greedy_mod, Clustering.louvain):  # pylint: disable=comparison-with-callable
+            return self.algorithm(data_sampled, indices, self.threshold, self.n_scans)
         else:
-            return self.algorithm(data_sampled, indexes, self.n_scans, self.n_clusters)
+            return self.algorithm(data_sampled, indices, self.n_scans, self.n_clusters)
 
-    def check_if_clusters_stable(self, _consensus, indexes, npoints, whole_connectivity_matrix):
+    def check_if_clusters_stable(self, _consensus, indices, npoints, whole_connectivity_matrix):
         for _ in range(100):
-            labels = self.get_labels(_consensus, indexes)
-            if self.algorithm in (info_map, greedy_mod, louvain):
+            labels = self.get_labels(_consensus, indices)
+            if self.algorithm in (Clustering.info_map, Clustering.greedy_mod, Clustering.louvain):
                 labels = labels[1]
             connect = compute_connectivity_matrix(npoints, labels)
 
