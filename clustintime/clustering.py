@@ -36,7 +36,10 @@ def generate_maps(labels, directory, data, masker, prefix):
     None.
 
     """
-
+    if len(labels.shape)>1:
+        nr_labels = len(labels)
+        nr_subjects = labels.shape[1]
+        labels = np.reshape(labels, (nr_labels*nr_subjects,), order='F')
     unique, counts = np.unique(labels, return_counts=True)  # find the labels and how many in each of them
     unique = unique[counts > 1]
     counts = counts[counts > 1]
@@ -75,6 +78,19 @@ def find_communities(graph):
     nx.set_node_attributes(graph, values=communities, name="community")
     return communities
 
+def create_labels(clustering_results, nscans):
+    if type(nscans) is not int:
+        labels = np.zeros([np.max(nscans), len(nscans)])
+        subject = 0
+        for idx in clustering_results.index:
+            labels[int(idx) - subject*max(nscans), subject] = clustering_results[0][int(idx)] + 1
+            if (int(idx)+1)%max(nscans) == 0:
+                subject+=1
+    else:
+        labels = np.zeros(nscans)
+        for idx in clustering_results.index:
+            labels[int(idx)] = clustering_results[0][int(idx)] + 1
+    return labels
 
 class Clustering:
     def __init__(self, corr_map, indices, nscans):
@@ -107,17 +123,10 @@ class Clustering:
         labels = np.transpose(
             pd.DataFrame([labels, self.indices])
         )  
-        labels = labels.set_index(1)
+        labels = labels.set_index(1)  
+        results = create_labels(labels, self.nscans)
     
-        final_labels = np.zeros(self.nscans)
-
-    
-        for idx in labels.index:
-            idx = int(idx)
-            final_labels[idx] = labels[0][idx] + 1
-
-    
-        return final_labels
+        return results
     
     
     def agglomerative_clustering(self, n_clusters, affinity="euclidean", linkage="ward"):
@@ -159,13 +168,9 @@ class Clustering:
         )  
         labels = labels.set_index(1)
     
-        final_labels = np.zeros(self.nscans)
-      
-        for idx in labels.index:
-            idx = int(idx)
-            final_labels[idx] = labels[0][idx] + 1
+        results = create_labels(labels, self.nscans)
    
-        return final_labels
+        return results
     
     
     def info_map(self,thr):
@@ -207,14 +212,11 @@ class Clustering:
         labels = np.transpose(pd.DataFrame([coms_labels, self.indices]))
         labels = labels.set_index(1)
     
-        final_labels = np.zeros(self.nscans)
-
-        for idx in labels.index:
-            final_labels[int(idx)] = labels[0][int(idx)] + 1
+        results = create_labels(labels, self.nscans)
 
 
     
-        return corr_smooth_binary, final_labels
+        return corr_smooth_binary, results
     
     
     def louvain(self, thr):
@@ -253,14 +255,11 @@ class Clustering:
         labels = np.transpose(pd.DataFrame([coms_labels, self.indices]))
         labels = labels.set_index(1)
     
-        final_labels = np.zeros(self.nscans)
-    
-        for idx in labels.index:
-            final_labels[int(idx)] = labels[0][int(idx)] + 1
+        results = create_labels(labels, self.nscans)
     
         print("Louvain applied")
     
-        return corr_smooth_binary, final_labels
+        return corr_smooth_binary, results
     
     
     def greedy_mod(self, thr):
@@ -298,13 +297,10 @@ class Clustering:
         labels = np.transpose(pd.DataFrame([coms_labels, self.indices]))
         labels = labels.set_index(1)
     
-        final_labels = np.zeros(self.indices)
-    
-        for i in labels.index:
-            final_labels[int(i)] = labels[0][int(i)] + 1
+        results = create_labels(labels, self.nscans)
 
     
-        return corr_smooth_binary, final_labels
+        return corr_smooth_binary, results
     
         
 

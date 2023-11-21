@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 from nilearn.input_data import NiftiMasker
 
-from clustintime.clustering import Clustering
+from clustintime.clustering import Clustering, generate_maps
 from clustintime.cli.run_clustintime import _get_parser
 from clustintime.consensus import Consensus
 from clustintime.visualization import Visualization
@@ -82,11 +82,11 @@ def implement_algorithm(
     elif algorithm == "Agglomerative":
         if consensus:
             labels = Consensus(
-                clustering_parameters.agglomerative_clustering_parameters(n_clusters=n_clusters,
+                clustering_parameters.agglomerative_clustering(n_clusters=n_clusters,
                 affinity=affinity,
                 linkage=linkage)).find_clusters_with_consensus()
         else:
-            labels = clustering_parameters.agglomerative_clustering_parameters(
+            labels = clustering_parameters.agglomerative_clustering(
                 n_clusters=n_clusters,
                 affinity=affinity,
                 linkage=linkage,
@@ -104,8 +104,8 @@ def implement_algorithm(
         else:
             corr_map, labels = clustering_parameters.greedy_mod(thr)
 
-    if algorithm == "infomap" or "Louvain" or "Greedy":
-        visualization_parameters.plot_two_matrixes(
+    if algorithm in ["infomap", "Louvain", "Greedy"]:
+        visualization_parameters.plot_two_matrices(
             corr_map_2, corr_map, "Original correlation map", "Binary correlation map", contrast=contrast
         )
     return labels
@@ -329,7 +329,7 @@ def clustintime(
         tasks=task, saving_dir=saving_dir, repetition_time=repetition_time, prefix=prefix, labels=labels, title=title
     ).show_table()
     if save_maps:
-        Clustering.generate_maps(labels, saving_dir, data, masker, prefix)
+        generate_maps(labels, saving_dir, data, masker, prefix)
 
     if generate_dyneusr_graph:
         Visualization(

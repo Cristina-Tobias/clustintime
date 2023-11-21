@@ -21,6 +21,19 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from umap.umap_ import UMAP
 
+def create_heatmatrix(nr_labels, subject_labels):
+    heatmatrix = np.zeros([nr_labels, len(subject_labels)])
+    file1d = pd.DataFrame()
+    rownames = np.zeros([nr_labels]).astype(str)
+    for label in range(nr_labels):
+        selected_labels = np.array([0] * len(subject_labels))
+        selected_labels[np.where(subject_labels == label + 1)] = 1
+        file1d = pd.concat([file1d, pd.DataFrame(selected_labels)], axis=1)
+        heatmatrix[label] = selected_labels
+        rownames[label] = f"# {label+1}"
+    heatmatrix = pd.DataFrame(heatmatrix,index=rownames)
+    return heatmatrix, file1d
+
 
 class Visualization:
     def __init__(self, title, saving_dir, prefix, tasks, repetition_time, labels):
@@ -35,21 +48,6 @@ class Visualization:
         self.repetition_time = repetition_time
         self.labels = labels
 
-    def create_multiindex(self, nscans):
-
-        time_in_secs = [list(range(nscans[i])) for i in range(len(nscans))]
-        time_in_secs = np.resize(time_in_secs, [sum(nscans)]) * self.repetition_time
-        subjects = [
-            [
-                f"subject_{idx}",
-            ]
-            * nscan
-            for idx, nscan in enumerate(nscans)
-        ]
-        subjects = np.resize(subjects, [sum(nscans)])
-        tuples = list(zip(time_in_secs, subjects))
-        index = pd.MultiIndex.from_tuples(tuples, names=["time_in_secs", "Subject"])
-        return index
 
     def plot_heatmap(self, nscans):
         """
@@ -75,47 +73,50 @@ class Visualization:
         None.
 
         """
-
-        fig = plt.figure(figsize=[8, 8])
-        ax = fig.add_subplot(111)
-        heatmatrix = np.zeros([int(self.labels.max()), len(self.labels)])
-        rownames = np.zeros([int(self.labels.max())]).astype(str)
-
-        file1d = pd.DataFrame()
-        for i in range(int(self.labels.max())):
-            selected_labels = np.array([0] * len(self.labels))
-            selected_labels[np.where(self.labels == i + 1)] = 1
-            file1d = pd.concat([file1d, pd.DataFrame(selected_labels)], axis=1)
-            heatmatrix[i] = selected_labels
-            rownames[i] = f"# {i+1}"
-
-        heatmatrix = pd.DataFrame(
-            heatmatrix,
-            index=rownames,
-            columns=Visualization(
-                self.title, self.saving_dir, self.prefix, self.tasks, self.repetition_time, self.labels
-            ).create_multiindex(nscans),
-        )
+        if len(self.labels.shape) == 1:
+            nr_subjects = 1
+        else:
+            nr_subjects = self.labels.shape[1]
+        nr_labels = int(self.labels.max())
+        
         colors = sns.color_palette("Dark2", len(self.tasks) + 1)
-        sns.heatmap(heatmatrix, cmap="Greys", xticklabels=150, cbar=False)
-        plt.xlabel("Time in seconds", fontsize=10)
-        plt.ylabel("Clusters", fontsize=10)
-        legends = np.zeros([len(self.tasks)]).astype(str)
         rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
-        for idx, task in enumerate(self.tasks):
-            plt.vlines(task / self.repetition_time, 0, self.labels.max(), linewidth=1.2, colors=colors[idx], alpha=0.5)
-            legends[idx] = f"task {idx}"
-            rectangles.append(patches.Rectangle((0, 0), 1, 1, facecolor=colors[idx + 1]))
-        plt.title(self.title)
-        labels = ["" for item in ax.get_xticklabels()]
-        ax.set_xticklabels(labels)
-        ax.set_xlabel("")
-        # label_group_plot(ax, heatmatrix)
-
-        # fig.subplots_adjust(bottom=.1*heatmatrix.columns.nlevels)
-        # ax.set_xticks([int(heatmatrix.shape[1]*0.25), int(heatmatrix.shape[1]*0.75)], minor=True)
-        # ax.set_xticklabels(heatmatrix.columns.levels[1], minor=True)
-        ax.tick_params(axis="x", which="minor", length=0, pad=18)
+        legends = np.zeros([len(self.tasks)]).astype(str)
+        fig, ax_arr = plt.subplots(ncols=nr_subjects, sharex=False, 
+                                   sharey=True, constrained_layout=True, 
+                                   figsize=(10*nr_subjects, nr_labels))
+        if nr_subjects == 1:
+            heatmatrix, file1d = create_heatmatrix(nr_labels, self.labels)
+            figure_info = [ax_arr]
+            np.savetxt(f"{self.saving_dir}/{self.prefix}_heatmap.1D", file1d)
+        else:
+            heatmatrix = []  
+            file1d = []
+            figure_info = ax_arr.flatten()
+            for subject in range(nr_subjects):
+                subject_labels = self.labels[:,subject]
+                subject_heatmatrix, subject_file1d = create_heatmatrix(nr_labels, subject_labels)
+                heatmatrix.append(subject_heatmatrix)
+                np.savetxt(f"{self.saving_dir}/{self.prefix}_subject_{subject}_heatmap.1D", subject_file1d)
+                
+        for subject, ax in enumerate(figure_info):
+            ax.set_title(f'Subject {subject}')            
+            for idx, task in self.tasks.items():
+                ax.vlines(task / self.repetition_time, 0, nr_labels, 
+                          linewidth=1.2, colors=colors[idx], alpha=0.5)
+                legends[idx] = f"task {idx}"
+                rectangles.append(patches.Rectangle((0, 0), 1, 1, 
+                                                    facecolor=colors[idx + 1]))
+            if nr_subjects == 1:
+                sns.heatmap(heatmatrix, xticklabels=150,cmap="Greys", 
+                        cbar=False, ax=ax)
+            else:
+                sns.heatmap(heatmatrix[subject], xticklabels=150,cmap="Greys", 
+                        cbar=False, ax=ax)
+            
+        fig.supxlabel("Time in seconds", fontsize=10)
+        fig.supylabel("Clusters", fontsize=10)
+            
         plt.legend(
             (rectangles),
             np.array(legends),
@@ -123,9 +124,12 @@ class Visualization:
             loc="center left",
             handlelength=1,
             handleheight=1,
-        )
+        ) 
+        
+        plt.title(self.title)
+        
         plt.savefig(f"{self.saving_dir}/{self.prefix}_heatmap.png")
-        np.savetxt(f"{self.saving_dir}/{self.prefix}_heatmap.1D", file1d)
+        
 
     def show_table(self):
         """
@@ -149,7 +153,7 @@ class Visualization:
         print(table_result)
         table_result.to_csv(f"{self.saving_dir}/{self.prefix}_Results.csv")
 
-    def plot_two_matrixes(self, map_1, map_2, title_1, title_2, contrast=1):
+    def plot_two_matrices(self, map_1, map_2, title_1, title_2, contrast=1):
         """
         Graphical comparison between two correlation maps
 
@@ -166,7 +170,7 @@ class Visualization:
         tasks : dictionary or list, optional
             Structure containing the times when the task is performed. The default is [].
         contrast : int, optional
-            Range of values of the correlation matrixes. The default is 1.
+            Range of values of the correlation matrices. The default is 1.
         repetition_time: float, optional
             TR of the data. The default is 0.5
 
