@@ -19,11 +19,11 @@ import numpy as np
 import pandas as pd
 from nilearn.input_data import NiftiMasker
 
-from clustintime.clustering import Clustering, generate_maps
-from clustintime.cli.run_clustintime import _get_parser
-from clustintime.consensus import Consensus
-from clustintime.visualization import Visualization
-from clustintime.processing import Processing
+from clustintime.clustintime.clustintime.clustering import Clustering, generate_maps
+from clustintime.clustintime.clustintime.cli.run_clustintime import _get_parser
+from clustintime.clustintime.clustintime.consensus import Consensus
+from clustintime.clustintime.clustintime.visualization import Visualization
+from clustintime.clustintime.clustintime.processing import Processing
 
 
 def load_data(data_paths, mask_paths):

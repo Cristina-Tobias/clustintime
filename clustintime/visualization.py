@@ -27,7 +27,7 @@ def create_heatmatrix(nr_labels, subject_labels):
     rownames = np.zeros([nr_labels]).astype(str)
     for label in range(nr_labels):
         selected_labels = np.array([0] * len(subject_labels))
-        selected_labels[np.where(subject_labels == label + 1)] = 1
+        selected_labels[np.where(subject_labels == label + 1)[0]] = 1
         file1d = pd.concat([file1d, pd.DataFrame(selected_labels)], axis=1)
         heatmatrix[label] = selected_labels
         rownames[label] = f"# {label+1}"
@@ -38,8 +38,8 @@ def create_heatmatrix(nr_labels, subject_labels):
 class Visualization:
     def __init__(self, title, saving_dir, prefix, tasks, repetition_time, labels):
 
-        if tasks is None:
-            tasks = []
+        # if tasks is None:
+        #     tasks = []
 
         self.title = title
         self.saving_dir = saving_dir
@@ -78,10 +78,10 @@ class Visualization:
         else:
             nr_subjects = self.labels.shape[1]
         nr_labels = int(self.labels.max())
-        
-        colors = sns.color_palette("Dark2", len(self.tasks) + 1)
-        rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
-        legends = np.zeros([len(self.tasks)]).astype(str)
+        if self.tasks is not None:
+            colors = sns.color_palette("Dark2", len(self.tasks) + 1)
+            rectangles = [patches.Rectangle((0, 0), 1, 1, facecolor=colors[0])]
+            legends = np.zeros([len(self.tasks)]).astype(str)
         fig, ax_arr = plt.subplots(ncols=nr_subjects, sharex=False, 
                                    sharey=True, constrained_layout=True, 
                                    figsize=(10*nr_subjects, nr_labels))
@@ -100,13 +100,14 @@ class Visualization:
                 np.savetxt(f"{self.saving_dir}/{self.prefix}_subject_{subject}_heatmap.1D", subject_file1d)
                 
         for subject, ax in enumerate(figure_info):
-            ax.set_title(f'Subject {subject}')            
-            for idx, task in self.tasks.items():
-                ax.vlines(task / self.repetition_time, 0, nr_labels, 
-                          linewidth=1.2, colors=colors[idx], alpha=0.5)
-                legends[idx] = f"task {idx}"
-                rectangles.append(patches.Rectangle((0, 0), 1, 1, 
-                                                    facecolor=colors[idx + 1]))
+            ax.set_title(f'Subject {subject}')
+            if self.tasks is not None:            
+                for idx, task in self.tasks.items():
+                    ax.vlines(task / self.repetition_time, 0, nr_labels, 
+                              linewidth=1.2, colors=colors[idx], alpha=0.5)
+                    legends[idx] = f"task {idx}"
+                    rectangles.append(patches.Rectangle((0, 0), 1, 1, 
+                                                        facecolor=colors[idx + 1]))
             if nr_subjects == 1:
                 sns.heatmap(heatmatrix, xticklabels=150,cmap="Greys", 
                         cbar=False, ax=ax)
@@ -116,15 +117,16 @@ class Visualization:
             
         fig.supxlabel("Time in seconds", fontsize=10)
         fig.supylabel("Clusters", fontsize=10)
-            
-        plt.legend(
-            (rectangles),
-            np.array(legends),
-            bbox_to_anchor=[1, 0.5],
-            loc="center left",
-            handlelength=1,
-            handleheight=1,
-        ) 
+        
+        if self.tasks is not None:
+            plt.legend(
+                (rectangles),
+                np.array(legends),
+                bbox_to_anchor=[1, 0.5],
+                loc="center left",
+                handlelength=1,
+                handleheight=1,
+            ) 
         
         plt.title(self.title)
         
