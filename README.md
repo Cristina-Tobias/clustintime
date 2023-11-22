@@ -1,6 +1,44 @@
-# Clustering Toolbox
+# Clustintime, a computational and visualization tool for time clustering of fMRI data.
 
-This toolbox contains all the functions required to run the whole project pipeline from one command
+Welcome! This toolbox contains all the functions required to run the whole project pipeline from one command.
+
+
+## Motivation
+
+In certain experimental contexts, particularly in naturalistic paradigms, clinical experiments (such as epilepsy), 
+and during resting states, the precise timing of neuronal activity remains elusive. 
+To address this challenge, researchers often turn to clustering algorithms in the time domain. 
+This approach enables the identification of spatial patterns in neural activity by grouping neurons or brain 
+regions together based on the similarity of their temporal dynamics.
+
+The concept of similarity in time domain is pivotal to this methodology. It involves assessing the degree of
+resemblance or corresponding between temporal patterns of different signals or data points.
+When we talk about measuring similarity in the time domain, we are investigating how closely the temporal profiles
+of 2 or more signals align over a specified period.
+
+This analytical strategy becomes invaluable in scenarios where the temporal sequence of neuronal events is not 
+predetermined. By employing clustering algorithms sensitive to temporal dynamics, researchers can uncover 
+meaningful patterns in neural activity, shedding light on how different neurons or brain regions organize their 
+responses over time. This approach is particularly relevant for understanding the intricacies of neural processing 
+in real-world, uncontrolled conditions or clinical settings, where precise timing information may be challenging 
+to obtain.
+
+This toolbox aims to fill the gap in time domain analysis. ????
+
+## Introduction
+
+Spatial clustering is conventionally employed to identify patterns of synchronous BOLD fMRI signals across regions
+(Thirion, B. 2014)
+
+There is increasing interest in applying clustering algorithms in the temporal domain (Jo, Y. 2021)
+
+### Key points of time domain clustering algorithms
+
+1. Flexibility. They adapt to the inherent variability in timing, allowing the identification of patterns without
+strict temporal contraints.
+2. Pattern discovery that may have been overlooked in time-locked analysis.
+3. Applicability across experimental designs, from exploratory research of spontaneous neural dynamics to controlled
+tasks.
 
 ## Instructions
 
