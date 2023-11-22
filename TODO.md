@@ -1,9 +1,5 @@
 # TODO
 
-## Urgent TODOs
-- Clustering.py (lowercase stuff).
-- Refactor for maintainability & Clean Code.
-
 ## CI/CD
 - Pre commit hooks
 - Liting
