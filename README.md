@@ -71,9 +71,9 @@ urllib3 == 1.26.12
 > In this repository, there is a requirements.txt file which contains the list above this line. In order to install all the libraries in a single command
 line, execute:
 
-> ``` bash
-> pip install -r requirements.txt
-> ```
+``` bash
+pip install -r requirements.txt
+```
 
 ## Example of basic usage
 
