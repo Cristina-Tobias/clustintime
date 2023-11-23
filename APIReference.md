@@ -4,7 +4,7 @@ This section provides a documentation of all the classes, functions and methods.
 
 ## clustintime Module Documentation
 
-_get_parser Function
+**_get_parser Function**
 
 `````def _get_parser():
     """
@@ -43,9 +43,10 @@ This function defines a command-line argument parser for the clustintime module.
 - dyn, --dyneusr: Generate and save DyneuSR map (optional, default is False).
 - t, --title: Title for the figures (optional, default is '').
 
-__main__ Block
+**__main__ Block**
 
-`````if __name__ == "__main__":
+`````
+if __name__ == "__main__":
     raise RuntimeError(
         "clustintime/cli/run_clustintime.py should not be run directly; \n"
         "Please `pip install` clustintime and use the"
