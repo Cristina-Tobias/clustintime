@@ -92,14 +92,15 @@ Once you have installed the toolbox,
   <tbody>
     <tr>
       <td align="center" valign="top" width="20%"><a href="https://github.com/Cristina-Tobias"><img src="https://github.com/Cristina-Tobias.png?size=200" width="100px;" alt="Cristina Tobias"/><br /><sub><b>Cristina Tobias</b></sub></a><br /><a href="https://github.com/Cristina-Tobias/clustintime/tree/main/clustintime" title="Code">💻</a> <a href="#ideas-Cristina-Tobias" title="Ideas">🤔</a> </td>
-      <td align="center" valign="top" width="20%"><a href="https://github.com/eurunuela"><img src="https://github.com/eurunuela.png?size=200" width="100px;" alt="Eneko Urunuela"/><br /><sub><b>Eneko Urunuela</b></sub></a><br /> <a href="https://github.com/Cristina-Tobias/clustintime/tree/main/clustintime" title="Code">💻</a> <a href="#testing-eurunuela" title="Testing">⚠️</a> <a title="Ideas">🤔</a> <a href="#ideas-eurunuela" title="Review">👀</a>  </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/eurunuela"><img src="https://github.com/eurunuela.png?size=200" width="100px;" alt="Eneko Urunuela"/><br /><sub><b>Eneko Urunuela</b></sub></a><br /> <a href="https://github.com/Cristina-Tobias/clustintime/tree/main/clustintime" title="Code">💻</a> <a href="#testing-eurunuela" title="Testing">⚠️</a> <a href="#ideas-eurunuela" title="Ideas">🤔</a> <a href="#ideas-eurunuela" title="Review">👀</a>  </td>
       <td align="center" valign="top" width="20%"><a href="https://github.com/zalteck"><img src="https://github.com/zalteck.png?size=200" width="100px;" alt="Fernando Perez-Bueno"/><br /><sub><b>Fernando Perez-Bueno</b></sub></a><br /> <a href="https://github.com/zalteck/clustintime" title="Code">💻</a> <a href="#testing-zalteck" title="Testing">⚠️</a> </td>
-      <td align="center" valign="top" width="20%"><a href="https://github.com/lauradefrutos"><img src="https://github.com/lauradefrutos.png?size=200" width="100px;" alt="Laura de Frutos-Sagastuy"/><br /><sub><b>Laura de Frutos</b></sub></a><br /></a> <a href="https://github.com/lauradefrutos/clustintime/blob/Documentation/README.md" title="Documentation">📖</a> </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/lauradefrutos"><img src="https://github.com/lauradefrutos.png?size=200" width="100px;" alt="Laura de Frutos-Sagastuy"/><br /><sub><b>Laura de Frutos-Sagastuy</b></sub></a><br /></a> <a href="https://github.com/lauradefrutos/clustintime/blob/Documentation/README.md" title="Documentation">📖</a> </td>
       <td align="center" valign="top" width="20%"><a href="https://github.com/lmansoo"><img src="https://github.com/lmansoo.png?size=200" width="100px;" alt="Lucia Manso-Ortega"/><br /><sub><b>Lucia Manso-Ortega</b></sub></a><br /><a href="https://github.com/lmansoo/clustintime" title="Code">💻</a> <a href="#testing-lmansoo" title="Testing">⚠️</a> </td>
     </tr> 
     </tr>
       <td align="center" valign="top" width="20%"><a href="https://github.com/silvyang"><img src="https://github.com/silvyang.png?size=200" width="100px;" alt="Silvia Yang"/><br /><sub><b>Silvia Yang</b></sub></a><br /></a> <a href="https://github.com/silvyang/clustintime" title="Documentation">📖</a> </td>
-    </tr>    
+      <td align="center" valign="top" width="20%"><a href="https://github.com/vinferrer"><img src="https://github.com/vinferrer.png?size=200" width="100px;" alt="Vicente Ferrer"/><br /><sub><b>Vicente Ferrer</b></sub></a><br /></a> <a href="https://github.com/Cristina-Tobias/clustintime/tree/main/clustintime" title="Code">💻</a> </td>        
+</tr>    
   </tbody>
 </table>
 
