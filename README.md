@@ -7,6 +7,7 @@
 Welcome! This toolbox contains all the functions required to run the whole time clustering pipeline from 
 one command.
 
+
 ## Motivation
 
 In certain experimental contexts, particularly in naturalistic paradigms, clinical experiments (such as epilepsy), 
@@ -42,6 +43,7 @@ tasks.
 
 These are the library version clustintime toolbox uses: 
 
+``` ruby
 certifi == 2022.9.24
 
 charset-normalizer == 2.1.1
@@ -83,7 +85,7 @@ six == 1.16.0
 threadpoolctl == 3.1.0
 
 urllib3 == 1.26.12
-
+```
 
 > [!TIP]
 > In this repository, there is a requirements.txt file which contains the list above this line. In order to install all the libraries in a single command
