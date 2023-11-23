@@ -24,7 +24,7 @@ The clustintime function is the main workflow, where users can specify data path
 
 ## Example Usage:
 
-clustintime(
+`````clustintime(
     data_paths="path/to/fmri_data.nii.gz",
     mask_path="path/to/mask.nii.gz",
     component="whole",
@@ -40,6 +40,7 @@ clustintime(
     generate_dyneusr_graph=False,
     title="Clustintime Analysis",
 )
+`````
 
 ## How to Run:
 The script can be executed from the command line with appropriate arguments.
@@ -105,3 +106,4 @@ Thoroughly read the documentation of the "clustintime" toolbox to understand all
 15. Stay Informed:
 Keep abreast of updates and releases for the "clustintime" toolbox or any similar tool.
 Participate in relevant forums or communities for discussions and support.
+
