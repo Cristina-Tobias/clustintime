@@ -2,7 +2,7 @@
 
 Welcome! This toolbox contains all the functions required to run the whole time clustering pipeline from 
 one command.
-![](clustintime/Documentation/logo.png)
+![/Documentation/logo.png]()
 
 
 ## Motivation
