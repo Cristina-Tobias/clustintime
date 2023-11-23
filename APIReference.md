@@ -29,6 +29,7 @@ Returns:
 - masker: Masker - Masker object.
 - nscans: List - Number of scans.
 
+
 **implement_algorithm** Function
 
 `````
@@ -70,6 +71,7 @@ Parameters:
 Returns:
 - labels (numpy array): Assigned clusters.
 
+
 **preprocess** Function
 
 `````
@@ -92,6 +94,7 @@ Returns:
 - indices (range): Range of indices.
 - parameter (int): Parameter used for analysis.
 
+
 **correlation_with_window** Function
 
 `````
@@ -109,6 +112,7 @@ Parameters:
 
 Returns:
 - corr_map_window (matrix): Correlation map of the data with the selected window.
+
 
 **clustintime** Function
 `````
@@ -164,8 +168,10 @@ Parameters:
 - generate_dyneusr_graph (bool, optional): Generate a DyNeuSR graph.
 - title (str, optional): Title for the graphs.
 
+
 **Command-Line Interface (CLI)**
 The script also includes a command-line interface (CLI) provided by the _main function. This CLI accepts various command-line arguments for running clustintime with different configurations. Run the script from the command line with appropriate arguments.
+
 
 **Note**
 This documentation provides an overview of the functions and classes in the clustintime script. For more detailed information on each function's parameters and behavior, refer to the code and comments within the script.
@@ -179,6 +185,7 @@ mask_path = "/path/to/mask.nii.gz"
 
 data_masked, masker, nscans = load_data(data_paths, mask_path)
 `````
+
 
 **implement_algorithm** Function
 `````
@@ -200,6 +207,7 @@ labels = implement_algorithm(
 )
 `````
 
+
 **preprocess** Function
 `````
 corr_map = np.random.rand(100, 100)
@@ -210,6 +218,7 @@ thr = 95
 new_corr_map, corr_map, indices, parameter = preprocess(corr_map=corr_map, analysis=analysis, near=near, thr=thr)
 `````
 
+
 **correlation_with_window** Function
 `````
 data = np.random.rand(50, 100)
@@ -217,6 +226,7 @@ window_length = 3
 
 corr_map_window = correlation_with_window(data, window_length)
 `````
+
 
 **clustintime** Function
 `````
@@ -249,7 +259,9 @@ clustintime(
 )
 `````
 
+
 **Command-Line Interface (CLI)**
+
 Assuming you have a script file named clustintime_script.py, you can run it from the command line as follows:
 `````
 python clustintime_script.py --data_paths /path/to/data.nii.gz --mask_path /path/to/mask.nii.gz --component whole --correlation standard --process_type None --algorithm infomap --consensus --n_clusters 5 --save_maps --saving_dir . --prefix example --seed 42 --generate_dyneusr_graph
