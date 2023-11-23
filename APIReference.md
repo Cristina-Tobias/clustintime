@@ -164,10 +164,94 @@ Parameters:
 - generate_dyneusr_graph (bool, optional): Generate a DyNeuSR graph.
 - title (str, optional): Title for the graphs.
 
-## Command-Line Interface (CLI)
+**Command-Line Interface (CLI)**
 The script also includes a command-line interface (CLI) provided by the _main function. This CLI accepts various command-line arguments for running clustintime with different configurations. Run the script from the command line with appropriate arguments.
 
-## Note
+**Note**
 This documentation provides an overview of the functions and classes in the clustintime script. For more detailed information on each function's parameters and behavior, refer to the code and comments within the script.
 
-- Provide example usage for each API endpoint.
+## Example Usage for Each API Endpoint
+
+**load_data** Function
+`````
+data_paths = "/path/to/data.nii.gz"
+mask_path = "/path/to/mask.nii.gz"
+
+data_masked, masker, nscans = load_data(data_paths, mask_path)
+`````
+
+**implement_algorithm** Function
+`````
+algorithm = "infomap"
+consensus = True
+thr = 90
+n_clusters = 5
+nscans = [50, 50, 50]  # Example number of scans
+corr_map = np.random.rand(150, 150)
+indices = range(corr_map.shape[0])
+seed = 42
+affinity = "euclidean"
+linkage = "ward"
+visualization_parameters = Visualization()  # Assuming an instance of Visualization
+contrast = 1.5
+
+labels = implement_algorithm(
+    algorithm, consensus, thr, n_clusters, nscans, corr_map, indices, seed, affinity, linkage, visualization_parameters, contrast
+)
+`````
+
+**preprocess** Function
+`````
+corr_map = np.random.rand(100, 100)
+analysis = "thr"
+near = 1
+thr = 95
+
+new_corr_map, corr_map, indices, parameter = preprocess(corr_map=corr_map, analysis=analysis, near=near, thr=thr)
+`````
+
+**correlation_with_window** Function
+`````
+data = np.random.rand(50, 100)
+window_length = 3
+
+corr_map_window = correlation_with_window(data, window_length)
+`````
+
+**clustintime** Function
+`````
+data_paths = "/path/to/data.nii.gz"
+mask_path = "/path/to/mask.nii.gz"
+
+clustintime(
+    data_paths,
+    mask_path,
+    component="whole",
+    timings_file=None,
+    correlation="standard",
+    process_type=None,
+    window_size=1,
+    near=1,
+    thr=90,
+    contrast=1,
+    repetition_time=0.5,
+    affinity="euclidean",
+    linkage="ward",
+    algorithm="infomap",
+    consensus=True,
+    n_clusters=5,
+    save_maps=True,
+    saving_dir=".",
+    prefix="example",
+    seed=42,
+    generate_dyneusr_graph=False,
+    title="Example Clustintime Analysis",
+)
+`````
+
+**Command-Line Interface (CLI)**
+Assuming you have a script file named clustintime_script.py, you can run it from the command line as follows:
+`````
+python clustintime_script.py --data_paths /path/to/data.nii.gz --mask_path /path/to/mask.nii.gz --component whole --correlation standard --process_type None --algorithm infomap --consensus --n_clusters 5 --save_maps --saving_dir . --prefix example --seed 42 --generate_dyneusr_graph
+`````
+Make sure to replace /path/to/data.nii.gz and /path/to/mask.nii.gz with the actual paths to your data and mask files. The other parameters can be adjusted based on your analysis requirements.
