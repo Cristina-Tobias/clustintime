@@ -81,8 +81,8 @@ threadpoolctl == 3.1.0
 urllib3 == 1.26.12
 
 
-[!TIP]
-In this repository, there is a requirements.txt file which contains the list above this line. In order to install all the libraries in a single command
+> [!TIP]
+> In this repository, there is a requirements.txt file which contains the list above this line. In order to install all the libraries in a single command
 line, execute:
 
 ``` ruby
