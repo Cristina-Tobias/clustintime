@@ -1,47 +1,48 @@
+# Input
+
 In the clustintime function, the inputs are the parameters or arguments that you can pass to the function.
 Let's go through each parameter and discuss its  meaning:
  
- 
-data_paths (str or path, required): A list of paths to the data files that the function will use for clustering.
+- data_paths (str or path, required): A list of paths to the data files that the function will use for clustering.
 
-mask_path (str or path, required): The path to a mask file, which likely represents a region of interest in the data.
+- mask_path (str or path, required): The path to a mask file, which likely represents a region of interest in the data.
 
-component (str, optional, default="whole"): Specifies which component of the data to use for clustering. It might refer to specific features or channels in the data. The options are `whole`, `positive`, `negative`.
+- component (str, optional, default="whole"): Specifies which component of the data to use for clustering. It might refer to specific features or channels in the data. The options are `whole`, `positive`, `negative`.
 
-timings_file (str or path, optional): Path to a file containing timing information.
+- timings_file (str or path, optional): Path to a file containing timing information.
 
-correlation (str, optional, default="standard"): The type of correlation to use for clustering. It could be Pearson, Spearman, etc. The options are `standard`, `window`.
+- correlation (str, optional, default="standard"): The type of correlation to use for clustering. It could be Pearson, Spearman, etc. The options are `standard`, `window`.
 
-process_type (str, optional, default="None"): The type of data processing to be applied. The options are `None`, `double`, `thr`, `RSS`, `window`
+- process_type (str, optional, default="None"): The type of data processing to be applied. The options are `None`, `double`, `thr`, `RSS`, `window`
 
-window_size (int, optional, default=1): The size of the window for processing data.
+- window_size (int, optional, default=1): The size of the window for processing data.
 
-near (int, optional, default=1): Parameter related to the clustering algorithm.
+- near (int, optional, default=1): Parameter related to the clustering algorithm.
 
-thr (int, optional, default=95): Threshold value for clustering.
+- thr (int, optional, default=95): Threshold value for clustering.
 
-contrast (float, optional, default=1):  Range of values for the correlation matrixes.
+- contrast (float, optional, default=1):  Range of values for the correlation matrixes.
 
-repetition_time (float, optional, default=0.5): The repetition time for the data.
+- repetition_time (float, optional, default=0.5): The repetition time for the data.
 
-affinity (optional, default="euclidean"): The affinity metric for the clustering algorithm.
+- affinity (optional, default="euclidean"): The affinity metric for the clustering algorithm.
 
-linkage (optional, default="ward"): The linkage method for hierarchical clustering.
+- linkage (optional, default="ward"): The linkage method for hierarchical clustering.
 
-algorithm (str, optional, default="infomap"): The clustering algorithm to use (e.g., "infomap"). The options are `infomap`, `Agglomerative`, `Louvain`, `Greedy` and `KMeans`.
+- algorithm (str, optional, default="infomap"): The clustering algorithm to use (e.g., "infomap"). The options are `infomap`, `Agglomerative`, `Louvain`, `Greedy` and `KMeans`.
 
-consensus (bool, optional, default=False): Boolean that indicates whether to use consensus clustering in the algorithm or not.
+- consensus (bool, optional, default=False): Boolean that indicates whether to use consensus clustering in the algorithm or not.
 
-n_clusters (int, optional, default=7): Desired number of groups for the K Means algorithm.
+- n_clusters (int, optional, default=7): Desired number of groups for the K Means algorithm.
 
-save_maps (bool, optional, default=True): Boolean that indicates whether the results must be saved or not.
+- save_maps (bool, optional, default=True): Boolean that indicates whether the results must be saved or not.
 
-saving_dir (str or path, optional, default="."): The directory where the results will be saved.
+- aving_dir (str or path, optional, default="."): The directory where the results will be saved.
 
-prefix (str, optional): A prefix to be added to the saved files.
+- prefix (str, optional): A prefix to be added to the saved files.
 
-seed (optional, default=0): Seed for random number generation.
+- seed (optional, default=0): Seed for random number generation.
 
-generate_dyneusr_graph (bool, optional, default=False): Whether to generate a graph using DyNeUsR.
+- generate_dyneusr_graph (bool, optional, default=False): Whether to generate a graph using DyNeUsR.
 
-title (str, optional): Title for the plot or output.
+- title (str, optional): Title for the plot or output.
