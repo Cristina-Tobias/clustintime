@@ -8,6 +8,8 @@ def test_load_data():
 
 
     assert data_masked.shape == (284,1936)
+    assert str(type(masker)) == "<class 'nilearn.maskers.nifti_masker.NiftiMasker'>"
+    assert nscans == [284]
 
 def test_stupid():
     prueba = np.ones([3,3])
