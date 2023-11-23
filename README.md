@@ -85,6 +85,26 @@ Once you have installed the toolbox,
 
 ## Contributors
 
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/dowdlelt"><img src="https://avatars2.githubusercontent.com/u/15126366?v=4?s=100" width="100px;" alt="Logan Dowdle"/><br /><sub><b>Logan Dowdle</b></sub></a><br /><a href="https://github.com/ME-ICA/tedana/commits?author=dowdlelt" title="Code">💻</a> <a href="#question-dowdlelt" title="Answering Questions">💬</a> <a href="#design-dowdlelt" title="Design">🎨</a> <a href="https://github.com/ME-ICA/tedana/issues?q=author%3Adowdlelt" title="Bug reports">🐛</a> <a href="https://github.com/ME-ICA/tedana/pulls?q=is%3Apr+reviewed-by%3Adowdlelt" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="20%"><a href="http://emdupre.me"><img src="https://avatars3.githubusercontent.com/u/15017191?v=4?s=100" width="100px;" alt="Elizabeth DuPre"/><br /><sub><b>Elizabeth DuPre</b></sub></a><br /><a href="https://github.com/ME-ICA/tedana/commits?author=emdupre" title="Code">💻</a> <a href="https://github.com/ME-ICA/tedana/commits?author=emdupre" title="Documentation">📖</a> <a href="#ideas-emdupre" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-emdupre" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/ME-ICA/tedana/pulls?q=is%3Apr+reviewed-by%3Aemdupre" title="Reviewed Pull Requests">👀</a> <a href="#example-emdupre" title="Examples">💡</a> <a href="https://github.com/ME-ICA/tedana/commits?author=emdupre" title="Tests">⚠️</a> <a href="#question-emdupre" title="Answering Questions">💬</a></td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/marco7877"><img src="https://avatars.githubusercontent.com/u/56403434?v=4?s=100" width="100px;" alt="Marco Flores-Coronado"/><br /><sub><b>Marco Flores-Coronado</b></sub></a><br /><a href="#ideas-marco7877" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/ME-ICA/tedana/commits?author=marco7877" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/javiergcas"><img src="https://avatars1.githubusercontent.com/u/7314358?v=4?s=100" width="100px;" alt="Javier Gonzalez-Castillo"/><br /><sub><b>Javier Gonzalez-Castillo</b></sub></a><br /><a href="#ideas-javiergcas" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/ME-ICA/tedana/commits?author=javiergcas" title="Code">💻</a> <a href="#design-javiergcas" title="Design">🎨</a></td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/handwerkerd"><img src="https://avatars3.githubusercontent.com/u/7406227?v=4?s=100" width="100px;" alt="Dan Handwerker"/><br /><sub><b>Dan Handwerker</b></sub></a><br /><a href="#design-handwerkerd" title="Design">🎨</a> <a href="https://github.com/ME-ICA/tedana/commits?author=handwerkerd" title="Documentation">📖</a> <a href="#example-handwerkerd" title="Examples">💡</a> <a href="https://github.com/ME-ICA/tedana/pulls?q=is%3Apr+reviewed-by%3Ahandwerkerd" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/ME-ICA/tedana/commits?author=handwerkerd" title="Code">💻</a></td>
+    </tr>    
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
 
 ## License
 GNU GENERAL PUBLIC LICENSE (Version 3, 29 June 2007)
