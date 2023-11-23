@@ -3,7 +3,9 @@
 Welcome! This toolbox contains all the functions required to run the whole time clustering pipeline from 
 one command.
 
-<img src=/logo.png height=100 width=100/>
+<p align="center">
+<img src=/logo.png height=200 width=200/>
+</p>
 
 
 ## Motivation
