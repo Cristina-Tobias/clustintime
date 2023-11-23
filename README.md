@@ -96,8 +96,7 @@ Once you have installed the toolbox,
       <td align="center" valign="top" width="20%"><a href="https://github.com/zalteck"><img src="https://github.com/zalteck.png?size=200" width="100px;" alt="Fernando Perez-Bueno"/><br /><sub><b>Fernando Perez-Bueno</b></sub></a><br /> <a href="https://github.com/zalteck/clustintime" title="Code">💻</a> <a href="#testing-zalteck" title="Testing">⚠️</a> </td>
       <td align="center" valign="top" width="20%"><a href="https://github.com/lauradefrutos"><img src="https://github.com/lauradefrutos.png?size=200" width="100px;" alt="Laura de Frutos-Sagastuy"/><br /><sub><b>Laura de Frutos</b></sub></a><br /></a> <a href="https://github.com/lauradefrutos/clustintime/blob/Documentation/README.md" title="Documentation">📖</a> </td>
       <td align="center" valign="top" width="20%"><a href="https://github.com/lmansoo"><img src="https://github.com/lmansoo.png?size=200" width="100px;" alt="Lucia Manso-Ortega"/><br /><sub><b>Lucia Manso-Ortega</b></sub></a><br /><a href="https://github.com/lmansoo/clustintime" title="Code">💻</a> <a href="#testing-lmansoo" title="Testing">⚠️</a> </td>
-    </tr>
- 
+    </tr> 
     </tr>
       <td align="center" valign="top" width="20%"><a href="https://github.com/silvyang"><img src="https://github.com/silvyang.png?size=200" width="100px;" alt="Silvia Yang"/><br /><sub><b>Silvia Yang</b></sub></a><br /></a> <a href="https://github.com/silvyang/clustintime" title="Documentation">📖</a> </td>
     </tr>    
