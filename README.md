@@ -1,12 +1,11 @@
 # Clustintime, a computational and visualization tool for time clustering of fMRI data.
 
-Welcome! This toolbox contains all the functions required to run the whole time clustering pipeline from 
-one command.
-
 <p align="center">
-<img src=/logo.png height=200 width=200/>
+<img src=/logo.png height=250 width=250/>
 </p>
 
+Welcome! This toolbox contains all the functions required to run the whole time clustering pipeline from 
+one command.
 
 ## Motivation
 
