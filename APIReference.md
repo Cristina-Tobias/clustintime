@@ -1,61 +1,172 @@
 # APIReference
 
-This section provides a documentation of all the classes, functions and methods.
+## Overview
 
-## clustintime Module Documentation
+Clustintime is a Python library designed for applying clustering algorithms to spatio-temporal fMRI data. It supports both .nii.gz and .txt files and requires Python 3.6 or above. The required modules include:
 
-**_get_parser Function**
+- numpy
+- matplotlib
+- pandas
 
-`````def _get_parser():
+## Functions and Classes
+
+**load_data** Function
+
+`````
+def load_data(data_paths, mask_paths):
     """
-    Parse command line inputs for clustintime
+    Load and mask data with atlas using NiftiLabelsMasker.
+    """
+`````
+This function loads and masks data with an atlas using NiftiLabelsMasker.
 
-    Returns
-    -------
-    parser.parse_args() : argparse dict
+Arguments:
+- data_paths: Str or path - Full path to the data to be analyzed.
+- mask_paths: Str or path - Full path to the corresponding mask.
+
+Returns:
+- data_masked: Numpy array - Masked data.
+- masker: Masker - Masker object.
+- nscans: List - Number of scans.
+
+**implement_algorithm** Function
+
+``````
+def implement_algorithm(
+    algorithm,
+    consensus,
+    thr,
+    n_clusters,
+    nscans,
+    corr_map,
+    indices,
+    seed,
+    affinity,
+    linkage,
+    visualization_parameters,
+    contrast,
+):
+    """
+    Perform clustering analysis using the specified algorithm.
+    """
+`````
+This function performs clustering analysis using the specified algorithm, considering options such as consensus clustering, threshold, number of clusters, etc.
+
+Parameters:
+- algorithm (str): Desired clustering algorithm for the analysis.
+- consensus (bool): Boolean that indicates whether to use consensus clustering in the algorithm.
+- thr (int): Threshold percentile for processing.
+- n_clusters (int): Desired number of clusters for KMeans algorithm.
+- nscans (list): Number of scans.
+- corr_map (numpy array): Correlation map of the data.
+- indices (range): Range of indices.
+- seed (int): Seed for the algorithm.
+- affinity (str): Affinity parameter for agglomerative clustering.
+- linkage (str): Linkage criterion for agglomerative clustering.
+- visualization_parameters (Visualization): Visualization parameters.
+- contrast (float): Range of values for correlation matrices.
+
+Returns:
+- labels (numpy array): Assigned clusters.
+
+**preprocess** Function
+
+`````
+def preprocess(corr_map, analysis, near, thr):
+    """
+    Preprocess the correlation map based on the specified analysis.
+    """
+`````
+This function preprocesses the correlation map based on the specified analysis, such as thresholding or selecting nearby time-points.
+
+Parameters:
+- corr_map (numpy array): Correlation map of the data.
+- analysis (str): Type of analysis (e.g., "thr", "RSS").
+- near (int): Nearby time-points for RSS processing.
+- thr (int): Threshold percentile for "thr" processing.
+
+Returns:
+- new_corr_map (numpy array): Preprocessed correlation map.
+- corr_map (numpy array): Original correlation map.
+- indices (range): Range of indices.
+- parameter (int): Parameter used for analysis.
+
+**correlation_with_window** Function
+
+`````
+def correlation_with_window(data, window_length):
+    """
+    Calculates the correlation using a sliding window.
     """
 `````
 
-This function defines a command-line argument parser for the clustintime module. It is used to parse user inputs when running clustintime from the command line.
+This function calculates the correlation using a sliding window on fMRI data.
 
-## Arguments:
+Parameters:
+- data (matrix): fMRI data.
+- window_length (int): Size of the sliding window.
 
-- i, --input-file: The name or full path to the file containing the fMRI data (required).
-- m, --mask-file: The name or full path to the file containing the mask for the data (required).
-- com, --component: Desired component of the signal to analyze, with options 'whole', 'positive', 'negative' (optional, default is 'whole').
-- tf, --timings-file: The name or full path to the file(s) containing the onset of the tasks (optional, default is None).
-- cor, --correlation: Desired type of correlation, with options 'standard', 'window' (optional, default is 'standard').
-- p, --processing: The name of the desired type of processing (optional, default is None).
-- ws, --window-size: Window size for processing when '-p' is 'window' (optional, default is 1).
-- n, --near: Number of points to use with RSS when '-p' is 'RSS' (optional, default is 1).
-- thr, --threshold: Threshold percentile when '-p' is 'thr' (optional, default is 95).
-- c, --contrast: Range of values for the correlation maps (optional, default is 1).
-- tr, --tr: Repetition time for the data (optional, default is 0.5).
-- alg, --algorithm: Algorithm to be employed for clustering (optional, default is 'infomap').
-- aff, --affinity: Affinity to use (optional, default is 'euclidean').
-- li, --linkage: Linkage criterion for the 'Agglomerative Clustering' algorithm (optional, default is 'ward').
-- nc, --n-clusters: Number of clusters for some sklearn algorithms (optional, default is 7).
-- sm, --save-maps: Save the generated maps (optional, default is True).
-- con, --consensus: Use consensus in the clustering algorithm (optional, default is False).
-- sd, --saving-dir: The name or full path to the saving directory (optional, default is '.').
-- pre, --prefix: Prefix for the saved data (optional, default is '.').
-- s, --seed: Seed for the KMeans algorithm (optional, default is 0).
-- dyn, --dyneusr: Generate and save DyneuSR map (optional, default is False).
-- t, --title: Title for the figures (optional, default is '').
+Returns:
+- corr_map_window (matrix): Correlation map of the data with the selected window.
 
-**__main__ Block**
-
+**clustintime** Function
 `````
-if __name__ == "__main__":
-    raise RuntimeError(
-        "clustintime/cli/run_clustintime.py should not be run directly; \n"
-        "Please `pip install` clustintime and use the"
-        "`clustintime` command"
-    )
+def clustintime(
+    data_paths,
+    mask_path,
+    component="whole",
+    timings_file=None,
+    correlation="standard",
+    process_type=None,
+    window_size=1,
+    near=1,
+    thr=95,
+    contrast=1,
+    repetition_time=0.5,
+    affinity="euclidean",
+    linkage="ward",
+    algorithm="infomap",
+    consensus=False,
+    n_clusters=7,
+    save_maps=True,
+    saving_dir=".",
+    prefix="",
+    seed=0,
+    generate_dyneusr_graph=False,
+    title="",
+):
+    """
+    Run the main workflow of clustintime.
+    """
 `````
+This function runs the main workflow of clustintime, estimating functional connectivity, processing data, and performing clustering analysis.
 
-This block of code ensures that the module is not run directly but is intended to be installed as part of the clustintime package. Users are encouraged to install clustintime and then use the clustintime command.
+Parameters:
+- data_paths (str or path): Fullpath to the data to be analyzed.
+- mask_path (str or path): Fullpath to the corresponding mask.
+- component (str, optional): Desired component of the signal to analyze.
+- timings_file (str or path, optional): Path to .txt files containing timings of the analyzed task.
+- correlation (str, optional): Desired type of correlation.
+- process_type (str, optional): Desired type of processing.
+- window_size (int, optional): Window size for the correlation option.
+- near (int, optional): Nearby time-points for processing.
+- thr (int, optional): Threshold percentile for processing.
+- contrast (float, optional): Range of values for the correlation matrix.
+- repetition_time (float, optional): Repetition time of the data.
+- algorithm (str, optional): Desired clustering algorithm for the analysis.
+- consensus (bool, optional): Boolean indicating whether to use consensus clustering.
+- n_clusters (int, optional): Desired number of groups for the K Means algorithm.
+- save_maps (bool, optional): Boolean indicating whether to save the results.
+- saving_dir (str or path, optional): Fullpath to the saving path.
+- prefix (str, optional): Prefix for the saved outcomes.
+- seed (int, optional): Seed for the algorithm.
+- generate_dyneusr_graph (bool, optional): Generate a DyNeuSR graph.
+- title (str, optional): Title for the graphs.
 
-- Detailed documentation of all classes, functions, and methods.
-- Include information on parameters, return values, and exceptions.
+## Command-Line Interface (CLI)
+The script also includes a command-line interface (CLI) provided by the _main function. This CLI accepts various command-line arguments for running clustintime with different configurations. Run the script from the command line with appropriate arguments.
+
+## Note
+This documentation provides an overview of the functions and classes in the clustintime script. For more detailed information on each function's parameters and behavior, refer to the code and comments within the script.
+
 - Provide example usage for each API endpoint.
