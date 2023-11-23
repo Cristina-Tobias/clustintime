@@ -12,7 +12,7 @@ import pandas as pd
 from community import community_louvain
 from networkx.algorithms import community
 from sklearn.cluster import AgglomerativeClustering, KMeans
-from clustintime.clustintime.clustintime.processing import Processing
+from clustintime.processing import Processing
 
 def generate_maps(labels, directory, data, masker, prefix):
     """
