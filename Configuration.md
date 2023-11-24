@@ -4,7 +4,7 @@ There are several parameters and settings that can be customized. These settings
 
 Let's go through some of the main customizable configurations:
 
-## Main Function Parameters (clustintime function):
+## Main Function Parameters (clustintime function)
 - data_paths: Full path to the data to be analyzed.
 - mask_path: Full path to the corresponding mask.
 - component: Desired component of the signal to analyze (whole, positive, negative).
@@ -26,7 +26,7 @@ Let's go through some of the main customizable configurations:
 - generate_dyneusr_graph: Generate a DyNeuSR graph.
 - title: Title for the graphs.
 
-## Command Line Interface (CLI) Parameters:
+## Command Line Interface (CLI) Parameters
 The command-line interface allows users to specify these parameters when running the script from the command line.
 
 For example:
@@ -35,7 +35,7 @@ python script.py --data_paths /path/to/data --mask_path /path/to/mask --algorith
 `````
 This command would run the script with the specified data and mask paths, using the Infomap clustering algorithm with 5 clusters.
 
-## Other Configurations:
+## Other Configurations
 Within the code, there are several constants and default values that can be adjusted based on specific needs. For example, default values for certain parameters, file extensions (e.g., .nii.gz, .txt), and required Python version (python 3.6 or above) are set as constants in the script.
 
 Overall, users can customize various aspects of the analysis by adjusting these parameters based on their specific data and research requirements.
