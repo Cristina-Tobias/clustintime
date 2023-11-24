@@ -43,21 +43,21 @@ If you encounter specific issues not covered here, it's advisable to consult the
 
 # Debugging 
 Debugging code, especially when working with complex tools like the "Clustintime" toolbox, is a crucial skill for developers and researchers. Here are some tips for debugging and getting help.
-- Print Statements
+- **Print Statements:**
 Insert print statements at key points in your code to output variable values. This helps you understand the flow of execution and identify potential issues.
-## Use a Debugger
+- **Use a Debugger:**
 Utilize a debugger, such as pdb for Python. Set breakpoints and step through your code to examine variable values at different stages.
-## Check Variable Types and Shapes
+- **Check Variable Types and Shapes:**
 Verify that the types and shapes of your variables match expectations. Print or inspect the types and shapes of key variables using built-in functions.
-## Isolate the Problem
+- **Isolate the Problem:**
 Narrow down the scope of the issue by isolating specific parts of your code. This makes it easier to identify the root cause.
-## Review Documentation
+- **Review Documentation:**
 Refer to the documentation for the toolbox and related libraries. Ensure that you are using functions and parameters correctly.
-## Error Messages
+- **Error Messages:**
 Pay close attention to error messages. They often provide valuable information about what went wrong and where the issue occurred.
-## Logging
+- **Logging:**
 Implement logging to record information about the execution of your code. This can help trace the flow of execution and identify problems.
-## Check Input Data
+- **Check Input Data:**
 Examine your input data. Ensure that it is in the expected format and contains the necessary information.
 
 # Getting Help
@@ -81,3 +81,24 @@ Ensure that you are using the latest version of the toolbox. Bugs may have been 
 If all else fails, consider reaching out to the developers directly. Many projects provide contact information or have dedicated channels for support.
 
 Remember that debugging is a skill that improves with practice. Being systematic, patient, and persistent will help you effectively identify and resolve issues in your code.
+
+
+### extra
+# Debugging 
+Debugging code, especially when working with complex tools like the "Clustintime" toolbox, is a crucial skill for developers and researchers. Here are some tips for debugging and getting help.
+- Print Statements:
+Insert print statements at key points in your code to output variable values. This helps you understand the flow of execution and identify potential issues.
+- Use a Debugger:
+Utilize a debugger, such as pdb for Python. Set breakpoints and step through your code to examine variable values at different stages.
+## Check Variable Types and Shapes
+Verify that the types and shapes of your variables match expectations. Print or inspect the types and shapes of key variables using built-in functions.
+## Isolate the Problem
+Narrow down the scope of the issue by isolating specific parts of your code. This makes it easier to identify the root cause.
+## Review Documentation
+Refer to the documentation for the toolbox and related libraries. Ensure that you are using functions and parameters correctly.
+## Error Messages
+Pay close attention to error messages. They often provide valuable information about what went wrong and where the issue occurred.
+## Logging
+Implement logging to record information about the execution of your code. This can help trace the flow of execution and identify problems.
+## Check Input Data
+Examine your input data. Ensure that it is in the expected format and contains the necessary information.
