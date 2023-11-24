@@ -43,7 +43,7 @@ If you encounter specific issues not covered here, it's advisable to consult the
 
 # Debugging 
 Debugging code, especially when working with complex tools like the "Clustintime" toolbox, is a crucial skill for developers and researchers. Here are some tips for debugging and getting help.
-## Print Statements
+- Print Statements
 Insert print statements at key points in your code to output variable values. This helps you understand the flow of execution and identify potential issues.
 ## Use a Debugger
 Utilize a debugger, such as pdb for Python. Set breakpoints and step through your code to examine variable values at different stages.
