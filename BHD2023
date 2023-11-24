@@ -1,0 +1,57 @@
+# Brainhack Donostia 2023
+<p align="center">
+<img src="https://pbs.twimg.com/profile_images/1660573552385441794/YyyAt7sn_400x400.jpg" height=250 width=250/>
+</p>
+
+
+# Clustintime, a computational and visualization tool for time clustering of fMRI data.
+
+<p align="center">
+<img src="https://github.com/Cristina-Tobias/clustintime/raw/Documentation/logo.png" height=250 width=250/>
+</p>
+
+
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/Cristina-Tobias"><img src="https://github.com/Cristina-Tobias.png?size=200" width="100px;" alt="Cristina Tobias"/><br /><sub><b>Cristina Tobias</b></sub></a><br /><a href="https://github.com/Cristina-Tobias/clustintime/tree/main/clustintime" title="Code">💻</a> <a href="#ideas-Cristina-Tobias" title="Ideas">🤔</a> </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/eurunuela"><img src="https://github.com/eurunuela.png?size=200" width="100px;" alt="Eneko Urunuela"/><br /><sub><b>Eneko Urunuela</b></sub></a><br /> <a href="https://github.com/Cristina-Tobias/clustintime/tree/main/clustintime" title="Code">💻</a> <a href="#ideas-eurunuela" title="Ideas">🤔</a> <a href="#review-eurunuela" title="Review">👀</a>  </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/zalteck"><img src="https://github.com/zalteck.png?size=200" width="100px;" alt="Fernando Perez-Bueno"/><br /><sub><b>Fernando Perez-Bueno</b></sub></a><br /> <a href="https://github.com/zalteck/clustintime" title="Code">💻</a> <a href="#testing-zalteck" title="Testing">⚠️</a> </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/itxasos23"><img src="https://github.com/itxasos23.png?size=200" width="100px;" alt="Itxaso Aizpurua"/><br /><sub><b>Itxaso Aizpurua</b></sub></a><br /></a> <a href="https://github.com/itxasos23/clustintime" title="Code">💻</a> <a href="#testing-itxasos23" title="Testing">⚠️</a> <a href="#review-itxasos23" title="Review">👀</a> </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/lauradefrutos"><img src="https://github.com/lauradefrutos.png?size=200" width="100px;" alt="Laura de Frutos-Sagastuy"/><br /><sub><b>Laura de Frutos-Sagastuy</b></sub></a><br /></a> <a href="https://github.com/lauradefrutos/clustintime/blob/Documentation/README.md" title="Documentation">📖</a> </td>
+    </tr> 
+    </tr>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/lmansoo"><img src="https://github.com/lmansoo.png?size=200" width="100px;" alt="Lucia Manso-Ortega"/><br /><sub><b>Lucia Manso-Ortega</b></sub></a><br /><a href="https://github.com/lmansoo/clustintime" title="Code">💻</a> <a href="#testing-lmansoo" title="Testing">⚠️</a> </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/silvyang"><img src="https://github.com/silvyang.png?size=200" width="100px;" alt="Silvia Yang"/><br /><sub><b>Silvia Yang</b></sub></a><br /></a> <a href="https://github.com/silvyang/clustintime" title="Documentation">📖</a> </td>
+      <td align="center" valign="top" width="20%"><a href="https://github.com/vinferrer"><img src="https://github.com/vinferrer.png?size=200" width="100px;" alt="Vicente Ferrer"/><br /><sub><b>Vicente Ferrer</b></sub></a><br /></a> <a href="https://github.com/Cristina-Tobias/clustintime/tree/main/clustintime" title="Code">💻</a> <a href="#testing-vinferrer" title="Testing">⚠️</a> <a href="#review-vinferrer" title="Review">👀</a>  </td>        
+    </tr>    
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## Quick updates
+
+1. New documentation (11 updates)
+   - New fancy readme
+   - Contributing guide
+   - Configuration
+   - Examples
+   - Getting started
+   - Usage guide
+   - To-Do (future work)
+   - Troubleshooting
+   - API Reference
+   - Input
+   - Output
+3. New Brainhack.yml file to replicate Python environment and facilitate installing the toolbox
+4. New testing branch
+   - 10 new fully working function tests
