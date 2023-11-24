@@ -82,7 +82,7 @@ Once you have installed the toolbox,
 
 ## Getting involved
 
-Do you have any question or suggestion? Open an issue or email Cristina on cristina.tobias@liu.se
+Do you have any question or suggestion? Open an issue or send an email to cristina.tobias@liu.se
 
 ## Contributors
 
