@@ -3,7 +3,7 @@ import random
 import numpy as np
 import pandas as pd
 
-from clustintime.clustering import Clustering
+from clustintime.clustintime.clustering import Clustering
 
 def compute_connectivity_matrix(n_items, labels):
     connectivity_matrix = np.zeros([n_items, n_items])

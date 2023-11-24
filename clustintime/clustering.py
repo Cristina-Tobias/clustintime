@@ -12,7 +12,7 @@ import pandas as pd
 from community import community_louvain
 from networkx.algorithms import community
 from sklearn.cluster import AgglomerativeClustering, KMeans
-from clustintime.processing import Processing
+from clustintime.clustintime.processing import Processing
 
 def generate_maps(labels, directory, data, masker, prefix):
     """
@@ -244,7 +244,7 @@ class Clustering:
     
         corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
     
-        graph = nx.from_numpy_matrix(corr_smooth_binary)  # Again the binary
+        graph = nx.from_numpy_array(corr_smooth_binary)  # Again the binary
         partition = community_louvain.best_partition(graph)
     
         coms_labels = np.zeros(corr_map.shape[0])
@@ -286,7 +286,7 @@ class Clustering:
     
         corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
     
-        graph = nx.from_numpy_matrix(corr_smooth_binary)  # Again the binary
+        graph = nx.from_numpy_array(corr_smooth_binary)  # Again the binary
         partition = list(community.greedy_modularity_communities(graph))
     
         coms_labels = np.zeros(corr_map.shape[0])
