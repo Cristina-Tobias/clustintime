@@ -219,7 +219,7 @@ class Clustering:
         return corr_smooth_binary, results
     
     
-    def louvain(self, thr):
+    def louvain(self, thr, seed):
     
         """
         Louvain's algorithm maximises modularity and implements an extra step to ensure community properties in the network.
@@ -244,8 +244,8 @@ class Clustering:
     
         corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
     
-        graph = nx.from_numpy_array(corr_smooth_binary)  # Again the binary
-        partition = community_louvain.best_partition(graph)
+        graph = nx.from_numpy_array(np.matrix(corr_smooth_binary))  # Again the binary
+        partition = community_louvain.best_partition(graph, random_state=seed)
     
         coms_labels = np.zeros(corr_map.shape[0])
     
@@ -286,7 +286,7 @@ class Clustering:
     
         corr_smooth_binary = corr_map != 0  # Find all the voxels with correlation
     
-        graph = nx.from_numpy_array(corr_smooth_binary)  # Again the binary
+        graph = nx.from_numpy_array(np.matrix(corr_smooth_binary))  # Again the binary
         partition = list(community.greedy_modularity_communities(graph))
     
         coms_labels = np.zeros(corr_map.shape[0])
