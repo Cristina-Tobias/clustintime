@@ -42,7 +42,7 @@ When working with the "Clustintime" toolbox or any similar tool, users may encou
 If you encounter specific issues not covered here, it's advisable to consult the toolbox's documentation, community forums, or reach out to the developers for assistance. Always check for updates and new releases that may address known issues or introduce improvements.
 
 # Debugging 
-Debugging code, especially when working with complex tools like the "Clustintime" toolbox, is a crucial skill for developers and researchers. Here are some tips for debugging and getting help.
+Debugging code, especially when working with complex tools like the "Clustintime" toolbox, is a crucial skill for developers and researchers. Here are some tips for debugging and getting help:
 - **Print Statements:**
 Insert print statements at key points in your code to output variable values. This helps you understand the flow of execution and identify potential issues.
 - **Use a Debugger:**
@@ -61,44 +61,23 @@ Implement logging to record information about the execution of your code. This c
 Examine your input data. Ensure that it is in the expected format and contains the necessary information.
 
 # Getting Help
-## Check the Documentation
+- **Check the Documentation:**
 Always start by checking the official documentation. It provides information about the toolbox's functionalities, parameters, and usage examples.
-## Search Online Forums
+- **Search Online Forums:**
 Look for discussions related to the toolbox on forums like Stack Overflow, GitHub issues, or dedicated community forums. Others may have faced similar issues.
-## GitHub Repository
+- **GitHub Repository:**
 If the toolbox is hosted on GitHub, check the repository's issues section. Look for open or closed issues related to your problem.
-## Community Support
+- **Community Support:**
 Reach out to the community associated with the toolbox. This could be through official forums, mailing lists, or social media channels.
-## Provide Minimal Reproducible Examples
+- **Provide Minimal Reproducible Examples:**
 When seeking help, provide a minimal and reproducible example that demonstrates the issue. This makes it easier for others to understand and assist.
-## Include Error Messages
+- **Include Error Messages:**
 If you encounter error messages, include them in your question or request for help. This helps others diagnose the problem more effectively.
-## Be Specific
+- **Be Specific:**
 Clearly describe the problem you're facing. Include details about your environment, data, and any steps you've taken to debug the issue.
-## Check for Updates
+- **Check for Updates:**
 Ensure that you are using the latest version of the toolbox. Bugs may have been fixed in newer releases.
-## Contact the Developers
+- **Contact the Developers:**
 If all else fails, consider reaching out to the developers directly. Many projects provide contact information or have dedicated channels for support.
 
 Remember that debugging is a skill that improves with practice. Being systematic, patient, and persistent will help you effectively identify and resolve issues in your code.
-
-
-### extra
-# Debugging 
-Debugging code, especially when working with complex tools like the "Clustintime" toolbox, is a crucial skill for developers and researchers. Here are some tips for debugging and getting help.
-- Print Statements:
-Insert print statements at key points in your code to output variable values. This helps you understand the flow of execution and identify potential issues.
-- Use a Debugger:
-Utilize a debugger, such as pdb for Python. Set breakpoints and step through your code to examine variable values at different stages.
-## Check Variable Types and Shapes
-Verify that the types and shapes of your variables match expectations. Print or inspect the types and shapes of key variables using built-in functions.
-## Isolate the Problem
-Narrow down the scope of the issue by isolating specific parts of your code. This makes it easier to identify the root cause.
-## Review Documentation
-Refer to the documentation for the toolbox and related libraries. Ensure that you are using functions and parameters correctly.
-## Error Messages
-Pay close attention to error messages. They often provide valuable information about what went wrong and where the issue occurred.
-## Logging
-Implement logging to record information about the execution of your code. This can help trace the flow of execution and identify problems.
-## Check Input Data
-Examine your input data. Ensure that it is in the expected format and contains the necessary information.
