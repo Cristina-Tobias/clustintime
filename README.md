@@ -68,12 +68,14 @@ urllib3 == 1.26.12
 ```
 
 > [!TIP]
-> In this repository, there is a requirements.txt file which contains the list above this line. In order to install all the libraries in a single command
+> To install the libraries, you have two possible options within this repository:
+>1. There is a requirements.txt file which contains the list above this line. In order to install all the libraries in a single command
 line, execute:
 
 ``` bash
 pip install -r requirements.txt
 ```
+>2. Use the .yml file with the environment to have all the libraries that you will need. For more details check: [Conda managing environments](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) 
 
 ## Example of basic usage
 
