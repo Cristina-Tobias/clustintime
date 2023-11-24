@@ -1,7 +1,6 @@
 # Usage Guide
 
-## Core Components and Features:
-
+## Core Components and Features
 1. Data Loading: The script can handle loading data from .nii.gz files as well as .txt files. It uses the Nilearn library's NiftiMasker for masking and loading data.
 2. Clustering Algorithms: The toolbox supports multiple clustering algorithms, including Infomap, KMeans, Agglomerative, Louvain, and Greedy. Consensus clustering is an option for achieving robust results.
 3. Data Preprocessing: Various preprocessing steps are available, such as thresholding, RSS (Region Sum of Squares), and windowed correlation. The correlation_with_window function calculates correlation using a sliding window.
@@ -11,14 +10,12 @@
 
 Include code snippets and examples for common use cases.
 
-## How to Use:
-
+## How to Use
 Users can run the script from the command line, providing various options and parameters for data analysis.
 
 The clustintime function is the main workflow, where users can specify data paths, clustering parameters, and other analysis options.
 
-## Example Usage:
-
+## Example Usage
 `````clustintime(
     data_paths="path/to/fmri_data.nii.gz",
     mask_path="path/to/mask.nii.gz",
@@ -37,17 +34,15 @@ The clustintime function is the main workflow, where users can specify data path
 )
 `````
 
-## How to Run:
+## How to Run
 The script can be executed from the command line with appropriate arguments.
 
 Command-line arguments are parsed using the _get_parser function.
 
-## Configuration Options and Parameters:
-
+## Configuration Options and Parameters
 Refer to the Input section for more detail.
 
 ## Important Considerations and Best Practices 
-
 1. Data Quality and Preprocessing:
 Ensure that your input fMRI data and mask are of high quality and properly preprocessed.
 Check for artifacts, motion effects, and other sources of noise.
