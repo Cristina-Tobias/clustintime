@@ -2,9 +2,9 @@
 Contributing to an open-source project like the "Clustintime" toolbox can be a rewarding experience. Here are some general guidelines for contributing:
 
 1. Familiarize Yourself with the Project:
-Read Documentation:
+- **Read Documentation:**
 Familiarize yourself with the project's documentation. Understand the project's goals, features, and how to use it.
-Explore Source Code:
+- **Explore Source Code:**
 Take the time to explore the source code. Understand the structure, major components, and coding conventions.
 2. Set Up the Development Environment:
 Install Dependencies:
