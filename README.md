@@ -4,7 +4,7 @@
 <img src=/logo.png height=250 width=250/>
 </p>
 
-Welcome! This toolbox contains all the functions required to run the whole time clustering pipeline from 
+Welcome! This toolbox contains all the functions required to run the clustering pipeline in the temporal domain from 
 one command.
 
 
